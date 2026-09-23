@@ -6,7 +6,7 @@ export const profile = {
   role: 'Machine Learning & Software Engineer',
   location: 'Bangkok, Thailand',
   email: 'wachirawit.kaewdang@gmail.com',
-  github: 'https://github.com/wachirawit-6509612013',
+  github: 'https://github.com/wachirawit-kaewdang',
   linkedin: 'https://www.linkedin.com/in/wachirawit-kaewdang',
   resume: 'Wachirawit_Kaewdang_Resume.pdf',
   summary:
@@ -39,7 +39,7 @@ export const projects = [
       'My part: data collection and preparation, and the training approach and model architecture.',
     ],
     tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy'],
-    link: 'https://github.com/wachirawit-6509612013/Project-CS403',
+    link: 'https://github.com/wachirawit-kaewdang/Project-CS403',
   },
   {
     title: 'Recipe Web Application',
