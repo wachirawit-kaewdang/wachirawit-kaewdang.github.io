@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { profile, projects, skills, education, languages } from './data.js';
+import ProjectCS403 from './ProjectCS403.jsx';
 
 // Vite serves files from /public at the site root; BASE_URL keeps links correct
 // whether the site is deployed at "/" or under a sub-path.
@@ -82,11 +84,16 @@ function ProjectCard({ project }) {
 
       <Tags items={project.tech} />
 
-      {project.link && (
-        <a className="link" href={project.link} target="_blank" rel="noreferrer">
-          View code on GitHub →
-        </a>
-      )}
+      <div className="card-links">
+        {project.caseStudy && (
+          <a className="link" href={project.caseStudy}>Read the case study →</a>
+        )}
+        {project.link && (
+          <a className="link" href={project.link} target="_blank" rel="noreferrer">
+            Code on GitHub →
+          </a>
+        )}
+      </div>
     </article>
   );
 }
@@ -154,17 +161,45 @@ function Contact() {
   );
 }
 
+// Tiny hash router: "#/cs403" shows the case study, anything else shows the home page.
+// Hash URLs work on GitHub Pages without any server configuration.
+function useHash() {
+  const [hash, setHash] = useState(window.location.hash);
+  useEffect(() => {
+    const onChange = () => setHash(window.location.hash);
+    window.addEventListener('hashchange', onChange);
+    return () => window.removeEventListener('hashchange', onChange);
+  }, []);
+  return hash;
+}
+
 export default function App() {
+  const hash = useHash();
+  const isCaseStudy = hash === '#/cs403';
+
+  // After switching pages, jump to the right place.
+  useEffect(() => {
+    if (isCaseStudy) {
+      window.scrollTo(0, 0);
+    } else if (hash.length > 1) {
+      document.getElementById(hash.slice(1))?.scrollIntoView();
+    }
+  }, [hash, isCaseStudy]);
+
   return (
     <>
       <Header />
-      <main>
-        <Hero />
-        <Projects />
-        <Skills />
-        <Background />
-        <Contact />
-      </main>
+      {isCaseStudy ? (
+        <ProjectCS403 />
+      ) : (
+        <main>
+          <Hero />
+          <Projects />
+          <Skills />
+          <Background />
+          <Contact />
+        </main>
+      )}
       <footer className="container footer">
         © {new Date().getFullYear()} {profile.name} · Built with React + Vite
       </footer>

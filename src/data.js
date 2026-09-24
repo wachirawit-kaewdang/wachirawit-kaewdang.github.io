@@ -18,27 +18,28 @@ export const profile = {
 
 export const projects = [
   {
-    title: 'Stock Price Direction Prediction with Explainable AI',
+    title: 'Stock Direction Prediction with Explainable AI',
     context: 'Senior project (CS403) · 2-person team',
     featured: true,
     summary:
       'An LSTM with self-attention that predicts 3-day price direction for 10 US stocks across ' +
-      '5 sectors — and a SHAP analysis that checks whether the model reasons the way a financial ' +
-      'analyst would.',
+      '5 sectors, used to test whether SHAP explains a model better than plain correlation. ' +
+      'It also includes an honest check against a naive baseline.',
     metrics: [
-      { value: '0.710', label: 'Average F1' },
-      { value: '0.754', label: 'Best F1 (JPM)' },
-      { value: '27', label: 'Engineered features' },
       { value: '10', label: 'Stocks · 5 sectors' },
+      { value: '27', label: 'Engineered features' },
+      { value: '3', label: 'Models compared' },
+      { value: '6 / 10', label: 'Stocks with bond yield in SHAP top 5' },
     ],
     points: [
-      'LSTM + self-attention (3 layers, hidden 128) trained with Focal Loss for class imbalance.',
-      'Benchmarked against Random Forest and Logistic Regression; an LSTM + RF + LR majority-vote ensemble became the final model.',
-      'SHAP (KernelExplainer) attribution compared with Pearson correlation, including rank-disagreement and sector-level analysis.',
-      'Fundamental data (P/E, EPS) was tested and deliberately excluded: quarterly values fill-forwarded into a daily series added noise, not signal.',
+      'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
+      'SHAP and Pearson correlation ranked features very differently, by roughly 5 to 12 positions per feature on average.',
+      'SHAP surfaced bond yield as a key driver (#1 for JPM and AMZN) that correlation ranked low.',
+      'Baseline check: the tuned model matched an "always predict up" baseline, so I report it honestly, along with what I would change.',
       'My part: data collection and preparation, and the training approach and model architecture.',
     ],
     tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy'],
+    caseStudy: '#/cs403',
     link: 'https://github.com/wachirawit-kaewdang/Project-CS403',
   },
   {
