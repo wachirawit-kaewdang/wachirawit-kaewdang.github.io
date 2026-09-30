@@ -73,7 +73,7 @@ export const skills = [
 
 export const education = {
   school: 'Thammasat University',
-  degree: 'BSc Computer Science — Software Engineering track',
+  degree: 'BSc Computer Science (Computer and Information Science major) — Software Engineering track',
   period: '2022 – May 2026',
 };
 
