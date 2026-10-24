@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Keep binary assets byte-exact (the resume PDF is ASCII85-encoded and looks like text)
+*.pdf binary
+*.png binary
+*.webp binary
