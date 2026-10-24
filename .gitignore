@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Markdown stays local, never committed (README.md is already tracked)
+*.md
+
+# Impeccable review captures (regenerated on demand)
+.impeccable/review/

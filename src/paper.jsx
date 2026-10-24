@@ -1,0 +1,59 @@
+// Pieces of the preprint look shared by the home page and the case study.
+
+import { jumpTo } from './paper-utils.js';
+
+// A hyperref-style cross-reference ("Table 1", "§1.1") to something on the same page.
+export function Ref({ to, children }) {
+  return (
+    <a className="ref" href={`#${to}`} onClick={(e) => jumpTo(to) && e.preventDefault()}>
+      {children}
+    </a>
+  );
+}
+
+// Links separated by middots. Each separator stays on the line of the link before it, so a
+// wrapped line never opens with "·".
+export function LinkLine({ className, children }) {
+  const links = [children].flat().filter(Boolean);
+  return (
+    <p className={className}>
+      {links.map((link, i) => (
+        <span key={i} className="linkitem">
+          {link}
+          {i < links.length - 1 && <span className="sep" aria-hidden="true">·</span>}
+        </span>
+      ))}
+    </p>
+  );
+}
+
+// A booktabs table with its numbered caption above, as in a paper. The first column is the
+// row label; the rest are figures, right-aligned in tabular numerals.
+export function NumberedTable({ number, caption, columns, rows }) {
+  return (
+    <div className="results" id={`table-${number}`} tabIndex={-1}>
+      <table>
+        <caption>
+          <span className="caplabel">Table {number}.</span> {caption}
+        </caption>
+        <thead>
+          <tr>
+            {columns.map((col) => (
+              <th key={col} scope="col">{col}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([label, ...values]) => (
+            <tr key={label}>
+              <th scope="row">{label}</th>
+              {values.map((v, i) => (
+                <td key={i}>{v}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
