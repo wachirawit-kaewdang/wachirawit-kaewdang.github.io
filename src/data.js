@@ -25,12 +25,21 @@ export const projects = [
       'An LSTM with self-attention that predicts 3-day price direction for 10 US stocks across ' +
       '5 sectors, used to test whether SHAP explains a model better than plain correlation. ' +
       'It also includes an honest check against a naive baseline.',
-    metrics: [
-      { value: '10', label: 'Stocks · 5 sectors' },
-      { value: '27', label: 'Engineered features' },
-      { value: '3', label: 'Models compared' },
-      { value: '6 / 10', label: 'Stocks with bond yield in SHAP top 5' },
-    ],
+    // Averages over the 10 stocks, recomputed from the per-stock outputs in stock_project.ipynb.
+    // The LSTM ROC-AUC is not printed in the notebook; it comes from the repo README.
+    results: {
+      caption:
+        'F1 and ROC-AUC averaged over the 10 stocks, on a test set of the last 20% of ' +
+        'Jan 2020 – Apr 2025, split by date. ROC-AUC of 0.5 is chance.',
+      columns: ['Model', 'F1', 'ROC-AUC'],
+      rows: [
+        // A figure space pads the two-decimal value so the column still lines up by place.
+        ['LSTM + self-attention', '0.710', '≈0.57 '],
+        ['Ensemble (LSTM + RF + LR, soft vote)', '0.663', '0.568'],
+        ['Logistic Regression', '0.525', '0.555'],
+        ['Random Forest', '0.374', '0.546'],
+      ],
+    },
     points: [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
       'SHAP and Pearson correlation ranked features very differently, by roughly 5 to 12 positions per feature on average.',
@@ -38,7 +47,7 @@ export const projects = [
       'Baseline check: the tuned model matched an "always predict up" baseline, so I report it honestly, along with what I would change.',
       'My part: data collection and preparation, and the training approach and model architecture.',
     ],
-    tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy'],
+    tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter'],
     caseStudy: '#/cs403',
     link: 'https://github.com/wachirawit-kaewdang/Project-CS403',
   },
@@ -51,7 +60,7 @@ export const projects = [
     points: [
       'My part: the MyRecipe management feature, recipe deletion, and wiring the frontend to the backend API.',
     ],
-    tech: ['React', 'Vite', 'JavaScript', 'Node.js', 'Express', 'REST'],
+    tech: ['React', 'Vite', 'JavaScript', 'Node.js', 'Express', 'REST APIs'],
   },
   {
     title: 'HTTP Web Server from Scratch',

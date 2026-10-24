@@ -1,0 +1,58 @@
+<!doctype html>
+<!--
+  Source for public/og-image.png, the 1200×630 link-preview card. Not part of the site build.
+  Regenerate with the dev server running: capture http://localhost:5173/og/og-image.html at
+  1200×630 (any headless Chrome screenshot), then copy the PNG to public/og-image.png.
+  The words come from src/data.js; keep them in sync when the profile changes.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>og-image</title>
+    <style>
+      @font-face {
+        font-family: 'STIX Two Text';
+        font-weight: 400;
+        src: url('/node_modules/@fontsource/stix-two-text/files/stix-two-text-latin-400-normal.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'STIX Two Text';
+        font-weight: 600;
+        src: url('/node_modules/@fontsource/stix-two-text/files/stix-two-text-latin-600-normal.woff2') format('woff2');
+      }
+      html, body { margin: 0; }
+      body {
+        width: 1200px; height: 630px; box-sizing: border-box;
+        padding: 0 120px;
+        display: flex; flex-direction: column;
+        background: #ffffff; color: #16181d;
+        font-family: 'STIX Two Text', serif; font-variant-numeric: lining-nums;
+      }
+      .head {
+        display: flex; justify-content: space-between;
+        font-size: 22px; color: #4a4f59;
+        padding: 34px 0 18px; border-bottom: 1px solid #dadde2;
+      }
+      main { text-align: center; margin: auto 0; padding-bottom: 28px; }
+      h1 { font-size: 64px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.1; margin: 0 0 24px; white-space: nowrap; }
+      h1 span { font-weight: 400; color: #4a4f59; }
+      .author { font-size: 30px; margin: 0 0 6px; }
+      .affil { font-size: 26px; color: #4a4f59; margin: 0; }
+      .abstract { font-size: 25px; line-height: 1.45; text-align: left; margin: 48px 50px 0; }
+      .abstract b { font-weight: 600; margin-right: 0.25em; }
+      .link { color: #1f4fd1; }
+    </style>
+  </head>
+  <body>
+    <div class="head"><span class="link">wachirawit-kaewdang.github.io</span><span>Portfolio</span></div>
+    <main>
+      <h1>Wachirawit Kaewdang <span>(Ohm)</span></h1>
+      <p class="author">Machine Learning &amp; Software Engineer</p>
+      <p class="affil">Thammasat University · Bangkok, Thailand</p>
+      <p class="abstract">
+        <b>Abstract.</b> Machine learning for time series, with a focus on model explainability
+        rather than accuracy alone, and full-stack web development in React and Node.js.
+      </p>
+    </main>
+  </body>
+</html>
