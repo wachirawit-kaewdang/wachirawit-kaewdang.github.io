@@ -1,0 +1,482 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T08:03:16.816Z",
+  "title": "Design System: Wachirawit Kaewdang, Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 90)",
+        "mode": "light",
+        "tonalRamp": [
+          "oklch(15% 0.000 90)",
+          "oklch(25% 0.000 90)",
+          "oklch(35% 0.000 90)",
+          "oklch(45% 0.000 90)",
+          "oklch(55% 0.000 90)",
+          "oklch(65% 0.000 90)",
+          "oklch(80% 0.000 90)",
+          "oklch(95% 0.000 90)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Press Ink",
+        "canonical": "#16181d",
+        "oklch": "oklch(20.9% 0.010 268)",
+        "mode": "light",
+        "tonalRamp": [
+          "oklch(15% 0.010 268)",
+          "oklch(25% 0.010 268)",
+          "oklch(35% 0.010 268)",
+          "oklch(45% 0.010 268)",
+          "oklch(55% 0.010 268)",
+          "oklch(65% 0.010 268)",
+          "oklch(80% 0.010 268)",
+          "oklch(95% 0.010 268)"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Faded Ink",
+        "canonical": "#4a4f59",
+        "oklch": "oklch(42.7% 0.018 264)",
+        "mode": "light",
+        "tonalRamp": [
+          "oklch(15% 0.018 264)",
+          "oklch(25% 0.018 264)",
+          "oklch(35% 0.018 264)",
+          "oklch(45% 0.018 264)",
+          "oklch(55% 0.018 264)",
+          "oklch(65% 0.018 264)",
+          "oklch(80% 0.018 264)",
+          "oklch(95% 0.018 264)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Table Rule",
+        "canonical": "#16181d",
+        "oklch": "oklch(20.9% 0.010 268)",
+        "mode": "light",
+        "tonalRamp": [
+          "oklch(15% 0.010 268)",
+          "oklch(25% 0.010 268)",
+          "oklch(35% 0.010 268)",
+          "oklch(45% 0.010 268)",
+          "oklch(55% 0.010 268)",
+          "oklch(65% 0.010 268)",
+          "oklch(80% 0.010 268)",
+          "oklch(95% 0.010 268)"
+        ]
+      },
+      "hair": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#dadde2",
+        "oklch": "oklch(89.7% 0.008 261)",
+        "mode": "light",
+        "tonalRamp": [
+          "oklch(15% 0.008 261)",
+          "oklch(25% 0.008 261)",
+          "oklch(35% 0.008 261)",
+          "oklch(45% 0.008 261)",
+          "oklch(55% 0.008 261)",
+          "oklch(65% 0.008 261)",
+          "oklch(80% 0.008 261)",
+          "oklch(95% 0.008 261)"
+        ]
+      },
+      "link": {
+        "role": "primary",
+        "displayName": "Hyperlink Blue",
+        "canonical": "#1f4fd1",
+        "oklch": "oklch(48.4% 0.207 264)",
+        "mode": "light",
+        "tonalRamp": [
+          "oklch(15% 0.207 264)",
+          "oklch(25% 0.207 264)",
+          "oklch(35% 0.207 264)",
+          "oklch(45% 0.207 264)",
+          "oklch(55% 0.207 264)",
+          "oklch(65% 0.207 264)",
+          "oklch(80% 0.207 264)",
+          "oklch(95% 0.207 264)"
+        ]
+      },
+      "paper-dark": {
+        "role": "neutral",
+        "displayName": "Dark Stock",
+        "canonical": "#141415",
+        "oklch": "oklch(19.2% 0.002 286)",
+        "mode": "dark",
+        "tonalRamp": [
+          "oklch(15% 0.002 286)",
+          "oklch(25% 0.002 286)",
+          "oklch(35% 0.002 286)",
+          "oklch(45% 0.002 286)",
+          "oklch(55% 0.002 286)",
+          "oklch(65% 0.002 286)",
+          "oklch(80% 0.002 286)",
+          "oklch(95% 0.002 286)"
+        ]
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Press Ink (dark)",
+        "canonical": "#e6e7ea",
+        "oklch": "oklch(92.8% 0.004 271)",
+        "mode": "dark",
+        "tonalRamp": [
+          "oklch(15% 0.004 271)",
+          "oklch(25% 0.004 271)",
+          "oklch(35% 0.004 271)",
+          "oklch(45% 0.004 271)",
+          "oklch(55% 0.004 271)",
+          "oklch(65% 0.004 271)",
+          "oklch(80% 0.004 271)",
+          "oklch(95% 0.004 271)"
+        ]
+      },
+      "ink-soft-dark": {
+        "role": "neutral",
+        "displayName": "Faded Ink (dark)",
+        "canonical": "#a6abb5",
+        "oklch": "oklch(74.0% 0.015 264)",
+        "mode": "dark",
+        "tonalRamp": [
+          "oklch(15% 0.015 264)",
+          "oklch(25% 0.015 264)",
+          "oklch(35% 0.015 264)",
+          "oklch(45% 0.015 264)",
+          "oklch(55% 0.015 264)",
+          "oklch(65% 0.015 264)",
+          "oklch(80% 0.015 264)",
+          "oklch(95% 0.015 264)"
+        ]
+      },
+      "rule-dark": {
+        "role": "neutral",
+        "displayName": "Table Rule (dark)",
+        "canonical": "#c9ccd2",
+        "oklch": "oklch(84.5% 0.009 265)",
+        "mode": "dark",
+        "tonalRamp": [
+          "oklch(15% 0.009 265)",
+          "oklch(25% 0.009 265)",
+          "oklch(35% 0.009 265)",
+          "oklch(45% 0.009 265)",
+          "oklch(55% 0.009 265)",
+          "oklch(65% 0.009 265)",
+          "oklch(80% 0.009 265)",
+          "oklch(95% 0.009 265)"
+        ]
+      },
+      "hair-dark": {
+        "role": "neutral",
+        "displayName": "Hairline (dark)",
+        "canonical": "#2c3038",
+        "oklch": "oklch(30.9% 0.015 264)",
+        "mode": "dark",
+        "tonalRamp": [
+          "oklch(15% 0.015 264)",
+          "oklch(25% 0.015 264)",
+          "oklch(35% 0.015 264)",
+          "oklch(45% 0.015 264)",
+          "oklch(55% 0.015 264)",
+          "oklch(65% 0.015 264)",
+          "oklch(80% 0.015 264)",
+          "oklch(95% 0.015 264)"
+        ]
+      },
+      "link-dark": {
+        "role": "primary",
+        "displayName": "Hyperlink Blue (dark)",
+        "canonical": "#8fb0ff",
+        "oklch": "oklch(76.4% 0.120 266)",
+        "mode": "dark",
+        "tonalRamp": [
+          "oklch(15% 0.120 266)",
+          "oklch(25% 0.120 266)",
+          "oklch(35% 0.120 266)",
+          "oklch(45% 0.120 266)",
+          "oklch(55% 0.120 266)",
+          "oklch(65% 0.120 266)",
+          "oklch(80% 0.120 266)",
+          "oklch(95% 0.120 266)"
+        ]
+      },
+      "tint": {
+        "role": "primary",
+        "displayName": "Landing Tint",
+        "canonical": "color-mix(in srgb, #1f4fd1 12%, transparent)",
+        "mode": "light",
+        "tonalRamp": [
+          "oklch(15% 0.207 264)",
+          "oklch(25% 0.207 264)",
+          "oklch(35% 0.207 264)",
+          "oklch(45% 0.207 264)",
+          "oklch(55% 0.207 264)",
+          "oklch(65% 0.207 264)",
+          "oklch(80% 0.207 264)",
+          "oklch(95% 0.207 264)"
+        ]
+      },
+      "tint-dark": {
+        "role": "primary",
+        "displayName": "Landing Tint (dark)",
+        "canonical": "color-mix(in srgb, #8fb0ff 18%, transparent)",
+        "mode": "dark",
+        "tonalRamp": [
+          "oklch(15% 0.120 266)",
+          "oklch(25% 0.120 266)",
+          "oklch(35% 0.120 266)",
+          "oklch(45% 0.120 266)",
+          "oklch(55% 0.120 266)",
+          "oklch(65% 0.120 266)",
+          "oklch(80% 0.120 266)",
+          "oklch(95% 0.120 266)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The name in the centred title block only."
+      },
+      "headline": {
+        "displayName": "Section heading",
+        "purpose": "Numbered section headings (1 Projects)."
+      },
+      "title": {
+        "displayName": "Subsection heading",
+        "purpose": "Numbered subsection headings (1.1 ...)."
+      },
+      "title-run-in": {
+        "displayName": "Run-in heading",
+        "purpose": "Paragraph-level heads inside a project, set 600 italic."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text and lists; 1.0625rem at <=600px."
+      },
+      "body-abstract": {
+        "displayName": "Abstract",
+        "purpose": "The indented abstract block with bold run-in labels."
+      },
+      "label": {
+        "displayName": "Meta",
+        "purpose": "Stack / Code lines and Also-used lines in Faded Ink."
+      },
+      "table": {
+        "displayName": "Table",
+        "purpose": "Results table body, lining tabular figures."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Table caption above the table, 600 \"Table N.\" label."
+      },
+      "nav": {
+        "displayName": "Running head",
+        "purpose": "Numbered section links; 0.92rem at <=600px."
+      },
+      "footer": {
+        "displayName": "Footer",
+        "purpose": "Copyright line."
+      }
+    },
+    "fonts": {
+      "family": "STIX Two Text",
+      "source": "@fontsource/stix-two-text, latin subset (imported in src/main.jsx)",
+      "weights": [
+        "400",
+        "400 italic",
+        "600",
+        "600 italic"
+      ],
+      "smallCaps": "None. The latin subset has no true small caps, so none are used or synthesised."
+    },
+    "shadows": [],
+    "borders": [
+      {
+        "name": "booktabs-heavy",
+        "value": "1.5px solid var(--rule)",
+        "purpose": "Top and bottom rule of a results table."
+      },
+      {
+        "name": "booktabs-mid",
+        "value": "0.75px solid var(--rule)",
+        "purpose": "Rule under the table head."
+      },
+      {
+        "name": "hairline",
+        "value": "1px solid var(--hair)",
+        "purpose": "Under the running head; between consecutive subsections."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 2px solid var(--link); outline-offset: 3px; border-radius: 2px",
+        "purpose": ":focus-visible only; programmatic focus on tabindex=-1 targets shows no outline."
+      }
+    ],
+    "motion": [
+      {
+        "name": "xref-landing-tint",
+        "value": "animation: flash 1.6s cubic-bezier(0.16, 1, 0.3, 1); background var(--tint) to transparent",
+        "purpose": "Brief tint on a cross-reference target after the jump. Removed under prefers-reduced-motion: reduce."
+      },
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The only easing in the system (landing tint)."
+      },
+      {
+        "name": "scroll",
+        "value": "scroll-behavior: smooth",
+        "purpose": "Only under prefers-reduced-motion: no-preference; JS cross-reference jumps use behavior auto under reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact",
+        "value": "600px",
+        "query": "(max-width: 600px)",
+        "purpose": "Smaller body, hidden running-head name, full-width nav, narrower abstract indent and table padding."
+      },
+      {
+        "name": "two-column-lists",
+        "value": "720px",
+        "query": "(min-width: 720px)",
+        "purpose": "Skills and education definition lists become 12rem / 1fr rows."
+      }
+    ],
+    "colorScheme": "prefers-color-scheme: dark swaps token values on :root; color-scheme: light dark; no manual toggle."
+  },
+  "components": [
+    {
+      "name": "Link",
+      "kind": "custom",
+      "refersTo": "link",
+      "description": "Every followable link: blue, thin offset underline that firms up on hover.",
+      "html": "<p class=\"ds-p\">See the <a class=\"ds-link\" href=\"#\">repository</a> for code.</p>",
+      "css": ":host{--paper:#ffffff;--ink:#16181d;--ink-soft:#4a4f59;--rule:#16181d;--hair:#dadde2;--link:#1f4fd1;--tint:color-mix(in srgb, var(--link) 12%, transparent);--font-text:'STIX Two Text', 'STIX Two', 'Times New Roman', Times, serif;}.ds-p{font-family:var(--font-text);font-size:1.125rem;line-height:1.55;color:var(--ink);background:var(--paper);margin:0;padding:12px;}.ds-link{color:var(--link);text-decoration-line:underline;text-decoration-thickness:1px;text-underline-offset:0.18em;text-decoration-color:color-mix(in srgb, var(--link) 40%, transparent);}.ds-link:hover{text-decoration-color:currentColor;}.ds-link:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:2px;}"
+    },
+    {
+      "name": "Contact line (primary link)",
+      "kind": "button",
+      "refersTo": "link",
+      "description": "The system has no buttons; the call to action is the first link in a middot line, set at 600.",
+      "html": "<p class=\"ds-contact\"><a class=\"ds-link ds-primary\" href=\"#\">Résumé (PDF)</a><span class=\"ds-sep\">·</span><a class=\"ds-link\" href=\"#\">GitHub</a><span class=\"ds-sep\">·</span><a class=\"ds-link\" href=\"#\">Email</a></p>",
+      "css": ":host{--paper:#ffffff;--ink:#16181d;--ink-soft:#4a4f59;--rule:#16181d;--hair:#dadde2;--link:#1f4fd1;--tint:color-mix(in srgb, var(--link) 12%, transparent);--font-text:'STIX Two Text', 'STIX Two', 'Times New Roman', Times, serif;}.ds-contact{font-family:var(--font-text);font-size:1.125rem;line-height:1.55;color:var(--ink);background:var(--paper);margin:0;padding:12px;text-align:center;}.ds-link{color:var(--link);text-decoration-line:underline;text-decoration-thickness:1px;text-underline-offset:0.18em;text-decoration-color:color-mix(in srgb, var(--link) 40%, transparent);}.ds-link:hover{text-decoration-color:currentColor;}.ds-link:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:2px;}.ds-primary{font-weight:600;}.ds-sep{margin:0 0.6em;color:var(--ink-soft);}"
+    },
+    {
+      "name": "Running head",
+      "kind": "nav",
+      "refersTo": "running-head",
+      "description": "Sticky 3rem header: name left, numbered section links right, hairline beneath.",
+      "html": "<header class=\"ds-runhead\"><a class=\"ds-name\" href=\"#\">Wachirawit Kaewdang</a><nav class=\"ds-nav\"><a href=\"#\"><span class=\"ds-num\">1</span>Projects</a><a href=\"#\"><span class=\"ds-num\">2</span>Skills</a><a href=\"#\"><span class=\"ds-num\">3</span>Education</a><a href=\"#\"><span class=\"ds-num\">4</span>Contact</a></nav></header>",
+      "css": ":host{--paper:#ffffff;--ink:#16181d;--ink-soft:#4a4f59;--rule:#16181d;--hair:#dadde2;--link:#1f4fd1;--tint:color-mix(in srgb, var(--link) 12%, transparent);--font-text:'STIX Two Text', 'STIX Two', 'Times New Roman', Times, serif;}.ds-runhead{font-family:var(--font-text);background:var(--paper);border-bottom:1px solid var(--hair);display:flex;align-items:center;justify-content:space-between;gap:1rem;height:3rem;padding:0 16px;}.ds-runhead a{color:var(--ink);text-decoration:none;}.ds-name{font-weight:600;white-space:nowrap;}.ds-nav{display:flex;gap:0.25rem 1.1rem;font-size:0.95rem;}.ds-nav a{color:var(--ink-soft);padding:0.7rem 0;}.ds-nav a:hover{color:var(--ink);}.ds-runhead a:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:2px;}.ds-num{font-variant-numeric:lining-nums tabular-nums;margin-right:0.3em;}"
+    },
+    {
+      "name": "Section and subsection heading",
+      "kind": "custom",
+      "refersTo": "subsection",
+      "description": "Numbered 600 headings with lining figures, italic context line, hairline between subsections.",
+      "html": "<section class=\"ds-sec\"><h2><span class=\"ds-num\">1</span>Projects</h2><article class=\"ds-sub\"><h3><span class=\"ds-num\">1.1</span>Stock Price Direction Prediction</h3><p class=\"ds-context\">Senior project (CS403) · 2-person team</p></article><article class=\"ds-sub\"><h3><span class=\"ds-num\">1.2</span>Recipe Web Application</h3><p class=\"ds-context\">CS369 · 5-person team</p></article></section>",
+      "css": ":host{--paper:#ffffff;--ink:#16181d;--ink-soft:#4a4f59;--rule:#16181d;--hair:#dadde2;--link:#1f4fd1;--tint:color-mix(in srgb, var(--link) 12%, transparent);--font-text:'STIX Two Text', 'STIX Two', 'Times New Roman', Times, serif;}.ds-sec{font-family:var(--font-text);color:var(--ink);background:var(--paper);padding:12px;line-height:1.55;}.ds-sec h2{font-size:1.4rem;font-weight:600;line-height:1.25;margin:0 0 1rem;}.ds-sec h3{font-size:1.15rem;font-weight:600;line-height:1.25;margin:0 0 0.25rem;}.ds-num{font-variant-numeric:lining-nums tabular-nums;margin-right:0.6em;}.ds-sub{padding:0.75rem 0 1.25rem;}.ds-sub+.ds-sub{border-top:1px solid var(--hair);padding-top:1.75rem;}.ds-context{font-style:italic;color:var(--ink-soft);margin:0;}"
+    },
+    {
+      "name": "Booktabs results table",
+      "kind": "card",
+      "refersTo": "results-table",
+      "description": "The signature evidence block: caption above, heavy top and bottom rules, light mid rule, right-aligned tabular figures.",
+      "html": "<div class=\"ds-results\"><table><caption><span class=\"ds-cap\">Table 1.</span> F1 and ROC-AUC averaged over 10 stocks.</caption><thead><tr><th>Model</th><th>F1</th><th>ROC-AUC</th></tr></thead><tbody><tr><th>LSTM + self-attention</th><td>0.710</td><td>≈0.57</td></tr><tr><th>Logistic Regression</th><td>0.525</td><td>0.555</td></tr><tr><th>Random Forest</th><td>0.374</td><td>0.546</td></tr></tbody></table></div>",
+      "css": ":host{--paper:#ffffff;--ink:#16181d;--ink-soft:#4a4f59;--rule:#16181d;--hair:#dadde2;--link:#1f4fd1;--tint:color-mix(in srgb, var(--link) 12%, transparent);--font-text:'STIX Two Text', 'STIX Two', 'Times New Roman', Times, serif;}.ds-results{font-family:var(--font-text);color:var(--ink);background:var(--paper);padding:12px;overflow-x:auto;}.ds-results table{border-collapse:collapse;font-size:1rem;line-height:1.55;min-width:min(100%, 34rem);border-top:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule);font-variant-numeric:lining-nums;}.ds-results caption{caption-side:top;text-align:left;padding-bottom:0.6rem;font-size:0.95rem;line-height:1.45;}.ds-cap{font-weight:600;}.ds-results thead th{border-bottom:0.75px solid var(--rule);font-weight:600;}.ds-results th,.ds-results td{padding:0.4rem 2rem 0.4rem 0;text-align:left;vertical-align:baseline;}.ds-results tbody tr:first-child>*{padding-top:0.55rem;}.ds-results tbody tr:last-child>*{padding-bottom:0.55rem;}.ds-results tbody th{font-weight:400;}.ds-results td,.ds-results thead th:not(:first-child){text-align:right;font-variant-numeric:lining-nums tabular-nums;white-space:nowrap;}.ds-results td:last-child,.ds-results thead th:last-child{padding-right:0;}"
+    },
+    {
+      "name": "Cross-reference",
+      "kind": "custom",
+      "refersTo": "link",
+      "description": "Hyperref-style pointer that jumps to its target and tints it for 1.6s; no tint under reduced motion.",
+      "html": "<div class=\"ds-wrap\"><p class=\"ds-p\">Main result: <a class=\"ds-link\" href=\"#\" onclick=\"var t=this.closest('.ds-wrap').querySelector('.ds-target');t.classList.remove('ds-flash');void t.offsetWidth;t.classList.add('ds-flash');return false;\">Table 1</a> in §1.1.</p><div class=\"ds-target\"><strong>Table 1.</strong> The landing target.</div></div>",
+      "css": ":host{--paper:#ffffff;--ink:#16181d;--ink-soft:#4a4f59;--rule:#16181d;--hair:#dadde2;--link:#1f4fd1;--tint:color-mix(in srgb, var(--link) 12%, transparent);--font-text:'STIX Two Text', 'STIX Two', 'Times New Roman', Times, serif;}.ds-wrap{font-family:var(--font-text);font-size:1.125rem;line-height:1.55;color:var(--ink);background:var(--paper);padding:12px;}.ds-p{margin:0 0 0.85rem;}.ds-link{color:var(--link);text-decoration-line:underline;text-decoration-thickness:1px;text-underline-offset:0.18em;text-decoration-color:color-mix(in srgb, var(--link) 40%, transparent);}.ds-link:hover{text-decoration-color:currentColor;}.ds-link:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:2px;}.ds-target{padding:0.75rem 0;border-radius:2px;}.ds-flash{animation:ds-flash 1.6s cubic-bezier(0.16, 1, 0.3, 1);}@keyframes ds-flash{from{background:var(--tint);}to{background:transparent;}}@media (prefers-reduced-motion: reduce){.ds-flash{animation:none;}}"
+    },
+    {
+      "name": "Abstract",
+      "kind": "custom",
+      "refersTo": "abstract",
+      "description": "Indented abstract with bold run-in labels; availability in Faded Ink.",
+      "html": "<section class=\"ds-abstract\"><p><strong>Abstract.</strong> Computer Science graduate working across machine learning for time series.</p><p class=\"ds-avail\"><strong>Availability.</strong> Open to ML Engineer and Software Engineer roles.</p></section>",
+      "css": ":host{--paper:#ffffff;--ink:#16181d;--ink-soft:#4a4f59;--rule:#16181d;--hair:#dadde2;--link:#1f4fd1;--tint:color-mix(in srgb, var(--link) 12%, transparent);--font-text:'STIX Two Text', 'STIX Two', 'Times New Roman', Times, serif;}.ds-abstract{font-family:var(--font-text);font-size:1.0625rem;line-height:1.55;color:var(--ink);background:var(--paper);margin:0 2.5rem;padding:12px 0 1.5rem;}.ds-abstract p{margin:0 0 0.85rem;}.ds-abstract strong{font-weight:600;margin-right:0.2em;}.ds-avail{color:var(--ink-soft);}.ds-avail strong{color:var(--ink);}"
+    },
+    {
+      "name": "Definition list (skills and facts)",
+      "kind": "custom",
+      "refersTo": "subsection",
+      "description": "Bold term with plain lines; Also-used line in Faded Ink; two columns from 720px.",
+      "html": "<dl class=\"ds-dl\"><div><dt>Languages</dt><dd>Python, JavaScript</dd><dd class=\"ds-also\"><em>Also used:</em> Java, C, C++, SQL</dd></div><div><dt>Web</dt><dd>React, Vite, Node.js</dd></div></dl>",
+      "css": ":host{--paper:#ffffff;--ink:#16181d;--ink-soft:#4a4f59;--rule:#16181d;--hair:#dadde2;--link:#1f4fd1;--tint:color-mix(in srgb, var(--link) 12%, transparent);--font-text:'STIX Two Text', 'STIX Two', 'Times New Roman', Times, serif;}.ds-dl{font-family:var(--font-text);font-size:1.125rem;line-height:1.55;color:var(--ink);background:var(--paper);margin:0;padding:12px;display:grid;gap:1rem;}.ds-dl dt{font-weight:600;}.ds-dl dd{margin:0;}.ds-also{color:var(--ink-soft);font-size:1rem;}.ds-also em{color:var(--ink);}@media (min-width:720px){.ds-dl>div{display:grid;grid-template-columns:12rem 1fr;column-gap:1.5rem;row-gap:0.15rem;}.ds-dl dd{grid-column:2;}.ds-dl dt{grid-column:1;grid-row:1 / span 2;}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Camera-Ready Preprint",
+    "overview": "The page is set the way an ML reader already trusts evidence: an arXiv preprint or conference camera-ready. One serif (STIX Two Text) carries every role, from the title to the table figures. One centred title block with an author line, an indented abstract with a run-in bold label, numbered sections and subsections, a booktabs results table with its caption above, and hyperref-style cross-references (\"Table 1\", \"§1.1\") that jump to their target and briefly tint it. The density is that of a paper: a single 42rem reading column, generous line height, no decoration that a typesetter would not use.\n\nDepth, colour and shape are all nearly absent on purpose. White paper and near-black ink, one hyperlink blue, rules instead of boxes, square corners. Dark mode is the same paper in a darker stock: tokens swap values under `prefers-color-scheme: dark`, the rules never change. There is no theme toggle; the page follows the system setting.\n\nThe world explicitly refuses the dev-portfolio template: no hero banner, no pill buttons, no cards, no chips or tags, no stat tiles, no shadows, no monospace.",
+    "keyCharacteristics": [
+      "One family (STIX Two Text) at weights 400, 400 italic, 600, 600 italic; nothing else is loaded.",
+      "One reading column (42rem measure) with a sticky running head.",
+      "Numbered sections (1, 2, 3, 4) and subsections (1.1, 1.2) in lining figures, referenced from the text.",
+      "Booktabs table rules (1.5px top and bottom, 0.75px under the head, no verticals).",
+      "One accent: hyperlink blue, for links, cross-references, focus and selection only.",
+      "Flat: no shadows, no cards, 2px radius only where a tint or focus ring needs a corner."
+    ],
+    "rules": [
+      {
+        "name": "The One Blue Rule",
+        "body": "Hyperlink Blue appears only where something can be followed or is focused: links, cross-references, focus rings, selection, and the landing tint. Never as a fill, heading colour, or decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Same Grammar Rule",
+        "body": "Dark mode swaps the values of `--paper`, `--ink`, `--ink-soft`, `--rule`, `--hair`, `--link` and `--tint` and nothing else. No component has a dark-mode-only rule.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lining Figures Rule",
+        "body": "Section numbers and table figures use `lining-nums tabular-nums` so columns compare digit by digit; section numbers sit 0.6em before their title (0.3em in the running head).",
+        "section": "typography"
+      },
+      {
+        "name": "The No Fake Small Caps Rule",
+        "body": "The fontsource latin subset has no true small caps, so none are used and none are synthesised. Labels are bold upright (sections, caption label, abstract label) or italic (meta leads, context, run-in heads) instead.",
+        "section": "typography"
+      },
+      {
+        "name": "The Two Weights Rule",
+        "body": "Only 400 and 600 exist, each with its italic. Never request 300, 500 or 700; the browser would synthesise them.",
+        "section": "typography"
+      },
+      {
+        "name": "The Rules-Not-Boxes Rule",
+        "body": "Structure is drawn with horizontal rules (booktabs on the table, hairlines between subsections and under the running head), never with containers, backgrounds or shadows.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** set every role in STIX Two Text at 400 / 600 and their italics, with lining figures, and tabular figures wherever numbers are compared.",
+      "**Do** number sections and subsections and point at them from the text with cross-references that jump, focus and tint (tint removed under reduced motion).",
+      "**Do** draw results as booktabs tables: caption above, 1.5px top and bottom rules, 0.75px mid rule, right-aligned tabular figures.",
+      "**Do** keep all colour in the seven tokens and let dark mode swap only their values.",
+      "**Do** keep the 42rem single column with a 16px gutter, and give every `id` a 4rem scroll margin so it clears the running head."
+    ],
+    "donts": [
+      "**Don't** use cards, pill buttons, chips or tags, stat tiles, or a hero banner.",
+      "**Don't** add shadows or background-filled containers; use rules.",
+      "**Don't** use monospace, even for repository paths or code names.",
+      "**Don't** fake small caps with `font-variant: small-caps` or uppercase-plus-tracking; the loaded subset has none.",
+      "**Don't** use Hyperlink Blue for anything that cannot be followed or focused.",
+      "**Don't** draw vertical rules or zebra stripes in tables."
+    ]
+  }
+}
