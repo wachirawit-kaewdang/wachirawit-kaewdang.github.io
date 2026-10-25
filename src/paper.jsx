@@ -28,8 +28,9 @@ export function LinkLine({ className, children }) {
 }
 
 // A booktabs table with its numbered caption above, as in a paper. The first column is the
-// row label; the rest are figures, right-aligned in tabular numerals.
-export function NumberedTable({ number, caption, columns, rows }) {
+// row label; the rest are figures, right-aligned in tabular numerals. An optional note sits
+// under the bottom rule for sources and the test setup.
+export function NumberedTable({ number, caption, note, columns, rows }) {
   return (
     <div className="results" id={`table-${number}`} tabIndex={-1}>
       <table>
@@ -54,6 +55,7 @@ export function NumberedTable({ number, caption, columns, rows }) {
           ))}
         </tbody>
       </table>
+      {note && <p className="tablenote">{note}</p>}
     </div>
   );
 }

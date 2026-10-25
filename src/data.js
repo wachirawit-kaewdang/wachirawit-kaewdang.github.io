@@ -23,18 +23,26 @@ export const projects = [
     featured: true,
     summary:
       'An LSTM with self-attention that predicts 3-day price direction for 10 US stocks across ' +
-      '5 sectors, used to test whether SHAP explains a model better than plain correlation. ' +
-      'It also includes an honest check against a naive baseline.',
+      '5 sectors, used to test whether SHAP explains a model better than plain correlation, ' +
+      'and checked against a naive baseline.',
+    // Stated as the abstract's main result, ahead of any metric.
+    finding:
+      'my senior-project model ties a naive “always predict up” baseline, and the case study ' +
+      'shows how I caught it',
     // Averages over the 10 stocks, recomputed from the per-stock outputs in stock_project.ipynb.
-    // The LSTM ROC-AUC is not printed in the notebook; it comes from the repo README.
     results: {
+      // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption:
-        'F1 and ROC-AUC averaged over the 10 stocks, on a test set of the last 20% of ' +
-        'Jan 2020 – Apr 2025, split by date. ROC-AUC of 0.5 is chance.',
+        'Every model is close to chance. F1 looks strong, but on 7 of 10 stocks the tuned LSTM ' +
+        'predicts “up” on every test day, so its 0.710 equals an always-up baseline. ROC-AUC, ' +
+        'which ignores the threshold, is 0.55–0.57 for every model (0.5 is chance).',
+      note:
+        'Averages over the 10 stocks; test set is the last 20% of Jan 2020 – Apr 2025, split by ' +
+        'date. † From the project README; every other value is recomputed from the notebook.',
       columns: ['Model', 'F1', 'ROC-AUC'],
       rows: [
-        // A figure space pads the two-decimal value so the column still lines up by place.
-        ['LSTM + self-attention', '0.710', '≈0.57 '],
+        // The dagger points to the table note: this value is from the README, not the notebook.
+        ['LSTM + self-attention', '0.710', '≈0.57†'],
         ['Ensemble (LSTM + RF + LR, soft vote)', '0.663', '0.568'],
         ['Logistic Regression', '0.525', '0.555'],
         ['Random Forest', '0.374', '0.546'],
@@ -43,8 +51,8 @@ export const projects = [
     points: [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
       'SHAP and Pearson correlation ranked features very differently, by roughly 5 to 12 positions per feature on average.',
-      'SHAP surfaced bond yield as a key driver (#1 for JPM and AMZN) that correlation ranked low.',
-      'Baseline check: the tuned model matched an "always predict up" baseline, so I report it honestly, along with what I would change.',
+      'SHAP surfaced bond yield as a key driver: top 5 for 6 of 10 stocks and #1 for JPM and AMZN, while correlation ranked it low.',
+      'Baseline check: the tuned model matched an “always predict up” baseline. The case study shows how I caught it and what I would change.',
       'My part: data collection and preparation, and the training approach and model architecture.',
     ],
     tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter'],

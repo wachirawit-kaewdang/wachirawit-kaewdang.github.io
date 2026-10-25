@@ -134,10 +134,12 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 
 /* Table 1: booktabs. Heavy top and bottom rules, a light rule under the head, no verticals,
    figures in tabular lining numerals so the columns compare digit by digit. */
-.results { overflow-x: auto; margin: 1.25rem 0 0.5rem; border-radius: 2px; }
-.results table { border-collapse: collapse; font-size: 1rem; min-width: min(100%, 34rem); }
+/* The block shrinks to its table, so the caption above and the note below share its width. */
+.results { overflow-x: auto; width: fit-content; min-width: min(100%, 34rem); max-width: 100%; margin: 1.25rem 0 1rem; border-radius: 2px; }
+.results table { border-collapse: collapse; font-size: 1rem; width: 100%; }
 .results caption { caption-side: top; text-align: left; padding-bottom: 0.6rem; font-size: 0.95rem; line-height: 1.45; }
 .caplabel { font-weight: 600; }
+.tablenote { width: 0; min-width: 100%; margin: 0.5rem 0 0; font-size: 0.9rem; line-height: 1.45; color: var(--ink-soft); }
 .results table { border-top: 1.5px solid var(--rule); border-bottom: 1.5px solid var(--rule); }
 .results thead th { border-bottom: 0.75px solid var(--rule); font-weight: 600; }
 .results th, .results td { padding: 0.4rem 2rem 0.4rem 0; text-align: left; vertical-align: baseline; }
