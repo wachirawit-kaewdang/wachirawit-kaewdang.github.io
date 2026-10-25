@@ -81,8 +81,9 @@ function Abstract() {
         <strong>Abstract.</strong> {profile.summary}
         {featured >= 0 && (
           <>
-            {' '}Main result: <Ref to="table-1">Table 1</Ref> in{' '}
-            <Ref to={projectId(featured)}>§{sectionNumber('projects')}.{featured + 1}</Ref>.
+            {' '}Main result (<Ref to="table-1">Table 1</Ref>,{' '}
+            <Ref to={projectId(featured)}>§{sectionNumber('projects')}.{featured + 1}</Ref>):{' '}
+            {projects[featured].finding}.
           </>
         )}
       </p>
