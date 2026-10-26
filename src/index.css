@@ -175,6 +175,26 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
   .figure { width: 64rem; margin-left: calc(50% - 32rem); }
   .figure figcaption { max-width: var(--measure); margin-inline: auto; }
 }
+/* Figure A.2 drawn as small multiples: one compact table per sector, bars scaled within it. */
+.multiples { display: grid; grid-template-columns: 1fr; gap: 1.25rem 2rem; }
+@media (min-width: 36rem) { .multiples { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 72rem) { .multiples { grid-template-columns: repeat(3, 1fr); } }
+.bars { width: 100%; border-collapse: collapse; font-size: 0.85rem; line-height: 1.3; border-top: 1px solid var(--rule); }
+.bars caption { caption-side: top; text-align: left; font-weight: 600; padding-bottom: 0.35rem; }
+.bars caption span { font-weight: 400; color: var(--ink-soft); }
+.bars th { font-weight: 400; text-align: left; white-space: nowrap; padding: 0.18rem 0.75rem 0.18rem 0; width: 1%; }
+.bars td { padding: 0.18rem 0; }
+.bars td { display: flex; align-items: center; gap: 0.45rem; }
+.bars .track { flex: 1; height: 0.55rem; }
+.bars .fill { display: block; height: 100%; background: color-mix(in srgb, var(--ink) 32%, transparent); }
+.bars .mark th, .bars .mark .val { color: var(--link); font-weight: 600; }
+.bars .mark .fill { background: var(--link); }
+.bars .val { font-variant-numeric: lining-nums tabular-nums; color: var(--ink-soft); min-width: 3.4em; text-align: right; }
+.data-figure .multiples { padding: 0.75rem 0 0.25rem; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
 .closing { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--hair); }
 .closing .back { margin-top: 1.5rem; }
 

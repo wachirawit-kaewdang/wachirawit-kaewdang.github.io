@@ -36,14 +36,16 @@ export const projects = [
       caption:
         'Every model is close to chance. F1 looks strong, but on 7 of 10 stocks the tuned LSTM ' +
         'predicts “up” on every test day, so its 0.710 equals an always-up baseline. ROC-AUC, ' +
-        'which ignores the threshold, is 0.55–0.57 for every model (0.5 is chance).',
+        'which ignores the threshold, is 0.55–0.57 wherever it was recorded (0.5 is chance).',
       note:
         'Averages over the 10 stocks; test set is the last 20% of Jan 2020 – Apr 2025, split by ' +
-        'date. † From the project README; every other value is recomputed from the notebook.',
+        'date. Values are recomputed from the notebook’s per-stock outputs. † The notebook does not ' +
+        'record ROC-AUC for the full-feature LSTM; the project README’s “≈0.57” matches the ' +
+        'ensemble’s 0.568.',
       columns: ['Model', 'F1', 'ROC-AUC'],
       rows: [
-        // The dagger points to the table note: this value is from the README, not the notebook.
-        ['LSTM + self-attention', '0.710', '≈0.57†'],
+        // n/r = not recorded: the notebook never prints ROC-AUC for this model (see the note).
+        ['LSTM + self-attention', '0.710', 'n/r†'],
         ['Ensemble (LSTM + RF + LR, soft vote)', '0.663', '0.568'],
         ['Logistic Regression', '0.525', '0.555'],
         ['Random Forest', '0.374', '0.546'],
@@ -70,6 +72,8 @@ export const projects = [
       'My part: the MyRecipe management feature, recipe deletion, and wiring the frontend to the backend API.',
     ],
     tech: ['React', 'Vite', 'JavaScript', 'Node.js', 'Express', 'REST APIs'],
+    // The repository is a private GitHub Classroom repo, so there is nothing public to link.
+    codeNote: 'In a private course repository (GitHub Classroom), so it cannot be linked.',
   },
   {
     title: 'HTTP Web Server from Scratch',

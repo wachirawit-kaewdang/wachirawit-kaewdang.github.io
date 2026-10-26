@@ -22,11 +22,23 @@ const baselineRows = [
 ];
 const alwaysUpF1 = (p) => ((2 * p) / (1 + p)).toFixed(3);
 
+// Figure A.2 drawn from its data: each sector's top 10 features by mean |SHAP|, as printed on
+// the bars of the original matplotlib chart (public/cs403/sector_shap.webp). Drawing it here
+// lets it reflow to one column on a phone instead of shrinking a 1600px image.
+const sectorShap = [
+  { sector: 'Consumer', stocks: 'AMZN, COST', rows: [['Bond_yield', 0.0312], ['Volume_change', 0.0141], ['Volatility_20d', 0.0106], ['Relative_return', 0.0082], ['Stoch_d', 0.0071], ['Return_1d', 0.0068], ['OBV', 0.0065], ['Volume_MA_ratio', 0.0057], ['Stoch_k', 0.0056], ['Price_MA20_dist', 0.0051]] },
+  { sector: 'Healthcare', stocks: 'JNJ, UNH', rows: [['MACD_diff', 0.0378], ['Volume_MA_ratio', 0.0215], ['Stoch_d', 0.0189], ['SP500_MA20', 0.0143], ['Stoch_k', 0.0132], ['OBV', 0.013], ['Return_5d', 0.0123], ['RSI', 0.0113], ['Volume_change', 0.0108], ['Price_MA20_dist', 0.0107]] },
+  { sector: 'Finance', stocks: 'JPM, GS', rows: [['Bond_yield', 0.0127], ['MACD_diff', 0.0114], ['MACD_signal', 0.0076], ['Relative_return', 0.0066], ['MA50', 0.0062], ['EMA26', 0.0055], ['Return_1d', 0.0054], ['SP500_vol', 0.0052], ['Volume_MA_ratio', 0.0049], ['EMA12', 0.0043]] },
+  { sector: 'Technology', stocks: 'NVDA, TSLA', rows: [['MACD_diff', 0.0341], ['Volume_change', 0.0287], ['Bond_yield', 0.0282], ['Stoch_d', 0.0138], ['MA5', 0.0135], ['MA20', 0.0128], ['EMA26', 0.0125], ['SP500_MA20', 0.0115], ['Stoch_k', 0.0108], ['Return_10d', 0.0104]] },
+  { sector: 'Energy', stocks: 'XOM, CVX', rows: [['SP500_MA20', 0.0613], ['Volume_change', 0.0243], ['Volume_MA_ratio', 0.0109], ['Volatility_20d', 0.0088], ['Stoch_d', 0.008], ['MACD_signal', 0.0071], ['OBV', 0.0064], ['RSI', 0.0063], ['MACD', 0.0059], ['Stoch_k', 0.0059]] },
+];
+const featureLabel = (name) => name.replace(/_/g, ' ');
+
 const sections = [
   'Setup',
   'SHAP and correlation disagree a lot',
   'Bond yield matters to the model, but correlation misses it',
-  'Checking the results honestly',
+  'Checking the results against a baseline',
   'What I’d do differently',
   'My part',
 ];
@@ -57,6 +69,49 @@ function Figure({ n, name, width, height, alt, caption }) {
 }
 
 const ARef = (props) => <Ref route={APPENDIX} {...props} />;
+
+// Small multiples, one booktabs-style table per sector. Bars are scaled within each panel, as in
+// the original chart; the printed value carries the comparison across sectors. Bond yield, the
+// feature §A.3 is about, is the one bar in the accent colour.
+function SectorFigure() {
+  return (
+    <figure className="figure data-figure" id="figure-a2" tabIndex={-1}>
+      <div className="multiples">
+        {sectorShap.map(({ sector, stocks, rows }) => {
+          const max = rows[0][1];
+          return (
+            <table key={sector} className="bars">
+              <caption>
+                {sector} <span>({stocks})</span>
+              </caption>
+              <thead className="visually-hidden">
+                <tr><th scope="col">Feature</th><th scope="col">Mean |SHAP|</th></tr>
+              </thead>
+              <tbody>
+                {rows.map(([feature, value]) => (
+                  <tr key={feature} className={feature === 'Bond_yield' ? 'mark' : undefined}>
+                    <th scope="row">{featureLabel(feature)}</th>
+                    <td>
+                      <span className="track" aria-hidden="true">
+                        <span className="fill" style={{ width: `${(value / max) * 100}%` }} />
+                      </span>
+                      <span className="val">{value.toFixed(4)}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          );
+        })}
+      </div>
+      <figcaption>
+        <span className="caplabel">Figure A.2.</span> Mean |SHAP| of the top 10 features in each sector,
+        bond yield highlighted. Bars are scaled within each sector, so compare the printed values across
+        panels. <a href={img('sector_shap')} target="_blank" rel="noreferrer">Original chart (opens in a new tab)</a>
+      </figcaption>
+    </figure>
+  );
+}
 
 function Contacts({ className }) {
   return (
@@ -90,7 +145,7 @@ export default function ProjectCS403() {
           <strong>Abstract.</strong> Can SHAP tell us something about a stock-prediction model that
           plain correlation can’t? We trained an LSTM with self-attention on 10 US stocks, explained
           it with SHAP, and compared those explanations with Pearson correlation. We also checked
-          honestly whether the model beat a naive baseline (<ARef to="table-a1">Table A.1</ARef>).
+          whether the model beat a naive baseline (<ARef to="table-a1">Table A.1</ARef>).
         </p>
       </section>
 
@@ -133,14 +188,7 @@ export default function ProjectCS403() {
           Grouped by sector, the patterns differ too (<ARef to="figure-a2">Figure A.2</ARef>). Energy
           leans on the S&amp;P 500 trend, while Healthcare and Technology lean on MACD.
         </p>
-        <Figure
-          n={2}
-          name="sector_shap"
-          width={1600}
-          height={396}
-          alt="Five bar charts, one per sector, of average SHAP importance by feature. Energy leans on the S&P 500 trend, while Healthcare and Technology lean on MACD."
-          caption="Average SHAP importance by sector."
-        />
+        <SectorFigure />
       </section>
 
       <section className="section">
@@ -159,11 +207,10 @@ export default function ProjectCS403() {
           rows={baselineRows.map((r) => [r.stock, r.acc.toFixed(3), r.f1.toFixed(3), alwaysUpF1(r.acc)])}
         />
         <p>
-          Threshold-free metrics tell the same story: ROC-AUC averaged about 0.57 across the 10 stocks,
-          only a little better than random (0.5). Predicting 3-day direction from technical
-          indicators alone is close to a coin flip (<ARef to="figure-a3">Figure A.3</ARef>). That’s an
-          honest result, not a failure of the explainability work: SHAP still shows what the model
-          relied on.
+          Threshold-free metrics tell the same story: the ensemble’s ROC-AUC averaged 0.568 across the
+          10 stocks, only a little better than random (0.5). Predicting 3-day direction from technical
+          indicators alone is close to a coin flip (<ARef to="figure-a3">Figure A.3</ARef>). That is the
+          result, not a failure of the explainability work: SHAP still shows what the model relied on.
         </p>
         <Figure
           n={3}
