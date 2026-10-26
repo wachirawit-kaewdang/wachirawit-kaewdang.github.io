@@ -21,3 +21,10 @@ export function jumpTo(id, { tint = true } = {}) {
   }
   return true;
 }
+
+// The CS403 write-up is Appendix A, shown at this hash route. Anchors inside it extend the route
+// ("#/cs403/figure-a1") so they still open the appendix when loaded directly.
+export const APPENDIX = '#/cs403';
+
+// "1" -> "table-1", "A.1" -> "table-a1".
+export const tableId = (number) => `table-${String(number).toLowerCase().replace('.', '')}`;

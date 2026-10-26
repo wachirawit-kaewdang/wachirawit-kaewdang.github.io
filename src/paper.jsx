@@ -1,11 +1,19 @@
 // Pieces of the preprint look shared by the home page and the case study.
 
-import { jumpTo } from './paper-utils.js';
+import { jumpTo, tableId } from './paper-utils.js';
 
-// A hyperref-style cross-reference ("Table 1", "§1.1") to something on the same page.
-export function Ref({ to, children }) {
+// A hyperref-style cross-reference ("Table 1", "§1.1") to something on the same page. Inside a
+// hash route (the appendix) the link keeps the route, as "#/cs403/table-a1", and the address bar
+// is updated to it, so the reference can be copied and still opens the right page.
+export function Ref({ to, route, children }) {
+  const href = route ? `${route}/${to}` : `#${to}`;
+  const follow = (e) => {
+    if (!jumpTo(to)) return;
+    e.preventDefault();
+    if (route) history.replaceState(null, '', href);
+  };
   return (
-    <a className="ref" href={`#${to}`} onClick={(e) => jumpTo(to) && e.preventDefault()}>
+    <a className="ref" href={href} onClick={follow}>
       {children}
     </a>
   );
@@ -32,7 +40,7 @@ export function LinkLine({ className, children }) {
 // under the bottom rule for sources and the test setup.
 export function NumberedTable({ number, caption, note, columns, rows }) {
   return (
-    <div className="results" id={`table-${number}`} tabIndex={-1}>
+    <div className="results" id={tableId(number)} tabIndex={-1}>
       <table>
         <caption>
           <span className="caplabel">Table {number}.</span> {caption}

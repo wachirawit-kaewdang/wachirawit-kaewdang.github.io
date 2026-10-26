@@ -9,6 +9,7 @@ export const profile = {
   github: 'https://github.com/wachirawit-kaewdang',
   linkedin: 'https://www.linkedin.com/in/wachirawit-kaewdang',
   resume: 'Wachirawit_Kaewdang_Resume.pdf',
+  source: 'https://github.com/wachirawit-kaewdang/wachirawit-kaewdang.github.io',
   summary:
     'Computer Science graduate (Software Engineering track) from Thammasat University. ' +
     'I work across machine learning for time series — with a focus on model explainability ' +
@@ -27,7 +28,7 @@ export const projects = [
       'and checked against a naive baseline.',
     // Stated as the abstract's main result, ahead of any metric.
     finding:
-      'my senior-project model ties a naive “always predict up” baseline, and the case study ' +
+      'my senior-project model ties a naive “always predict up” baseline, and Appendix A ' +
       'shows how I caught it',
     // Averages over the 10 stocks, recomputed from the per-stock outputs in stock_project.ipynb.
     results: {
@@ -52,10 +53,10 @@ export const projects = [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
       'SHAP and Pearson correlation ranked features very differently, by roughly 5 to 12 positions per feature on average.',
       'SHAP surfaced bond yield as a key driver: top 5 for 6 of 10 stocks and #1 for JPM and AMZN, while correlation ranked it low.',
-      'Baseline check: the tuned model matched an “always predict up” baseline. The case study shows how I caught it and what I would change.',
+      'Baseline check: the tuned model matched an “always predict up” baseline. Appendix A shows how I caught it and what I would change.',
       'My part: data collection and preparation, and the training approach and model architecture.',
     ],
-    tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter'],
+    tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance'],
     caseStudy: '#/cs403',
     link: 'https://github.com/wachirawit-kaewdang/Project-CS403',
   },
