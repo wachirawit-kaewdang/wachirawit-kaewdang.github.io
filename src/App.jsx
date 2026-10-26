@@ -155,6 +155,11 @@ function Project({ project, index }) {
           </a>
         </p>
       )}
+      {!project.link && project.codeNote && (
+        <p className="meta">
+          <em>Code.</em> {project.codeNote}
+        </p>
+      )}
     </article>
   );
 }
