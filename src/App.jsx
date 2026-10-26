@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { profile, projects, skills, education, languages } from './data.js';
 import { Ref, LinkLine, NumberedTable } from './paper.jsx';
-import { asset, jumpTo } from './paper-utils.js';
+import { APPENDIX, asset, jumpTo } from './paper-utils.js';
 import ProjectCS403 from './ProjectCS403.jsx';
 
 // The page is laid out like a preprint: numbered sections and subsections that the text can
@@ -19,6 +19,9 @@ const projectId = (i) => `project-${i + 1}`;
 // projects are added without a second list to maintain.
 const shownInProjects = new Set(projects.flatMap((p) => p.tech));
 
+// The page's own title from index.html, restored when leaving the appendix.
+const homeTitle = document.title;
+
 // Tiny hash router: "#/cs403" shows the case study, anything else shows the home page.
 // Hash URLs work on GitHub Pages without any server configuration.
 function useHash() {
@@ -31,17 +34,27 @@ function useHash() {
   return hash;
 }
 
-function RunningHead() {
+// On the home page the running head lists the numbered sections. On Appendix A those numbers
+// would clash with A.1–A.6, so it offers the way back, the code and the résumé instead.
+function RunningHead({ appendix }) {
+  const featured = projects.find((p) => p.caseStudy);
   return (
     <header className="runhead">
       <div className="page runhead-inner">
         <a href="#top" className="runhead-name">{profile.name}</a>
-        <nav aria-label="Sections">
-          {sections.map((s, i) => (
-            <a key={s.id} href={`#${s.id}`}>
-              <span className="num">{i + 1}</span> {s.id === 'education' ? 'Education' : s.title}
-            </a>
-          ))}
+        <nav aria-label={appendix ? 'Appendix A' : 'Sections'}>
+          {appendix ? (
+            <>
+              <a href={`#${projectId(0)}`}>← §{sectionNumber('projects')}.1</a>
+              {featured?.link && <a href={featured.link} target="_blank" rel="noreferrer">Code</a>}
+            </>
+          ) : (
+            sections.map((s, i) => (
+              <a key={s.id} href={`#${s.id}`} aria-label={`${i + 1} ${s.title}`}>
+                <span className="num">{i + 1}</span> {s.id === 'education' ? 'Education' : s.title}
+              </a>
+            ))
+          )}
           <a className="runhead-resume" href={asset(profile.resume)} target="_blank" rel="noreferrer">
             Résumé
           </a>
@@ -114,6 +127,12 @@ function Project({ project, index }) {
       </h3>
       <p className="context">{project.context}</p>
       <p>{project.summary}</p>
+      {project.caseStudy && (
+        <p className="seealso">
+          Full write-up in <a href={project.caseStudy}>Appendix A</a>: the method, the baseline
+          check and what I would change.
+        </p>
+      )}
 
       {project.results && <NumberedTable number={1} {...project.results} />}
 
@@ -128,11 +147,6 @@ function Project({ project, index }) {
       <p className="meta">
         <em>Stack.</em> {project.tech.join(' · ')}
       </p>
-      {project.caseStudy && (
-        <p className="meta">
-          <em>Case study.</em> <a href={project.caseStudy}>Method, findings and the baseline check</a>
-        </p>
-      )}
       {project.link && (
         <p className="meta">
           <em>Code.</em>{' '}
@@ -222,15 +236,26 @@ function Contact() {
 
 export default function App() {
   const hash = useHash();
-  const isCaseStudy = hash === '#/cs403';
+  // "#/cs403" and anything under it ("#/cs403/figure-a1") is the appendix.
+  const isCaseStudy = hash === APPENDIX || hash.startsWith(`${APPENDIX}/`);
 
-  // After switching pages, land in the right place: the top of the case study, or the
-  // section the home-page link named.
+  // After switching pages, land in the right place and say where we are: the tab title names
+  // the page, and focus moves to it so a screen reader announces the change. In the appendix
+  // that is the anchor the link named, or else its title; at home, the section named.
   useEffect(() => {
     if (isCaseStudy) {
+      document.title = `Appendix A: Stock Direction Prediction · ${profile.name}`;
+      const anchor = hash.slice(APPENDIX.length + 1);
+      if (anchor && jumpTo(anchor, { tint: false })) return;
       window.scrollTo(0, 0);
-    } else if (hash.length > 1) {
-      document.getElementById(hash.slice(1))?.scrollIntoView();
+      document.getElementById('appendix-title')?.focus({ preventScroll: true });
+    } else {
+      document.title = homeTitle;
+      const target = hash.length > 1 && document.getElementById(hash.slice(1));
+      if (target) {
+        target.scrollIntoView();
+        target.focus({ preventScroll: true });
+      }
     }
   }, [hash, isCaseStudy]);
 
@@ -240,7 +265,7 @@ export default function App() {
       <a className="skip" href="#main" onClick={(e) => jumpTo('main', { tint: false }) && e.preventDefault()}>
         Skip to content
       </a>
-      <RunningHead />
+      <RunningHead appendix={isCaseStudy} />
       {isCaseStudy ? (
         <ProjectCS403 />
       ) : (
@@ -254,7 +279,8 @@ export default function App() {
         </main>
       )}
       <footer className="page footer">
-        © {new Date().getFullYear()} {profile.name} · Built with React + Vite
+        © {new Date().getFullYear()} {profile.name} ·{' '}
+        <a href={profile.source} target="_blank" rel="noreferrer">Site source on GitHub</a>
       </footer>
     </>
   );

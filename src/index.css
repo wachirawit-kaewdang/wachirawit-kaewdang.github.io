@@ -101,7 +101,7 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 /* Role on its own line, affiliation and place beneath it, like a paper's author block. */
 .authorline { color: var(--ink-soft); margin-bottom: 0.75rem; }
 .authorline .role { display: block; color: var(--ink); }
-.authorline span { white-space: nowrap; }
+.authorline span:not(.role) { white-space: nowrap; }
 /* The middot trails the item before it, so a wrapped line never opens with one. */
 .authorline span:not(.role):not(:last-child)::after {
   content: '·'; margin-left: 0.6em; color: var(--ink-soft);
@@ -113,6 +113,10 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .sep { margin: 0 0.6em; color: var(--ink-soft); }
 .contactline .primary { font-weight: 600; }
 .contactline.left { text-align: left; }
+/* Inline links are text-height; vertical padding widens their hit area without moving text. */
+.contactline a, .meta a, .seealso a, .back a, .footer a { padding-block: 0.6rem; }
+.seealso { margin-top: -0.25rem; color: var(--ink-soft); }
+.titleblock h1 .num { display: block; margin: 0 0 0.35rem; font-size: 0.5em; font-weight: 600; color: var(--ink-soft); letter-spacing: 0; }
 
 .abstract { margin: 0 2.5rem 1rem; padding-bottom: 1.5rem; font-size: 1.0625rem; }
 .abstract strong { margin-right: 0.2em; }
@@ -126,7 +130,6 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .subsection + .subsection { border-top: 1px solid var(--hair); padding-top: 1.75rem; }
 .subsection h3 { font-size: 1.15rem; margin: 0 0 0.25rem; }
 .context { font-style: italic; color: var(--ink-soft); margin-bottom: 0.75rem; }
-.paragraph h4 { font-size: 1rem; font-style: italic; margin: 1.25rem 0 0.4rem; }
 .meta { margin: 0.25rem 0 0; font-size: 1rem; color: var(--ink-soft); }
 .meta em { color: var(--ink); }
 .meta + .meta { margin-top: 0.1rem; }
@@ -161,11 +164,19 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .case .titleblock { padding-top: 1.5rem; }
 .back { margin: 1.5rem 0 0; font-size: 1rem; }
 .back a { text-decoration: none; }
-.back.end { margin: 2.5rem 0 0; }
 .case .section > p + .meta { margin-top: 1rem; }
 .figure { margin: 1.25rem 0 0.5rem; border-radius: 2px; }
 .figure img { display: block; width: 100%; height: auto; background: #fff; border: 1px solid var(--hair); }
 .figure figcaption { margin-top: 0.6rem; font-size: 0.95rem; line-height: 1.45; text-wrap: pretty; }
+/* Wide charts get room on wide screens: the figure breaks out of the reading column to 64rem,
+   centred on it, while its caption stays at the reading measure. Only where 64rem plus gutters
+   fits, so it never causes sideways scrolling. */
+@media (min-width: 72rem) {
+  .figure { width: 64rem; margin-left: calc(50% - 32rem); }
+  .figure figcaption { max-width: var(--measure); margin-inline: auto; }
+}
+.closing { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--hair); }
+.closing .back { margin-top: 1.5rem; }
 
 /* Skills, education, facts */
 .skills, .facts { margin: 0; display: grid; gap: 1rem; }
@@ -205,6 +216,6 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
   .titleblock { padding-top: 0; }
   a { text-decoration: none; }
   .contactline a[href^='http']::after { content: ' (' attr(href) ')'; font-size: 0.85em; }
-  .results, .paragraph { break-inside: avoid; }
+  .results, .figure { break-inside: avoid; }
   h2, h3, h4 { break-after: avoid; }
 }
