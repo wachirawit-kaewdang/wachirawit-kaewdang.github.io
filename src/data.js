@@ -43,9 +43,10 @@ export const projects = [
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption:
-        `Every model is close to chance. F1 looks strong, but on ${collapsedShare} stocks the tuned LSTM ` +
-        'predicts “up” on every test day, so there its F1 equals an always-up baseline’s. ROC-AUC, ' +
-        'which ignores the threshold, is 0.55–0.57 wherever it was recorded (0.5 is chance).',
+        'Every model is close to chance: ROC-AUC, which ignores the threshold, is 0.55–0.57 ' +
+        'wherever it was recorded (0.5 is chance). F1 looks strong only because on ' +
+        `${collapsedShare} stocks the tuned LSTM predicts “up” on every test day, where its F1 ` +
+        'equals an always-up baseline’s.',
       note:
         `Averages over the ${stockCount} stocks; test set is the last 20% of Jan 2020 – Apr 2025, split by ` +
         `date. Computed from the notebook’s per-stock outputs (Project-CS403 @ ${source.commit}). ` +
@@ -54,11 +55,11 @@ export const projects = [
       columns: ['Model', 'F1', 'ROC-AUC'],
       rows: table1Rows,
     },
+    // The details (SHAP findings, the baseline check, what I'd change) live in Appendix A; here
+    // only what a reader needs before choosing to go there.
     points: [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
-      'SHAP and Pearson correlation ranked features very differently, by roughly 5 to 12 positions per feature on average.',
-      'SHAP surfaced bond yield as a key driver: top 5 for 6 of 10 stocks and #1 for JPM and AMZN, while correlation ranked it low.',
-      'Baseline check: the tuned model matched an “always predict up” baseline. Appendix A shows how I caught it and what I would change.',
+      'SHAP and Pearson correlation ranked features 5 to 12 positions apart on average, and SHAP surfaced bond yield (top 5 for 6 of 10 stocks) where correlation ranked it low; see Appendix A.2–A.3.',
       'My part: data collection and preparation, and the training approach and model architecture.',
     ],
     tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance'],

@@ -51,15 +51,16 @@ function Figure({ n, name, width, height, alt, caption }) {
 
 const ARef = (props) => <Ref route={APPENDIX} {...props} />;
 
-// Small multiples, one booktabs-style table per sector. Bars are scaled within each panel, as in
-// the original chart; the printed value carries the comparison across sectors. Bond yield, the
-// feature §A.3 is about, is the one bar in the accent colour.
+// Small multiples, one booktabs-style table per sector, all on one shared scale so a bar's length
+// can be compared across sectors (the original chart scaled each panel to itself). Bond yield, the
+// feature §A.3 is about, is set in bold ink; the sixth grid cell is the key.
+const shapMax = Math.max(...sectorShap.flatMap((s) => s.rows.map(([, value]) => value)));
+
 function SectorFigure() {
   return (
     <figure className="figure data-figure" id="figure-a2" tabIndex={-1}>
       <div className="multiples">
         {sectorShap.map(({ sector, stocks, rows }) => {
-          const max = rows[0][1];
           return (
             <table key={sector} className="bars">
               <caption>
@@ -74,7 +75,7 @@ function SectorFigure() {
                     <th scope="row">{featureLabel(feature)}</th>
                     <td>
                       <span className="track" aria-hidden="true">
-                        <span className="fill" style={{ width: `${(value / max) * 100}%` }} />
+                        <span className="fill" style={{ width: `${(value / shapMax) * 100}%` }} />
                       </span>
                       <span className="val">{value.toFixed(4)}</span>
                     </td>
@@ -84,11 +85,14 @@ function SectorFigure() {
             </table>
           );
         })}
+        <p className="key">
+          All bars share one scale, from 0 to {shapMax.toFixed(4)} (Energy’s SP500 MA20). Bond yield
+          is in <strong>bold</strong>.
+        </p>
       </div>
       <figcaption>
-        <span className="caplabel">Figure A.2.</span> Mean |SHAP| of the top 10 features in each sector,
-        bond yield highlighted. Bars are scaled within each sector, so compare the printed values across
-        panels. <a href={img('sector_shap')} target="_blank" rel="noreferrer">Original chart (opens in a new tab)</a>
+        <span className="caplabel">Figure A.2.</span> Mean |SHAP| of the top 10 features in each
+        sector. <a href={img('sector_shap')} target="_blank" rel="noreferrer">Original chart (opens in a new tab)</a>
       </figcaption>
     </figure>
   );
