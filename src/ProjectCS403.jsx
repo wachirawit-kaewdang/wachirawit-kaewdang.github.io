@@ -209,7 +209,7 @@ export default function ProjectCS403() {
           Our tuned model reported an average F1 of about 0.71, which looked good. When I checked it
           against the simplest possible baseline, a model that always predicts “up”, the numbers
           matched (<ARef to="table-a1">Table A.1</ARef>). With the decision threshold tuned down to 0.30,
-          the model was predicting “up” for almost every day in a rising market.
+          the model predicted “up” on every test day for 7 of the 10 stocks, in a rising market.
         </p>
         <NumberedTable
           number="A.1"

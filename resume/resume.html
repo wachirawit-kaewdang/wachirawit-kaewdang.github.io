@@ -1,0 +1,120 @@
+<!doctype html>
+<!--
+  Source of public/Wachirawit_Kaewdang_Resume.pdf. Not part of the site build.
+  Rebuild with: npm run resume   (prints this page to PDF with headless Chrome; see scripts/build-resume.mjs)
+  Keep the facts in step with src/data.js and the Appendix A numbers; one column of real text so
+  applicant-tracking systems can read it.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Wachirawit Kaewdang - Resume</title>
+    <style>
+      @font-face {
+        font-family: 'STIX Two Text'; font-weight: 400; font-style: normal;
+        src: url('../node_modules/@fontsource/stix-two-text/files/stix-two-text-latin-400-normal.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'STIX Two Text'; font-weight: 400; font-style: italic;
+        src: url('../node_modules/@fontsource/stix-two-text/files/stix-two-text-latin-400-italic.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'STIX Two Text'; font-weight: 600; font-style: normal;
+        src: url('../node_modules/@fontsource/stix-two-text/files/stix-two-text-latin-600-normal.woff2') format('woff2');
+      }
+      @page { size: A4; margin: 13mm 15mm; }
+      html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      body {
+        margin: 0; color: #16181d;
+        font: 9.6pt/1.38 'STIX Two Text', 'Times New Roman', serif;
+        font-variant-numeric: lining-nums;
+      }
+      a { color: inherit; text-decoration: none; }
+      h1 { font-size: 19pt; font-weight: 600; margin: 0 0 2pt; letter-spacing: -0.01em; }
+      .contact { margin: 0 0 8pt; color: #4a4f59; font-size: 9pt; }
+      h2 {
+        font-size: 9.6pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+        margin: 9pt 0 4pt; padding-bottom: 2pt; border-bottom: 0.75pt solid #16181d;
+      }
+      .entry { margin: 0 0 6pt; break-inside: avoid; }
+      .head { display: flex; justify-content: space-between; gap: 12pt; }
+      .head b { font-weight: 600; }
+      .head span { color: #4a4f59; white-space: nowrap; }
+      .sub { font-style: italic; color: #4a4f59; margin: 0 0 2pt; }
+      ul { margin: 2pt 0 2pt; padding-left: 12pt; }
+      li { margin: 0 0 1.5pt; }
+      .stack { color: #4a4f59; font-size: 9pt; margin: 2pt 0 0; }
+      dl { display: grid; grid-template-columns: 26mm 1fr; gap: 1.5pt 8pt; margin: 0; }
+      dt { font-weight: 600; }
+      dd { margin: 0; }
+      p { margin: 0; }
+    </style>
+  </head>
+  <body>
+    <h1>Wachirawit Kaewdang</h1>
+    <p class="contact">
+      Bangkok, Thailand · wachirawit.kaewdang@gmail.com · wachirawit-kaewdang.github.io ·
+      linkedin.com/in/wachirawit-kaewdang · github.com/wachirawit-kaewdang
+    </p>
+
+    <h2>Summary</h2>
+    <p>
+      Computer Science graduate (Software Engineering track) from Thammasat University. I work across
+      machine learning for time series, with a particular focus on model explainability rather than
+      accuracy alone, and full-stack web development in React and Node.js. Seeking Machine Learning
+      Engineer or Software Engineer roles.
+    </p>
+
+    <h2>Education</h2>
+    <div class="entry">
+      <div class="head"><b>Thammasat University</b><span>2022 – May 2026</span></div>
+      <p class="sub">BSc Computer Science (Computer and Information Science major), Software Engineering track</p>
+    </div>
+
+    <h2>Projects</h2>
+    <div class="entry">
+      <div class="head"><b>Stock Price Direction Prediction – LSTM + Self-Attention with Explainable AI</b><span>Senior project (CS403)</span></div>
+      <p class="sub">github.com/wachirawit-kaewdang/Project-CS403</p>
+      <ul>
+        <li>Built a deep learning pipeline predicting 3-day price direction for 10 US stocks across 5 sectors (2020–2025), from 27 engineered features: momentum and volatility, moving averages, RSI / MACD / Stochastic, volume and OBV, S&amp;P 500 market context and bond yield.</li>
+        <li>Architecture: LSTM with self-attention (3 layers, hidden size 128) over a 60-day window, trained with Focal Loss and class weights to handle imbalance.</li>
+        <li>Compared against Random Forest, Logistic Regression, a soft-voting ensemble and a VIX market-fear feature set.</li>
+        <li>Applied SHAP (KernelExplainer) and compared it with Pearson correlation: rankings differed by roughly 5–12 positions per feature, and SHAP surfaced bond yield as a top-5 driver for 6 of 10 stocks (#1 for JPM and AMZN) that correlation ranked low.</li>
+        <li>Evaluated results against a naive baseline: on 7 of 10 stocks the tuned model collapsed to always predicting “up”, so its F1 matched an always-up model; the ensemble’s threshold-free ROC-AUC averaged 0.568, showing short-term direction is close to random. Identified threshold and early-stopping leakage and documented fixes.</li>
+        <li>Evaluated quarterly fundamental data (P/E, EPS, market cap) and deliberately excluded it from training after finding that constant fill-forward injected noise into the daily series; retained as descriptive analysis and documented as a limitation.</li>
+        <li>My contribution: data collection and preparation, and design of the training approach including model architecture. Two-person project.</li>
+      </ul>
+      <p class="stack">Python · PyTorch · SHAP · scikit-learn · pandas · NumPy · Jupyter</p>
+    </div>
+    <div class="entry">
+      <div class="head"><b>Recipe Web Application – Full-Stack</b><span>CS369, group of 5</span></div>
+      <ul>
+        <li>React + Vite frontend with client-side routing, connected to a Node.js / Express REST API.</li>
+        <li>My contribution: the MyRecipe management feature, recipe deletion, and integration of the frontend with the backend API.</li>
+      </ul>
+      <p class="stack">React · Vite · JavaScript · Node.js · Express · REST APIs</p>
+    </div>
+    <div class="entry">
+      <div class="head"><b>HTTP Web Server from Scratch</b><span>CS322 Computer Networks</span></div>
+      <ul>
+        <li>Implemented an HTTP/1.0 server in Python using raw socket programming – no frameworks – serving static HTML and image content with correct status codes and content-type headers.</li>
+      </ul>
+      <p class="stack">Python · sockets · TCP/IP · HTTP</p>
+    </div>
+
+    <h2>Technical skills</h2>
+    <dl>
+      <dt>Languages</dt><dd>Python, JavaScript, Java, C, C++, SQL</dd>
+      <dt>ML &amp; Data</dt><dd>PyTorch, scikit-learn, SHAP, pandas, NumPy, Jupyter – time series, feature engineering, explainable AI</dd>
+      <dt>Web</dt><dd>React, Vite, Node.js, Express, Django, REST API design, HTML/CSS</dd>
+      <dt>Databases</dt><dd>MySQL, MongoDB</dd>
+      <dt>Tools</dt><dd>Git, Docker, automated testing (TDD), object-oriented design</dd>
+    </dl>
+
+    <h2>Languages</h2>
+    <dl>
+      <dt>Thai</dt><dd>Native</dd>
+      <dt>English</dt><dd>Professional working proficiency – technical reading and writing</dd>
+    </dl>
+  </body>
+</html>

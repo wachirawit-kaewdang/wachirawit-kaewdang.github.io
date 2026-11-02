@@ -35,7 +35,7 @@ export const projects = [
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption:
         'Every model is close to chance. F1 looks strong, but on 7 of 10 stocks the tuned LSTM ' +
-        'predicts “up” on every test day, so its 0.710 equals an always-up baseline. ROC-AUC, ' +
+        'predicts “up” on every test day, so there its F1 equals an always-up baseline’s. ROC-AUC, ' +
         'which ignores the threshold, is 0.55–0.57 wherever it was recorded (0.5 is chance).',
       note:
         'Averages over the 10 stocks; test set is the last 20% of Jan 2020 – Apr 2025, split by ' +
