@@ -19,6 +19,17 @@ export function Ref({ to, route, children }) {
   );
 }
 
+// An outbound link that opens in a new tab and says so to screen readers, so a reader is never
+// moved out of the page without warning.
+export function ExtLink({ children, ...props }) {
+  return (
+    <a {...props} target="_blank" rel="noreferrer">
+      {children}
+      <span className="visually-hidden"> (opens in a new tab)</span>
+    </a>
+  );
+}
+
 // Links separated by middots. Each separator stays on the line of the link before it, so a
 // wrapped line never opens with "·".
 export function LinkLine({ className, children }) {

@@ -71,7 +71,9 @@ li::marker { color: var(--ink-soft); }
 h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 
 .page { max-width: var(--measure); margin: 0 auto; padding: 0 16px; box-sizing: content-box; }
-.num { font-variant-numeric: lining-nums tabular-nums; margin-right: 0.6em; }
+/* A real space follows each number (so headings read "1 Projects", not "1Projects"); the
+   margin adds the rest of the visual gap. */
+.num { font-variant-numeric: lining-nums tabular-nums; margin-right: 0.35em; }
 
 .skip {
   position: absolute; left: 16px; top: -3rem; z-index: 20;
@@ -91,7 +93,7 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .runhead nav { display: flex; gap: 0.25rem 1.1rem; font-size: 0.95rem; }
 .runhead nav a { color: var(--ink-soft); padding: 0.7rem 0; white-space: nowrap; }
 .runhead nav a:hover { color: var(--ink); }
-.runhead nav .num { margin-right: 0.3em; }
+.runhead nav .num { margin-right: 0; }
 .runhead nav .runhead-resume { color: var(--link); font-weight: 600; }
 
 /* Title block and abstract */
@@ -116,6 +118,10 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 /* Inline links are text-height; vertical padding widens their hit area without moving text. */
 .contactline a, .meta a, .seealso a, .back a, .footer a { padding-block: 0.6rem; }
 .seealso { margin-top: -0.25rem; color: var(--ink-soft); }
+.contents { margin: 0 2.5rem 1rem; font-size: 0.95rem; color: var(--ink-soft); }
+.contents strong { color: var(--ink); margin-right: 0.2em; }
+.contents .linkitem { white-space: normal; }
+@media (max-width: 600px) { .contents { margin: 0 1rem 1rem; } }
 .titleblock h1 .num { display: block; margin: 0 0 0.35rem; font-size: 0.5em; font-weight: 600; color: var(--ink-soft); letter-spacing: 0; }
 
 .abstract { margin: 0 2.5rem 1rem; padding-bottom: 1.5rem; font-size: 1.0625rem; }

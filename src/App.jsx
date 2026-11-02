@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { profile, projects, skills, education, languages } from './data.js';
-import { Ref, LinkLine, NumberedTable } from './paper.jsx';
+import { ExtLink, Ref, LinkLine, NumberedTable } from './paper.jsx';
 import { APPENDIX, asset, jumpTo } from './paper-utils.js';
 import ProjectCS403 from './ProjectCS403.jsx';
 
@@ -45,19 +45,22 @@ function RunningHead({ appendix }) {
         <nav aria-label={appendix ? 'Appendix A' : 'Sections'}>
           {appendix ? (
             <>
-              <a href={`#${projectId(0)}`}>← §{sectionNumber('projects')}.1</a>
-              {featured?.link && <a href={featured.link} target="_blank" rel="noreferrer">Code</a>}
+              <a href={`#${projectId(0)}`} aria-label={`Back to the portfolio, section ${sectionNumber('projects')}.1`}>
+                ← Portfolio
+              </a>
+              {featured?.link && <ExtLink href={featured.link}>Code</ExtLink>}
             </>
           ) : (
             sections.map((s, i) => (
               <a key={s.id} href={`#${s.id}`} aria-label={`${i + 1} ${s.title}`}>
-                <span className="num">{i + 1}</span> {s.id === 'education' ? 'Education' : s.title}
+                <span className="num">{i + 1}</span>{' '}
+                {s.id === 'education' ? 'Education' : s.title}
               </a>
             ))
           )}
-          <a className="runhead-resume" href={asset(profile.resume)} target="_blank" rel="noreferrer">
+          <ExtLink className="runhead-resume" href={asset(profile.resume)}>
             Résumé
-          </a>
+          </ExtLink>
         </nav>
       </div>
     </header>
@@ -66,7 +69,7 @@ function RunningHead({ appendix }) {
 
 function TitleBlock() {
   return (
-    <header id="top" className="titleblock">
+    <header id="top" className="titleblock" tabIndex={-1}>
       <h1>
         {profile.name} <span className="nick">({profile.nickname})</span>
       </h1>
@@ -75,11 +78,11 @@ function TitleBlock() {
         <span>{education.school}</span> <span>{profile.location}</span>
       </p>
       <LinkLine className="contactline">
-        <a className="primary" href={asset(profile.resume)} target="_blank" rel="noreferrer">
+        <ExtLink className="primary" href={asset(profile.resume)}>
           Résumé (PDF)
-        </a>
-        <a href={profile.github} target="_blank" rel="noreferrer">GitHub</a>
-        <a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
+        </ExtLink>
+        <ExtLink href={profile.github}>GitHub</ExtLink>
+        <ExtLink href={profile.linkedin}>LinkedIn</ExtLink>
         <a href={`mailto:${profile.email}`}>Email</a>
       </LinkLine>
     </header>
@@ -110,8 +113,8 @@ function Abstract() {
 function SectionHeading({ id }) {
   const s = sections.find((x) => x.id === id);
   return (
-    <h2>
-      <span className="num">{sectionNumber(id)}</span>
+    <h2 id={`${id}-title`}>
+      <span className="num">{sectionNumber(id)}</span>{' '}
       {s.title}
     </h2>
   );
@@ -120,9 +123,9 @@ function SectionHeading({ id }) {
 function Project({ project, index }) {
   const number = `${sectionNumber('projects')}.${index + 1}`;
   return (
-    <article id={projectId(index)} className="subsection" tabIndex={-1}>
-      <h3>
-        <span className="num">{number}</span>
+    <article id={projectId(index)} className="subsection" tabIndex={-1} aria-labelledby={`${projectId(index)}-title`}>
+      <h3 id={`${projectId(index)}-title`}>
+        <span className="num">{number}</span>{' '}
         {project.title}
       </h3>
       <p className="context">{project.context}</p>
@@ -150,9 +153,9 @@ function Project({ project, index }) {
       {project.link && (
         <p className="meta">
           <em>Code.</em>{' '}
-          <a href={project.link} target="_blank" rel="noreferrer">
+          <ExtLink href={project.link}>
             {project.link.replace(/^https?:\/\//, '')}
-          </a>
+          </ExtLink>
         </p>
       )}
       {!project.link && project.codeNote && (
@@ -166,7 +169,7 @@ function Project({ project, index }) {
 
 function Projects() {
   return (
-    <section id="projects" className="section" tabIndex={-1}>
+    <section id="projects" className="section" tabIndex={-1} aria-labelledby="projects-title">
       <SectionHeading id="projects" />
       {projects.map((project, i) => (
         <Project key={project.title} project={project} index={i} />
@@ -177,7 +180,7 @@ function Projects() {
 
 function Skills() {
   return (
-    <section id="skills" className="section" tabIndex={-1}>
+    <section id="skills" className="section" tabIndex={-1} aria-labelledby="skills-title">
       <SectionHeading id="skills" />
       <p>
         Each group starts with what the projects in{' '}
@@ -206,7 +209,7 @@ function Skills() {
 
 function Background() {
   return (
-    <section id="education" className="section" tabIndex={-1}>
+    <section id="education" className="section" tabIndex={-1} aria-labelledby="education-title">
       <SectionHeading id="education" />
       <dl className="facts">
         <div>
@@ -227,13 +230,13 @@ function Background() {
 
 function Contact() {
   return (
-    <section id="contact" className="section" tabIndex={-1}>
+    <section id="contact" className="section" tabIndex={-1} aria-labelledby="contact-title">
       <SectionHeading id="contact" />
       <p>The quickest way to reach me is email or LinkedIn.</p>
       <LinkLine className="contactline left">
         <a className="primary" href={`mailto:${profile.email}`}>{profile.email}</a>
-        <a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
-        <a href={asset(profile.resume)} target="_blank" rel="noreferrer">Résumé (PDF)</a>
+        <ExtLink href={profile.linkedin}>LinkedIn</ExtLink>
+        <ExtLink href={asset(profile.resume)}>Résumé (PDF)</ExtLink>
       </LinkLine>
     </section>
   );
@@ -243,6 +246,9 @@ export default function App() {
   const hash = useHash();
   // "#/cs403" and anything under it ("#/cs403/figure-a1") is the appendix.
   const isCaseStudy = hash === APPENDIX || hash.startsWith(`${APPENDIX}/`);
+  // Remembers whether the last route was the appendix, so leaving it with browser Back (which
+  // returns to an empty hash) lands the reader on §1.1, where they came from.
+  const wasCaseStudy = useRef(false);
 
   // After switching pages, land in the right place and say where we are: the tab title names
   // the page, and focus moves to it so a screen reader announces the change. In the appendix
@@ -251,17 +257,20 @@ export default function App() {
     if (isCaseStudy) {
       document.title = `Appendix A: Stock Direction Prediction · ${profile.name}`;
       const anchor = hash.slice(APPENDIX.length + 1);
-      if (anchor && jumpTo(anchor, { tint: false })) return;
-      window.scrollTo(0, 0);
-      document.getElementById('appendix-title')?.focus({ preventScroll: true });
+      if (!(anchor && jumpTo(anchor, { tint: false }))) {
+        window.scrollTo(0, 0);
+        document.getElementById('appendix-title')?.focus({ preventScroll: true });
+      }
     } else {
       document.title = homeTitle;
-      const target = hash.length > 1 && document.getElementById(hash.slice(1));
+      const named = hash.length > 1 ? hash.slice(1) : wasCaseStudy.current ? projectId(0) : null;
+      const target = named && document.getElementById(named);
       if (target) {
         target.scrollIntoView();
         target.focus({ preventScroll: true });
       }
     }
+    wasCaseStudy.current = isCaseStudy;
   }, [hash, isCaseStudy]);
 
   return (
@@ -285,7 +294,7 @@ export default function App() {
       )}
       <footer className="page footer">
         © {new Date().getFullYear()} {profile.name} ·{' '}
-        <a href={profile.source} target="_blank" rel="noreferrer">Site source on GitHub</a>
+        <ExtLink href={profile.source}>Site source on GitHub</ExtLink>
       </footer>
     </>
   );

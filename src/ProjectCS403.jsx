@@ -1,6 +1,6 @@
 // Appendix A of the portfolio: the CS403 senior project write-up, shown at #/cs403. Set like the
 // home page, with its own A-numbering: sections A.1–A.6, Table A.1 and Figures A.1–A.3.
-import { Ref, LinkLine, NumberedTable } from './paper.jsx';
+import { ExtLink, Ref, LinkLine, NumberedTable } from './paper.jsx';
 import { APPENDIX, asset } from './paper-utils.js';
 import { profile } from './data.js';
 
@@ -47,7 +47,7 @@ const sectionId = (n) => `appendix-a${n}`;
 function Heading({ n }) {
   return (
     <h2 id={sectionId(n)} tabIndex={-1}>
-      <span className="num">A.{n}</span>
+      <span className="num">A.{n}</span>{' '}
       {sections[n - 1]}
     </h2>
   );
@@ -116,8 +116,8 @@ function SectorFigure() {
 function Contacts({ className }) {
   return (
     <LinkLine className={className}>
-      <a className="primary" href={repo} target="_blank" rel="noreferrer">Code on GitHub</a>
-      <a href={asset(profile.resume)} target="_blank" rel="noreferrer">Résumé (PDF)</a>
+      <ExtLink className="primary" href={repo}>Code on GitHub</ExtLink>
+      <ExtLink href={asset(profile.resume)}>Résumé (PDF)</ExtLink>
       <a href={`mailto:${profile.email}`}>Email</a>
     </LinkLine>
   );
@@ -126,11 +126,11 @@ function Contacts({ className }) {
 export default function ProjectCS403() {
   return (
     <main id="main" className="page case" tabIndex={-1}>
-      <p className="back"><a href="#project-1">← Back to §1.1</a></p>
+      <p className="back"><a href="#project-1">← Back to the portfolio (§1.1)</a></p>
 
       <header className="titleblock">
         <h1 id="appendix-title" tabIndex={-1}>
-          <span className="num">Appendix A</span>
+          <span className="num">Appendix A</span>{' '}
           Stock Direction Prediction with Explainable AI
         </h1>
         <p className="authorline">
@@ -148,6 +148,18 @@ export default function ProjectCS403() {
           whether the model beat a naive baseline (<ARef to="table-a1">Table A.1</ARef>).
         </p>
       </section>
+
+      <nav className="contents" aria-label="Appendix A contents">
+        <p>
+          <strong>Contents.</strong>{' '}
+          {sections.map((title, i) => (
+            <span key={title} className="linkitem">
+              <ARef to={sectionId(i + 1)}>A.{i + 1} {title}</ARef>
+              {i < sections.length - 1 && <span className="sep" aria-hidden="true">·</span>}
+            </span>
+          ))}
+        </p>
+      </nav>
 
       <section className="section">
         <Heading n={1} />
@@ -248,7 +260,7 @@ export default function ProjectCS403() {
       <footer className="closing">
         <p>Questions about the method or the data? The code and notebook are on GitHub.</p>
         <Contacts className="contactline left" />
-        <p className="back"><a href="#project-1">← Back to §1.1</a></p>
+        <p className="back"><a href="#project-1">← Back to the portfolio (§1.1)</a></p>
       </footer>
     </main>
   );
