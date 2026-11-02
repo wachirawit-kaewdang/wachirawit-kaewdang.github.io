@@ -4,6 +4,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve, relative } from 'node:path';
 import { profile } from '../src/data.js';
+import { alwaysUpF1, collapsed } from '../src/metrics.js';
 
 const root = resolve(import.meta.dirname, '..');
 const pub = (path) => resolve(root, 'public', path);
@@ -34,6 +35,14 @@ for (const [, path] of html.matchAll(/property="og:image" content="https?:\/\/[^
   expect(path, 'index.html (og:image)');
 }
 
+// Appendix A claims the 0.30-threshold stocks collapsed to always-up, so their F1 must equal
+// 2p / (1 + p) for accuracy p. If a rerun of the notebook breaks that, the claim must change too.
+for (const s of collapsed) {
+  if (Math.abs(s.lstm.f1 - alwaysUpF1(s.lstm.acc)) > 0.0006) {
+    failures.push(`metrics.json: ${s.ticker} F1 ${s.lstm.f1} is not the always-up value for accuracy ${s.lstm.acc}`);
+  }
+}
+
 // Files in public/ that nothing links to are not errors, but worth knowing about.
 const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
   e.isDirectory() ? walk(resolve(dir, e.name)) : [relative(pub(''), resolve(dir, e.name)).replaceAll('\\', '/')]);
@@ -45,3 +54,4 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(`✓ ${referenced.size} linked files exist in public/`);
+console.log(`✓ always-up identity holds for ${collapsed.length} stocks`);

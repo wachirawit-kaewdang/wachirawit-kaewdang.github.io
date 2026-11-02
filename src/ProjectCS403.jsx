@@ -3,35 +3,14 @@
 import { ExtLink, Ref, LinkLine, NumberedTable } from './paper.jsx';
 import { APPENDIX, asset } from './paper-utils.js';
 import { profile } from './data.js';
+import { alwaysUpF1, collapsed, ensembleAuc, notCollapsed, sectorShap, stockCount } from './metrics.js';
 
 const img = (name) => asset(`cs403/${name}.webp`);
 const repo = 'https://github.com/wachirawit-kaewdang/Project-CS403';
 
-// The 7 stocks whose tuned threshold was 0.30. On each, the model predicted "up" on every test
-// day, so its accuracy is the share of up days p and its F1 equals an always-up model's,
-// 2p / (1 + p). Values are the notebook's 4-decimal outputs. NVDA (0.50), JNJ and COST (0.35)
-// used other thresholds, so the identity does not apply to them.
-const baselineRows = [
-  { stock: 'JPM', acc: 0.6082, f1: 0.7563 },
-  { stock: 'UNH', acc: 0.6, f1: 0.75 },
-  { stock: 'GS', acc: 0.5673, f1: 0.724 },
-  { stock: 'XOM', acc: 0.5347, f1: 0.6968 },
-  { stock: 'CVX', acc: 0.5265, f1: 0.6898 },
-  { stock: 'TSLA', acc: 0.502, f1: 0.6685 },
-  { stock: 'AMZN', acc: 0.4939, f1: 0.6612 },
-];
-const alwaysUpF1 = (p) => ((2 * p) / (1 + p)).toFixed(3);
-
-// Figure A.2 drawn from its data: each sector's top 10 features by mean |SHAP|, as printed on
-// the bars of the original matplotlib chart (public/cs403/sector_shap.webp). Drawing it here
-// lets it reflow to one column on a phone instead of shrinking a 1600px image.
-const sectorShap = [
-  { sector: 'Consumer', stocks: 'AMZN, COST', rows: [['Bond_yield', 0.0312], ['Volume_change', 0.0141], ['Volatility_20d', 0.0106], ['Relative_return', 0.0082], ['Stoch_d', 0.0071], ['Return_1d', 0.0068], ['OBV', 0.0065], ['Volume_MA_ratio', 0.0057], ['Stoch_k', 0.0056], ['Price_MA20_dist', 0.0051]] },
-  { sector: 'Healthcare', stocks: 'JNJ, UNH', rows: [['MACD_diff', 0.0378], ['Volume_MA_ratio', 0.0215], ['Stoch_d', 0.0189], ['SP500_MA20', 0.0143], ['Stoch_k', 0.0132], ['OBV', 0.013], ['Return_5d', 0.0123], ['RSI', 0.0113], ['Volume_change', 0.0108], ['Price_MA20_dist', 0.0107]] },
-  { sector: 'Finance', stocks: 'JPM, GS', rows: [['Bond_yield', 0.0127], ['MACD_diff', 0.0114], ['MACD_signal', 0.0076], ['Relative_return', 0.0066], ['MA50', 0.0062], ['EMA26', 0.0055], ['Return_1d', 0.0054], ['SP500_vol', 0.0052], ['Volume_MA_ratio', 0.0049], ['EMA12', 0.0043]] },
-  { sector: 'Technology', stocks: 'NVDA, TSLA', rows: [['MACD_diff', 0.0341], ['Volume_change', 0.0287], ['Bond_yield', 0.0282], ['Stoch_d', 0.0138], ['MA5', 0.0135], ['MA20', 0.0128], ['EMA26', 0.0125], ['SP500_MA20', 0.0115], ['Stoch_k', 0.0108], ['Return_10d', 0.0104]] },
-  { sector: 'Energy', stocks: 'XOM, CVX', rows: [['SP500_MA20', 0.0613], ['Volume_change', 0.0243], ['Volume_MA_ratio', 0.0109], ['Volatility_20d', 0.0088], ['Stoch_d', 0.008], ['MACD_signal', 0.0071], ['OBV', 0.0064], ['RSI', 0.0063], ['MACD', 0.0059], ['Stoch_k', 0.0059]] },
-];
+// Table A.1's rows and Figure A.2's values are computed in metrics.js from the notebook's outputs.
+const pct = (v) => v.toFixed(3);
+const thresholds = notCollapsed.map((s) => `${s.ticker} (${s.threshold.toFixed(2)})`).join(', ');
 const featureLabel = (name) => name.replace(/_/g, ' ');
 
 const sections = [
@@ -209,18 +188,18 @@ export default function ProjectCS403() {
           Our tuned model reported an average F1 of about 0.71, which looked good. When I checked it
           against the simplest possible baseline, a model that always predicts “up”, the numbers
           matched (<ARef to="table-a1">Table A.1</ARef>). With the decision threshold tuned down to 0.30,
-          the model predicted “up” on every test day for 7 of the 10 stocks, in a rising market.
+          the model predicted “up” on every test day for {collapsed.length} of the {stockCount} stocks, in a rising market.
         </p>
         <NumberedTable
           number="A.1"
-          caption="The 7 stocks tuned to a 0.30 threshold, where the model predicted “up” on every test day. Its accuracy is then the share of up days p, so its F1 must equal an always-up model’s, 2p / (1 + p), and it does on every row."
-          note="NVDA (threshold 0.50), JNJ and COST (0.35) did not collapse to always-up, so the identity does not apply to them. Accuracy and F1 are the notebook’s test-set outputs."
+          caption={`The ${collapsed.length} stocks tuned to a 0.30 threshold, where the model predicted “up” on every test day. Its accuracy is then the share of up days p, so its F1 must equal an always-up model’s, 2p / (1 + p), and it does on every row.`}
+          note={`${thresholds} used other thresholds and did not collapse to always-up, so the identity does not apply to them. Accuracy and F1 are the notebook’s test-set outputs.`}
           columns={['Stock', 'Accuracy', 'Our F1', 'F1 of “always up”']}
-          rows={baselineRows.map((r) => [r.stock, r.acc.toFixed(3), r.f1.toFixed(3), alwaysUpF1(r.acc)])}
+          rows={collapsed.map((s) => [s.ticker, pct(s.lstm.acc), pct(s.lstm.f1), pct(alwaysUpF1(s.lstm.acc))])}
         />
         <p>
-          Threshold-free metrics tell the same story: the ensemble’s ROC-AUC averaged 0.568 across the
-          10 stocks, only a little better than random (0.5). Predicting 3-day direction from technical
+          Threshold-free metrics tell the same story: the ensemble’s ROC-AUC averaged {ensembleAuc} across the{' '}
+          {stockCount} stocks, only a little better than random (0.5). Predicting 3-day direction from technical
           indicators alone is close to a coin flip (<ARef to="figure-a3">Figure A.3</ARef>). That is the
           result, not a failure of the explainability work: SHAP still shows what the model relied on.
         </p>

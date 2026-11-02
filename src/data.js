@@ -1,4 +1,8 @@
 // All site content lives here, so updating the portfolio never means touching layout code.
+// The CS403 numbers come from metrics.js, which computes them from the notebook's outputs.
+import { collapsed, ensembleAuc, source, stockCount, table1Rows } from './metrics.js';
+
+const collapsedShare = `${collapsed.length} of ${stockCount}`;
 
 export const profile = {
   name: 'Wachirawit Kaewdang',
@@ -28,28 +32,21 @@ export const projects = [
       'and checked against a naive baseline.',
     // Stated as the abstract's main result, ahead of any metric.
     finding:
-      'my senior-project model ties a naive “always predict up” baseline, and Appendix A ' +
-      'shows how I caught it',
-    // Averages over the 10 stocks, recomputed from the per-stock outputs in stock_project.ipynb.
+      `my senior-project model ties a naive “always predict up” baseline on ${collapsedShare} ` +
+      'stocks, and Appendix A shows how I caught it',
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption:
-        'Every model is close to chance. F1 looks strong, but on 7 of 10 stocks the tuned LSTM ' +
+        `Every model is close to chance. F1 looks strong, but on ${collapsedShare} stocks the tuned LSTM ` +
         'predicts “up” on every test day, so there its F1 equals an always-up baseline’s. ROC-AUC, ' +
         'which ignores the threshold, is 0.55–0.57 wherever it was recorded (0.5 is chance).',
       note:
-        'Averages over the 10 stocks; test set is the last 20% of Jan 2020 – Apr 2025, split by ' +
-        'date. Values are recomputed from the notebook’s per-stock outputs. † The notebook does not ' +
-        'record ROC-AUC for the full-feature LSTM; the project README’s “≈0.57” matches the ' +
-        'ensemble’s 0.568.',
+        `Averages over the ${stockCount} stocks; test set is the last 20% of Jan 2020 – Apr 2025, split by ` +
+        `date. Computed from the notebook’s per-stock outputs (Project-CS403 @ ${source.commit}). ` +
+        '† The notebook does not record ROC-AUC for the full-feature LSTM; the project README’s ' +
+        `“≈0.57” matches the ensemble’s ${ensembleAuc}.`,
       columns: ['Model', 'F1', 'ROC-AUC'],
-      rows: [
-        // n/r = not recorded: the notebook never prints ROC-AUC for this model (see the note).
-        ['LSTM + self-attention', '0.710', 'n/r†'],
-        ['Ensemble (LSTM + RF + LR, soft vote)', '0.663', '0.568'],
-        ['Logistic Regression', '0.525', '0.555'],
-        ['Random Forest', '0.374', '0.546'],
-      ],
+      rows: table1Rows,
     },
     points: [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
