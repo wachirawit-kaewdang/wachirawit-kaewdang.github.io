@@ -31,7 +31,7 @@ const html = read('index.html');
 for (const [, path] of html.matchAll(/(?:href|src)="\/([^"/][^"]*)"/g)) {
   if (!path.startsWith('src/')) expect(path, 'index.html');
 }
-for (const [, path] of html.matchAll(/property="og:image" content="https?:\/\/[^/]+\/([^"]+)"/g)) {
+for (const [, path] of html.matchAll(/property="og:image" content="(?:%SITE_URL%|https?:\/\/[^/]+\/)([^"]+)"/g)) {
   expect(path, 'index.html (og:image)');
 }
 

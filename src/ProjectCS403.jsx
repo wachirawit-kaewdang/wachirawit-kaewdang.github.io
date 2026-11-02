@@ -2,11 +2,13 @@
 // home page, with its own A-numbering: sections A.1–A.6, Table A.1 and Figures A.1–A.3.
 import { ExtLink, Ref, LinkLine, NumberedTable } from './paper.jsx';
 import { APPENDIX, asset } from './paper-utils.js';
-import { profile } from './data.js';
+import { profile, projects } from './data.js';
 import { alwaysUpF1, collapsed, ensembleAuc, notCollapsed, sectorShap, stockCount } from './metrics.js';
 
 const img = (name) => asset(`cs403/${name}.webp`);
-const repo = 'https://github.com/wachirawit-kaewdang/Project-CS403';
+// The project's code link and stack come from its entry in data.js.
+const project = projects.find((p) => p.caseStudy);
+const repo = project.link;
 
 // Table A.1's rows and Figure A.2's values are computed in metrics.js from the notebook's outputs.
 const pct = (v) => v.toFixed(3);
@@ -232,7 +234,7 @@ export default function ProjectCS403() {
           methodology and the VIX market-sentiment component.
         </p>
         <p className="meta">
-          <em>Stack.</em> {['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance'].join(' · ')}
+          <em>Stack.</em> {project.tech.join(' · ')}
         </p>
       </section>
 

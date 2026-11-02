@@ -4,16 +4,22 @@ import { collapsed, ensembleAuc, source, stockCount, table1Rows } from './metric
 
 const collapsedShare = `${collapsed.length} of ${stockCount}`;
 
+// Every GitHub and site URL is built from the username, so a rename is a one-line change.
+const username = 'wachirawit-kaewdang';
+const github = `https://github.com/${username}`;
+
 export const profile = {
   name: 'Wachirawit Kaewdang',
   nickname: 'Ohm',
   role: 'Machine Learning & Software Engineer',
   location: 'Bangkok, Thailand',
   email: 'wachirawit.kaewdang@gmail.com',
-  github: 'https://github.com/wachirawit-kaewdang',
+  github,
+  // The published site; index.html's share tags are filled from this at build time.
+  site: `https://${username}.github.io/`,
   linkedin: 'https://www.linkedin.com/in/wachirawit-kaewdang',
   resume: 'Wachirawit_Kaewdang_Resume.pdf',
-  source: 'https://github.com/wachirawit-kaewdang/wachirawit-kaewdang.github.io',
+  source: `${github}/${username}.github.io`,
   summary:
     'Computer Science graduate (Software Engineering track) from Thammasat University. ' +
     'I work across machine learning for time series — with a focus on model explainability ' +
@@ -57,7 +63,7 @@ export const projects = [
     ],
     tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance'],
     caseStudy: '#/cs403',
-    link: 'https://github.com/wachirawit-kaewdang/Project-CS403',
+    link: `${github}/Project-CS403`,
   },
   {
     title: 'Recipe Web Application',
