@@ -8,10 +8,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Read-only by default; only the deploy job gets the Pages and OIDC token writes it needs, so
+# the build (which runs pull-request code) never holds them.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   build:
@@ -36,6 +36,9 @@ jobs:
     if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     # One deploy at a time, and a deploy already running is allowed to finish rather than being
     # cancelled half-way by the next push.
     concurrency:

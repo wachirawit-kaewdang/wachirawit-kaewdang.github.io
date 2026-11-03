@@ -119,8 +119,11 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .contactline a, .meta a, .seealso a, .back a, .footer a { padding-block: 0.6rem; }
 .seealso { margin-top: -0.25rem; color: var(--ink-soft); }
 .contents { margin: 0 2.5rem 1rem; font-size: 0.95rem; color: var(--ink-soft); }
-.contents strong { color: var(--ink); margin-right: 0.2em; }
-.contents .linkitem { white-space: normal; }
+.contents p { margin: 0 0 0.2rem; }
+.contents strong { color: var(--ink); }
+.contents ol { list-style: none; margin: 0; padding: 0; }
+/* Each entry is a full-height target (about 32px), not just its line of text. */
+.contents a { display: inline-block; padding-block: 0.3rem; }
 @media (max-width: 600px) { .contents { margin: 0 1rem 1rem; } }
 .titleblock h1 .num { display: block; margin: 0 0 0.35rem; font-size: 0.5em; font-weight: 600; color: var(--ink-soft); letter-spacing: 0; }
 

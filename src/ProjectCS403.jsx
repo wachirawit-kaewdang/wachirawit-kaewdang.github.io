@@ -116,8 +116,7 @@ function Contacts({ className }) {
 export default function ProjectCS403() {
   return (
     <main id="main" className="page case" tabIndex={-1}>
-      <p className="back"><a href="#project-1">← Back to the portfolio (§1.1)</a></p>
-
+      {/* The running head's "← Portfolio" is the way back at the top; the closing has another. */}
       <header className="titleblock">
         <h1 id="appendix-title" tabIndex={-1}>
           <span className="num">Appendix A</span>{' '}
@@ -139,16 +138,18 @@ export default function ProjectCS403() {
         </p>
       </section>
 
-      <nav className="contents" aria-label="Appendix A contents">
-        <p>
-          <strong>Contents.</strong>{' '}
+      <nav className="contents" aria-labelledby="contents-title">
+        <p id="contents-title"><strong>Contents</strong></p>
+        <ol>
           {sections.map((title, i) => (
-            <span key={title} className="linkitem">
-              <ARef to={sectionId(i + 1)}>A.{i + 1} {title}</ARef>
-              {i < sections.length - 1 && <span className="sep" aria-hidden="true">·</span>}
-            </span>
+            <li key={title}>
+              <ARef to={sectionId(i + 1)}>
+                <span className="num">A.{i + 1}</span>{' '}
+                {title}
+              </ARef>
+            </li>
           ))}
-        </p>
+        </ol>
       </nav>
 
       <section className="section">

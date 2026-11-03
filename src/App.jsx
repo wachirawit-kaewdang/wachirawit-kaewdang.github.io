@@ -42,7 +42,7 @@ function RunningHead({ appendix }) {
     <header className="runhead">
       <div className="page runhead-inner">
         <a href="#top" className="runhead-name">{profile.name}</a>
-        <nav aria-label={appendix ? 'Appendix A' : 'Sections'}>
+        <nav aria-label={appendix ? 'Site' : 'Sections'}>
           {appendix ? (
             <>
               <a href={`#${projectId(0)}`} aria-label={`Back to the portfolio, section ${sectionNumber('projects')}.1`}>
@@ -204,7 +204,7 @@ function Skills() {
           return (
             <div key={s.group}>
               <dt>{s.group}</dt>
-              {shown.length > 0 && <dd>{shown.join(', ')}</dd>}
+              {shown.length > 0 ? <dd>{shown.join(', ')}</dd> : <dd className="also">None in the projects above.</dd>}
               {also.length > 0 && (
                 <dd className="also">
                   <em>Also used:</em> {also.join(', ')}
