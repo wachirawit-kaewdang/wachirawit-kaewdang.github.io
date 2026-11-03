@@ -1,0 +1,53 @@
+Maintaining the portfolio
+=========================
+Print this file with: npm run help
+Needs Node ^20.19.0 or >=22.12.0, and npm ci run once.
+
+Everyday
+--------
+npm run dev       Dev server at http://localhost:5173 (the appendix is at #/cs403).
+npm run lint      oxlint over the source.
+npm run check     Checks a build cannot catch (see "What CI checks" below).
+npm run build     Production build to dist/. Fails if index.html keeps a %NAME% placeholder.
+
+Content lives in src/data.js. The CS403 numbers are not typed anywhere: src/metrics.js
+computes them from src/metrics.json, so edit data, not prose.
+
+Deploying
+---------
+Push to main. GitHub Actions (.github/workflows/deploy.yml) runs npm ci, lint, check and
+build, then publishes dist/ to GitHub Pages. Pull requests run the same steps but never
+deploy.
+
+Refreshing the CS403 numbers after a notebook rerun
+---------------------------------------------------
+1. Commit the rerun notebook in the Project-CS403 repo.
+2. python scripts/extract-metrics.py <path to Project-CS403> <commit>
+   Reads the notebook's saved outputs at that commit and rewrites src/metrics.json. Nothing is
+   re-executed. sectorShap is kept as is: the notebook saves it only as sector_shap.png, so
+   read the new bar labels into metrics.json by hand.
+3. npm run check
+   Fails if the always-up claim no longer holds, if a field is missing or out of range, or if
+   the resume quotes numbers that no longer match.
+4. Update resume/resume.html to the numbers the check names, then rebuild the PDF (below).
+
+Rebuilding the resume PDF
+-------------------------
+Edit resume/resume.html, then: npm run resume
+Prints it to public/Wachirawit_Kaewdang_Resume.pdf with the installed Chrome or Edge (set
+CHROME=/path/to/chrome to pick another). It fails if a font file is missing or no new PDF is
+written. Commit the PDF with the HTML; the check warns when the HTML is newer.
+
+Rebuilding the link-preview image
+---------------------------------
+With npm run dev running, capture http://localhost:5173/og/og-image.html at 1200x630 with any
+headless Chrome screenshot and save it as public/og-image.png. Its words come from
+src/data.js, so redo it when the name, role or summary changes.
+
+What CI checks (npm run check)
+------------------------------
+- Every file the site links to exists in public/: resume, figures, favicon, og:image.
+- metrics.json has 10 stocks and 5 sectors of 10 rows, with every rate in [0, 1].
+- The 0.30-threshold stocks have F1 equal to always-up, 2p / (1 + p); the others do not.
+- resume/resume.html quotes the computed CS403 numbers.
+Warnings only: files in public/ nothing links to, and a resume PDF older than its HTML.
