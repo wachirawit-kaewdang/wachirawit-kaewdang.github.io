@@ -3,7 +3,10 @@
 import { ExtLink, Ref, LinkLine, NumberedTable } from './paper.jsx';
 import { APPENDIX, asset } from './paper-utils.js';
 import { profile, projects } from './data.js';
-import { alwaysUpF1, collapsed, ensembleAuc, notCollapsed, sectorShap, stockCount } from './metrics.js';
+import {
+  alwaysUpF1, bondFirstFor, bondTop5Share, collapsed, ensembleAuc, lstmF1About, notCollapsed, sectorCount, sectorShap,
+  shapPeak, stockCount,
+} from './metrics.js';
 
 const img = (name) => asset(`cs403/${name}.webp`);
 // The project's code link and stack come from its entry in data.js.
@@ -55,7 +58,7 @@ const ARef = (props) => <Ref route={APPENDIX} {...props} />;
 // Small multiples, one booktabs-style table per sector, all on one shared scale so a bar's length
 // can be compared across sectors (the original chart scaled each panel to itself). Bond yield, the
 // feature §A.3 is about, is set in bold ink; the sixth grid cell is the key.
-const shapMax = Math.max(...sectorShap.flatMap((s) => s.rows.map(([, value]) => value)));
+const shapMax = shapPeak.value;
 
 function SectorFigure() {
   return (
@@ -87,7 +90,8 @@ function SectorFigure() {
           );
         })}
         <p className="key">
-          All bars share one scale, from 0 to {shapMax.toFixed(4)} (Energy’s SP500 MA20). Bond yield
+          All bars share one scale, from 0 to {shapMax.toFixed(4)} ({shapPeak.sector}’s{' '}
+          {featureLabel(shapPeak.feature)}). Bond yield
           is in <strong>bold</strong>.
         </p>
       </div>
@@ -129,7 +133,7 @@ export default function ProjectCS403() {
       <section className="abstract" aria-label="Abstract">
         <p>
           <strong>Abstract.</strong> Can SHAP tell us something about a stock-prediction model that
-          plain correlation can’t? We trained an LSTM with self-attention on 10 US stocks, explained
+          plain correlation can’t? We trained an LSTM with self-attention on {stockCount} US stocks, explained
           it with SHAP, and compared those explanations with Pearson correlation. We also checked
           whether the model beat a naive baseline (<ARef to="table-a1">Table A.1</ARef>).
         </p>
@@ -150,7 +154,7 @@ export default function ProjectCS403() {
       <section className="section">
         <Heading n={1} />
         <dl className="facts">
-          <div><dt>Data</dt><dd>10 US stocks, 2 per sector (Tech, Healthcare, Energy, Finance, Consumer), Jan 2020 – Apr 2025</dd></div>
+          <div><dt>Data</dt><dd>{stockCount} US stocks, {stockCount / sectorCount} per sector (Tech, Healthcare, Energy, Finance, Consumer), Jan 2020 – Apr 2025</dd></div>
           <div><dt>Features</dt><dd>27 daily features: returns, volatility, moving averages, RSI/MACD/Stochastic, volume/OBV, S&amp;P 500 context, bond yield</dd></div>
           <div><dt>Target</dt><dd>Direction of the 3-day forward return (up / down), 80/20 time-ordered split</dd></div>
           <div><dt>Model</dt><dd>LSTM (3 layers, hidden 128) + self-attention over a 60-day window, Focal Loss with class weights</dd></div>
@@ -180,8 +184,8 @@ export default function ProjectCS403() {
       <section className="section">
         <Heading n={3} />
         <p>
-          Bond yield was in the model’s SHAP top 5 for 6 of the 10 stocks, and was the #1 feature for
-          JPM and AMZN, even though correlation ranked it low for most of them. That fits financial
+          Bond yield was in the model’s SHAP top 5 for {bondTop5Share} stocks, and was the #1 feature
+          for {bondFirstFor}, even though correlation ranked it low for most of them. That fits financial
           intuition: bank profits depend on interest rates, and growth stocks are sensitive to them.
           Grouped by sector, the patterns differ too (<ARef to="figure-a2">Figure A.2</ARef>). Energy
           leans on the S&amp;P 500 trend, while Healthcare and Technology lean on MACD.
@@ -192,7 +196,7 @@ export default function ProjectCS403() {
       <section className="section">
         <Heading n={4} />
         <p>
-          Our tuned model reported an average F1 of about 0.71, which looked good. When I checked it
+          Our tuned model reported an average F1 of about {lstmF1About}, which looked good. When I checked it
           against the simplest possible baseline, a model that always predicts “up”, the numbers
           matched (<ARef to="table-a1">Table A.1</ARef>). With the decision threshold tuned down to 0.30,
           the model predicted “up” on every test day for {collapsed.length} of the {stockCount} stocks, in a rising market.

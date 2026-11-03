@@ -7,6 +7,7 @@ export const sectorShap = metrics.sectorShap;
 
 const stocks = Object.entries(metrics.stocks).map(([ticker, s]) => ({ ticker, ...s }));
 export const stockCount = stocks.length;
+export const sectorCount = new Set(stocks.map((s) => s.sector)).size;
 
 const mean = (values) => values.reduce((sum, v) => sum + v, 0) / values.length;
 const avg = (pick) => mean(stocks.map(pick)).toFixed(3);
@@ -30,3 +31,21 @@ export const table1Rows = [
   ['Random Forest', avg((s) => s.rf.f1), avg((s) => s.rf.auc)],
 ];
 export const ensembleAuc = avg((s) => s.ensemble.auc);
+
+// The numbers the prose quotes, rounded the way the prose says them.
+const lstmF1 = table1Rows[0][1];
+export const lstmF1About = Number(lstmF1).toFixed(2);
+const recordedAucs = table1Rows.map((row) => Number(row[2])).filter((v) => !Number.isNaN(v));
+export const aucRange = `${Math.min(...recordedAucs).toFixed(2)}–${Math.max(...recordedAucs).toFixed(2)}`;
+
+const listed = (names) => names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
+
+// Bond yield's rank in each stock's LSTM SHAP ordering (1 = most important), from cell 27.
+const bondTop5 = stocks.filter((s) => s.bondYieldRank <= 5);
+export const bondTop5Share = `${bondTop5.length} of ${stockCount}`;
+export const bondFirstFor = listed(stocks.filter((s) => s.bondYieldRank === 1).map((s) => s.ticker));
+
+// Figure A.2's shared scale runs to the largest value in any panel.
+export const shapPeak = sectorShap
+  .flatMap(({ sector, rows }) => rows.map(([feature, value]) => ({ sector, feature, value })))
+  .reduce((a, b) => (b.value > a.value ? b : a));

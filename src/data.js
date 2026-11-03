@@ -1,6 +1,8 @@
 // All site content lives here, so updating the portfolio never means touching layout code.
 // The CS403 numbers come from metrics.js, which computes them from the notebook's outputs.
-import { collapsed, ensembleAuc, source, stockCount, table1Rows } from './metrics.js';
+import {
+  aucRange, bondTop5Share, collapsed, ensembleAuc, sectorCount, source, stockCount, table1Rows,
+} from './metrics.js';
 
 const collapsedShare = `${collapsed.length} of ${stockCount}`;
 
@@ -38,8 +40,8 @@ export const projects = [
     context: 'Senior project (CS403) · 2-person team',
     featured: true,
     summary:
-      'An LSTM with self-attention that predicts 3-day price direction for 10 US stocks across ' +
-      '5 sectors, used to test whether SHAP explains a model better than plain correlation, ' +
+      `An LSTM with self-attention that predicts 3-day price direction for ${stockCount} US stocks across ` +
+      `${sectorCount} sectors, used to test whether SHAP explains a model better than plain correlation, ` +
       'and checked against a naive baseline.',
     // Stated as the abstract's main result, ahead of any metric.
     finding: [
@@ -50,7 +52,7 @@ export const projects = [
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption: [
-        'Every model is close to chance: ROC-AUC, which ignores the threshold, is 0.55–0.57 ' +
+        `Every model is close to chance: ROC-AUC, which ignores the threshold, is ${aucRange} ` +
           'wherever it was recorded (0.5 is chance). F1 looks strong only because the tuned LSTM ' +
           `predicts “up” on every test day for ${collapsedShare} stocks, so there it equals an ` +
           'always-up baseline’s F1 (',
@@ -71,7 +73,7 @@ export const projects = [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
       [
         'SHAP and Pearson correlation ranked features 5 to 12 positions apart on average, and SHAP ' +
-          'surfaced bond yield (top 5 for 6 of 10 stocks) where correlation ranked it low; see ',
+          `surfaced bond yield (top 5 for ${bondTop5Share} stocks) where correlation ranked it low; see `,
         appendix('A.2', 'appendix-a2'),
         '.',
       ],

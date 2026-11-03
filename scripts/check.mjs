@@ -4,7 +4,9 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve, relative } from 'node:path';
 import { profile } from '../src/data.js';
-import { alwaysUpF1, collapsed } from '../src/metrics.js';
+import {
+  alwaysUpF1, bondFirstFor, bondTop5Share, collapsed, ensembleAuc, sectorCount, stockCount,
+} from '../src/metrics.js';
 
 const root = resolve(import.meta.dirname, '..');
 const pub = (path) => resolve(root, 'public', path);
@@ -43,6 +45,19 @@ for (const s of collapsed) {
   }
 }
 
+// The résumé is hand-set HTML, so its CS403 numbers are checked against the computed ones. Each
+// phrase is how resume.html says it; if a rerun changes a number, update the résumé and rebuild it.
+const resume = read('resume/resume.html');
+const resumeClaims = [
+  `${stockCount} US stocks across ${sectorCount} sectors`,
+  `top-5 driver for ${bondTop5Share} stocks (#1 for ${bondFirstFor})`,
+  `on ${collapsed.length} of ${stockCount} stocks the tuned model collapsed`,
+  `ROC-AUC averaged ${ensembleAuc}`,
+];
+for (const claim of resumeClaims) {
+  if (!resume.includes(claim)) failures.push(`resume/resume.html should say “${claim}” (computed from metrics.json)`);
+}
+
 // Files in public/ that nothing links to are not errors, but worth knowing about.
 const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
   e.isDirectory() ? walk(resolve(dir, e.name)) : [relative(pub(''), resolve(dir, e.name)).replaceAll('\\', '/')]);
@@ -55,3 +70,4 @@ if (failures.length) {
 }
 console.log(`✓ ${referenced.size} linked files exist in public/`);
 console.log(`✓ always-up identity holds for ${collapsed.length} stocks`);
+console.log(`✓ résumé matches ${resumeClaims.length} computed CS403 numbers`);
