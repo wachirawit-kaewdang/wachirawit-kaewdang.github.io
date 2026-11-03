@@ -89,6 +89,15 @@ function TitleBlock() {
   );
 }
 
+// Renders data.js prose: a plain string, or a list of strings and { label, to } refs into
+// Appendix A, which become cross-references that open the appendix at that anchor.
+function Prose({ pieces }) {
+  return [pieces].flat().map((piece, i) =>
+    typeof piece === 'string' ? piece : (
+      <Ref key={i} route={APPENDIX} to={piece.to}>{piece.label}</Ref>
+    ));
+}
+
 function Abstract() {
   const featured = projects.findIndex((p) => p.results);
   return (
@@ -99,7 +108,7 @@ function Abstract() {
           <>
             {' '}Main result (<Ref to="table-1">Table 1</Ref>,{' '}
             <Ref to={projectId(featured)}>§{sectionNumber('projects')}.{featured + 1}</Ref>):{' '}
-            {projects[featured].finding}.
+            <Prose pieces={projects[featured].finding} />.
           </>
         )}
       </p>
@@ -137,12 +146,14 @@ function Project({ project, index }) {
         </p>
       )}
 
-      {project.results && <NumberedTable number={1} {...project.results} />}
+      {project.results && (
+        <NumberedTable number={1} {...project.results} caption={<Prose pieces={project.results.caption} />} />
+      )}
 
       {project.points.length > 0 && (
         <ul>
-          {project.points.map((point) => (
-            <li key={point}>{point}</li>
+          {project.points.map((point, i) => (
+            <li key={i}><Prose pieces={point} /></li>
           ))}
         </ul>
       )}

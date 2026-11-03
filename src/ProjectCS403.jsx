@@ -39,9 +39,10 @@ function Heading({ n }) {
 function Figure({ n, name, width, height, alt, caption }) {
   return (
     <figure className="figure" id={`figure-a${n}`} tabIndex={-1}>
-      <a href={img(name)} target="_blank" rel="noreferrer" aria-label={`Open Figure A.${n} full size (opens in a new tab)`}>
+      {/* The link takes its name from the alt text, so a screen reader hears the finding. */}
+      <ExtLink href={img(name)}>
         <img src={img(name)} width={width} height={height} alt={alt} loading="lazy" decoding="async" />
-      </a>
+      </ExtLink>
       <figcaption>
         <span className="caplabel">Figure A.{n}.</span> {caption}
       </figcaption>

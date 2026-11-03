@@ -4,6 +4,11 @@ import { collapsed, ensembleAuc, source, stockCount, table1Rows } from './metric
 
 const collapsedShare = `${collapsed.length} of ${stockCount}`;
 
+// Prose that points into Appendix A is written as a list of pieces: strings, and refs that the
+// page renders as cross-references, e.g. ['see ', appendix('A.2', 'appendix-a2')].
+const appendix = (label, to) => ({ label: `Appendix ${label}`, to });
+const tableA1 = { label: 'Table A.1', to: 'table-a1' };
+
 // Every GitHub and site URL is built from the username, so a rename is a one-line change.
 const username = 'wachirawit-kaewdang';
 const github = `https://github.com/${username}`;
@@ -37,16 +42,21 @@ export const projects = [
       '5 sectors, used to test whether SHAP explains a model better than plain correlation, ' +
       'and checked against a naive baseline.',
     // Stated as the abstract's main result, ahead of any metric.
-    finding:
-      `my senior-project model ties a naive “always predict up” baseline on ${collapsedShare} ` +
-      'stocks, and Appendix A shows how I caught it',
+    finding: [
+      `my senior-project model ties a naive “always predict up” baseline on ${collapsedShare} stocks, and `,
+      appendix('A.4', 'appendix-a4'),
+      ' shows how I caught it',
+    ],
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
-      caption:
+      caption: [
         'Every model is close to chance: ROC-AUC, which ignores the threshold, is 0.55–0.57 ' +
-        'wherever it was recorded (0.5 is chance). F1 looks strong only because on ' +
-        `${collapsedShare} stocks the tuned LSTM predicts “up” on every test day, where its F1 ` +
-        'equals an always-up baseline’s.',
+          'wherever it was recorded (0.5 is chance). F1 looks strong only because the tuned LSTM ' +
+          `predicts “up” on every test day for ${collapsedShare} stocks, so there it equals an ` +
+          'always-up baseline’s F1 (',
+        tableA1,
+        ').',
+      ],
       note:
         `Averages over the ${stockCount} stocks; test set is the last 20% of Jan 2020 – Apr 2025, split by ` +
         `date. Computed from the notebook’s per-stock outputs (Project-CS403 @ ${source.commit}). ` +
@@ -59,7 +69,12 @@ export const projects = [
     // only what a reader needs before choosing to go there.
     points: [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
-      'SHAP and Pearson correlation ranked features 5 to 12 positions apart on average, and SHAP surfaced bond yield (top 5 for 6 of 10 stocks) where correlation ranked it low; see Appendix A.2–A.3.',
+      [
+        'SHAP and Pearson correlation ranked features 5 to 12 positions apart on average, and SHAP ' +
+          'surfaced bond yield (top 5 for 6 of 10 stocks) where correlation ranked it low; see ',
+        appendix('A.2', 'appendix-a2'),
+        '.',
+      ],
       'My part: data collection and preparation, and the training approach and model architecture.',
     ],
     tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance'],
