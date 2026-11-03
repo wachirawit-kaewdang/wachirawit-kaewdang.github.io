@@ -2,6 +2,7 @@
 // public/, so a typo in a file name fails CI instead of becoming a 404 on the live site.
 // Run: npm run check (CI runs it before the build).
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { resolve, relative } from 'node:path';
 import { profile } from '../src/data.js';
 import metrics from '../src/metrics.json' with { type: 'json' };
@@ -91,12 +92,24 @@ for (const claim of resumeClaims) {
   if (!resume.includes(claim)) failures.push(`resume/resume.html should say “${claim}” (computed from metrics.json)`);
 }
 
+// The PDF is built from resume.html by hand (npm run resume), so a source committed after its
+// PDF probably means the PDF was not rebuilt. Commit times, since checkouts reset file times.
+const committedAt = (path) => {
+  try {
+    return Number(execFileSync('git', ['log', '-1', '--format=%ct', '--', path], { cwd: root, encoding: 'utf8' }));
+  } catch {
+    return 0;
+  }
+};
+const stalePdf = committedAt('resume/resume.html') > committedAt(`public/${profile.resume}`);
+
 // Files in public/ that nothing links to are not errors, but worth knowing about.
 const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
   e.isDirectory() ? walk(resolve(dir, e.name)) : [relative(pub(''), resolve(dir, e.name)).replaceAll('\\', '/')]);
 const unused = walk(pub('')).filter((f) => !referenced.has(f));
 
 if (unused.length) console.warn(`Not linked from the site: ${unused.join(', ')}`);
+if (stalePdf) console.warn('resume/resume.html was committed after the PDF; run npm run resume and commit the PDF.');
 if (failures.length) {
   console.error(failures.map((f) => `✗ ${f}`).join('\n'));
   process.exit(1);
