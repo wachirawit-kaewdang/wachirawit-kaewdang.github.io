@@ -48,7 +48,8 @@ function Figure({ n, name, width, height, alt, caption }) {
         <img src={img(name)} width={width} height={height} alt={alt} loading="lazy" decoding="async" />
       </ExtLink>
       <figcaption>
-        <span className="caplabel">Figure A.{n}.</span> {caption}
+        <span className="caplabel">Figure A.{n}.</span> {caption}{' '}
+        <span className="scrollhint">Swipe sideways to see the whole chart.</span>
       </figcaption>
     </figure>
   );
@@ -61,7 +62,7 @@ const ARef = (props) => <Ref route={APPENDIX} {...props} />;
 // feature §A.3 is about, is set in bold ink; the sixth grid cell is the key.
 const shapMax = shapPeak.value;
 
-function Bar({ share, tick, label }) {
+function Bar({ share, tick, label, spoken }) {
   return (
     <div className="bar">
       <span className="track" aria-hidden="true">
@@ -69,6 +70,7 @@ function Bar({ share, tick, label }) {
         {tick != null && <span className="tick" style={{ left: `${tick * 100}%` }} />}
       </span>
       <span className="val">{label}</span>
+      {spoken && <span className="visually-hidden">{spoken}</span>}
     </div>
   );
 }
@@ -118,18 +120,27 @@ function SectorFigure() {
 // is only known for the stocks that collapsed; there the tick lands on the end of the bar.
 function StockFigure() {
   const panels = [
-    { title: 'Accuracy', note: 'tick: chance, 0.5', value: (s) => s.lstm.acc, tick: () => 0.5 },
+    {
+      title: 'Accuracy',
+      note: 'tick: chance, 0.5',
+      value: (s) => s.lstm.acc,
+      tick: () => 0.5,
+      spoken: () => ', chance is 0.500',
+    },
     {
       title: 'F1',
       note: 'tick: always “up”',
       value: (s) => s.lstm.f1,
       tick: (s) => (collapsed.includes(s) ? alwaysUpF1(s.lstm.acc) : null),
+      spoken: (s) => (collapsed.includes(s)
+        ? `, always “up” gives ${alwaysUpF1(s.lstm.acc).toFixed(3)}`
+        : ', always “up” value not known'),
     },
   ];
   return (
     <figure className="figure data-figure" id="figure-a3" tabIndex={-1}>
       <div className="multiples pair">
-        {panels.map(({ title, note, value, tick }) => (
+        {panels.map(({ title, note, value, tick, spoken }) => (
           <table key={title} className="bars tickers">
             <caption>
               {title} <span>({note})</span>
@@ -143,7 +154,7 @@ function StockFigure() {
                 <tr key={s.ticker}>
                   <th scope="row">{s.ticker}</th>
                   <td>
-                    <Bar share={value(s)} tick={tick(s)} label={value(s).toFixed(3)} />
+                    <Bar share={value(s)} tick={tick(s)} label={value(s).toFixed(3)} spoken={spoken(s)} />
                   </td>
                 </tr>
               ))}
@@ -201,7 +212,7 @@ export default function ProjectCS403() {
         </p>
       </section>
 
-      <nav className="contents" aria-labelledby="contents-title">
+      <nav className="contents" id="appendix-contents" tabIndex={-1} aria-labelledby="contents-title">
         <p id="contents-title"><strong>Contents</strong></p>
         <ol>
           {sections.map((title, i) => (

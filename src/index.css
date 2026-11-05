@@ -117,7 +117,9 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .contactline.left { text-align: left; }
 /* Inline links are text-height; vertical padding widens their hit area without moving text. */
 .contactline a, .meta a, .seealso a, .back a, .footer a { padding-block: 0.6rem; }
-.seealso { margin-top: -0.25rem; color: var(--ink-soft); }
+/* The way into Appendix A, the site's main onward path, so it reads as text rather than a note. */
+.seealso { margin-top: -0.25rem; }
+.seealso a { font-weight: 600; }
 .contents { margin: 0 2.5rem 1rem; font-size: 0.95rem; color: var(--ink-soft); }
 .contents p { margin: 0 0 0.2rem; }
 .contents strong { color: var(--ink); }
@@ -179,9 +181,11 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .figure figcaption { max-width: 34rem; margin-top: 0.6rem; font-size: 0.95rem; line-height: 1.45; text-wrap: pretty; }
 /* On phones a 1600px heatmap at full column width is unreadable, so it keeps a legible size and
    scrolls inside its own frame. */
+.scrollhint { display: none; }
 @media (max-width: 36rem) {
   .figure > a { display: block; overflow-x: auto; }
   .figure > a img { width: 42rem; max-width: none; }
+  .scrollhint { display: inline; color: var(--ink-soft); }
 }
 /* Wide charts get room on wide screens: the figure breaks out of the reading column to 64rem,
    centred on it, while its caption stays at the reading measure. Only where 64rem plus gutters

@@ -48,6 +48,7 @@ function RunningHead({ appendix }) {
               <a href={`#${projectId(0)}`} aria-label={`Back to the portfolio, section ${sectionNumber('projects')}.1`}>
                 ← Portfolio
               </a>
+              <Ref route={APPENDIX} to="appendix-contents">Contents</Ref>
               {featured?.link && <ExtLink href={featured.link}>Code</ExtLink>}
               <a href={`mailto:${profile.email}`}>Email</a>
             </>

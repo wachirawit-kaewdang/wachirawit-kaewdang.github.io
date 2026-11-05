@@ -108,6 +108,19 @@ export const projects = [
     tech: ['Python', 'Sockets', 'TCP/IP', 'HTTP'],
     codeNote: 'Course assignment; code not published.',
   },
+  {
+    title: 'This Portfolio and Its Data Checks',
+    context: 'Personal project · built with Claude Code',
+    summary:
+      'The site you are reading: React + Vite, with the CS403 tables computed from the notebook’s ' +
+      'saved outputs instead of typed by hand.',
+    points: [
+      'On every push, CI rebuilds the CS403 metrics from the notebook at a frozen commit and stops the deploy on any difference.',
+      'The same run checks the résumé PDF against its source and the site’s contact details, then opens both pages in headless Chrome.',
+    ],
+    tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions'],
+    link: `${github}/${username}.github.io`,
+  },
 ];
 
 export const skills = [
