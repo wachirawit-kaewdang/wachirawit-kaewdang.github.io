@@ -1,5 +1,5 @@
 # Builds the site with Vite and publishes it to GitHub Pages on every push to main.
-# Pull requests run the same checks and build, but never deploy.
+# Pull requests and manual runs on other branches run the same checks and build, but never deploy.
 name: Deploy to GitHub Pages
 
 on:
@@ -27,13 +27,13 @@ jobs:
       # Every file the site links to must exist in public/ (see scripts/check.mjs).
       - run: npm run check
       - run: npm run build
-      - if: github.event_name != 'pull_request'
+      - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     permissions:
