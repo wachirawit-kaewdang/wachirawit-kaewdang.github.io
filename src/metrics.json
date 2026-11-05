@@ -3,7 +3,7 @@
     "repo": "https://github.com/wachirawit-kaewdang/Project-CS403",
     "notebook": "stock_project.ipynb",
     "commit": "0c4ef04",
-    "note": "Per-stock test-set outputs copied by script from the notebook’s saved cell outputs (cells 12, 20, 27 and 29) by scripts/extract-metrics.py. Sector SHAP values are the numbers printed on the bars of sector_shap.png."
+    "note": "Per-stock test-set outputs copied by script from the notebook’s saved cell outputs (cells 5, 7, 12, 20, 27 and 29) by scripts/extract-metrics.py. Sector SHAP values are the numbers printed on the bars of sector_shap.png."
   },
   "stocks": {
     "NVDA": {
@@ -28,7 +28,8 @@
         "f1": 0.3704,
         "auc": 0.5316
       },
-      "bondYieldRank": 3
+      "bondYieldRank": 3,
+      "bondCorrelationRank": null
     },
     "TSLA": {
       "sector": "Technology",
@@ -52,7 +53,8 @@
         "f1": 0.4716,
         "auc": 0.5198
       },
-      "bondYieldRank": 2
+      "bondYieldRank": 2,
+      "bondCorrelationRank": 15
     },
     "JNJ": {
       "sector": "Healthcare",
@@ -76,7 +78,8 @@
         "f1": 0.6523,
         "auc": 0.5486
       },
-      "bondYieldRank": 5
+      "bondYieldRank": 5,
+      "bondCorrelationRank": null
     },
     "UNH": {
       "sector": "Healthcare",
@@ -100,7 +103,8 @@
         "f1": 0.66,
         "auc": 0.5564
       },
-      "bondYieldRank": 12
+      "bondYieldRank": 12,
+      "bondCorrelationRank": null
     },
     "XOM": {
       "sector": "Energy",
@@ -124,7 +128,8 @@
         "f1": 0.6968,
         "auc": 0.5726
       },
-      "bondYieldRank": 22
+      "bondYieldRank": 22,
+      "bondCorrelationRank": 2
     },
     "CVX": {
       "sector": "Energy",
@@ -148,7 +153,8 @@
         "f1": 0.6898,
         "auc": 0.5646
       },
-      "bondYieldRank": 19
+      "bondYieldRank": 19,
+      "bondCorrelationRank": null
     },
     "JPM": {
       "sector": "Finance",
@@ -172,7 +178,8 @@
         "f1": 0.6458,
         "auc": 0.4787
       },
-      "bondYieldRank": 1
+      "bondYieldRank": 1,
+      "bondCorrelationRank": 2
     },
     "GS": {
       "sector": "Finance",
@@ -196,7 +203,8 @@
         "f1": 0.3118,
         "auc": 0.6143
       },
-      "bondYieldRank": 16
+      "bondYieldRank": 16,
+      "bondCorrelationRank": null
     },
     "AMZN": {
       "sector": "Consumer",
@@ -220,7 +228,8 @@
         "f1": 0.1527,
         "auc": 0.4911
       },
-      "bondYieldRank": 1
+      "bondYieldRank": 1,
+      "bondCorrelationRank": null
     },
     "COST": {
       "sector": "Consumer",
@@ -244,7 +253,8 @@
         "f1": 0.5992,
         "auc": 0.6696
       },
-      "bondYieldRank": 2
+      "bondYieldRank": 2,
+      "bondCorrelationRank": 18
     }
   },
   "sectorShap": [

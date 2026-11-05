@@ -1,7 +1,8 @@
 // Prints resume/resume.html to public/Wachirawit_Kaewdang_Resume.pdf with headless Chrome, so the
 // résumé is rebuilt from a committed source instead of edited by hand. Run: npm run resume
 // Uses the Chrome or Edge already installed; set CHROME=/path/to/chrome to choose another.
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -53,4 +54,8 @@ if (!written || written.mtimeMs <= before || !readFileSync(out).subarray(0, 5).e
   console.error(`Chrome did not write a new PDF to ${out}`);
   process.exit(1);
 }
+// The check compares these with the committed files, so a forgotten rebuild fails CI.
+const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
+writeFileSync(resolve(root, 'resume/resume.sha256'),
+  `${sha256(html.replaceAll('\r\n', '\n'))}\n${sha256(readFileSync(out))}\n`);
 console.log(`Wrote ${out} (${Math.round(written.size / 1024)} KB)`);

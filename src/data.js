@@ -1,7 +1,7 @@
 // All site content lives here, so updating the portfolio never means touching layout code.
 // The CS403 numbers come from metrics.js, which computes them from the notebook's outputs.
 import {
-  aucRange, bondTop5Share, collapsed, ensembleAuc, sectorCount, source, stockCount, table1Rows,
+  aucRange, bondAgreeFor, bondTop5Share, collapsed, sectorCount, source, stockCount, table1Rows,
 } from './metrics.js';
 
 const collapsedShare = `${collapsed.length} of ${stockCount}`;
@@ -52,18 +52,17 @@ export const projects = [
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption: [
-        `Every model is close to chance: ROC-AUC, which ignores the threshold, is ${aucRange} ` +
-          'wherever it was recorded (0.5 is chance). F1 looks strong only because the tuned LSTM ' +
-          `predicts “up” on every test day for ${collapsedShare} stocks, so there it equals an ` +
-          'always-up baseline’s F1 (',
+        `Every model is close to chance: ROC-AUC is ${aucRange} where 0.50 is chance, and the tuned ` +
+          `LSTM’s high F1 comes from predicting “up” on every test day for ${collapsedShare} stocks (`,
         tableA1,
         ').',
       ],
       note:
         `Averages over the ${stockCount} stocks; test set is the last 20% of Jan 2020 – Apr 2025, split by ` +
-        `date. Computed from the notebook’s per-stock outputs (Project-CS403 @ ${source.commit}). ` +
-        '† The notebook does not record ROC-AUC for the full-feature LSTM; the project README’s ' +
-        `“≈0.57” matches the ensemble’s ${ensembleAuc}.`,
+        'date. Thresholds were tuned on that test set, so these figures are if anything optimistic. ' +
+        `Computed from the notebook’s per-stock outputs (Project-CS403 @ ${source.commit}). ` +
+        '† Not recorded for the full-feature LSTM. ' +
+        `‡ Over the ${collapsed.length} stocks whose test-set up-day share is known; the LSTM’s F1 equals it on each.`,
       columns: ['Model', 'F1', 'ROC-AUC'],
       rows: table1Rows,
     },
@@ -72,9 +71,10 @@ export const projects = [
     points: [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
       [
-        'SHAP and Pearson correlation ranked features 5 to 12 positions apart on average, and SHAP ' +
-          `surfaced bond yield (top 5 for ${bondTop5Share} stocks) where correlation ranked it low; see `,
-        appendix('A.2', 'appendix-a2'),
+        'SHAP and Pearson correlation ranked features 5 to 12 positions apart on average. SHAP put ' +
+          `bond yield in the top 5 for ${bondTop5Share} stocks; correlation agreed for ${bondAgreeFor} ` +
+          'but not for all of them; see ',
+        appendix('A.3', 'appendix-a3'),
         '.',
       ],
       'My part: data collection and preparation, and the training approach and model architecture.',

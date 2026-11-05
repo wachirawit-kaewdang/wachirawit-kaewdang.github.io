@@ -2,7 +2,7 @@
 // public/, so a typo in a file name fails CI instead of becoming a 404 on the live site.
 // Run: npm run check (CI runs it before the build).
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { resolve, relative } from 'node:path';
 import { profile } from '../src/data.js';
 import metrics from '../src/metrics.json' with { type: 'json' };
@@ -39,17 +39,28 @@ for (const [, path] of html.matchAll(/property="og:image" content="(?:%SITE_URL%
   expect(path, 'index.html (og:image)');
 }
 
+// The notebook has no random seeds and downloads live prices, so a rerun would change every
+// number. The results stay at this commit.
+const frozenAt = '0c4ef04';
+
 // metrics.json is rebuilt by scripts/extract-metrics.py; a parsing slip should fail here, not
 // render as NaN. Rates sit in [0, 1], thresholds in (0, 1), ranks among the 27 features.
 const rate = (v) => typeof v === 'number' && v >= 0 && v <= 1;
+const rank = (v) => Number.isInteger(v) && v >= 1 && v <= 27;
 const shape = [];
+if (metrics.source?.commit !== frozenAt) {
+  shape.push(`source commit is ${metrics.source?.commit}, but the results are frozen at ${frozenAt}. Moving it means ` +
+    'redoing the charts, sectorShap and typed claims first (see WORKFLOWS.txt), then changing frozenAt in check.mjs');
+}
 const stockEntries = Object.entries(metrics.stocks ?? {});
+// Typed prose, the charts and "2 per sector" all assume this many stocks and sectors.
 if (stockEntries.length !== 10) shape.push(`${stockEntries.length} stocks, expected 10`);
 for (const [ticker, s] of stockEntries) {
   const bad = [
     typeof s.sector !== 'string' && 'sector',
-    !(s.threshold > 0 && s.threshold < 1) && 'threshold',
-    !(Number.isInteger(s.bondYieldRank) && s.bondYieldRank >= 1 && s.bondYieldRank <= 27) && 'bondYieldRank',
+    !(rate(s.threshold) && s.threshold > 0 && s.threshold < 1) && 'threshold',
+    !rank(s.bondYieldRank) && 'bondYieldRank',
+    !(s.bondCorrelationRank === null || rank(s.bondCorrelationRank)) && 'bondCorrelationRank',
     ...['acc', 'f1'].filter((k) => !rate(s.lstm?.[k])).map((k) => `lstm.${k}`),
     ...['ensemble', 'rf', 'lr'].flatMap((m) => ['acc', 'f1', 'auc'].filter((k) => !rate(s[m]?.[k])).map((k) => `${m}.${k}`)),
   ].filter(Boolean);
@@ -58,9 +69,10 @@ for (const [ticker, s] of stockEntries) {
 const sectors = metrics.sectorShap ?? [];
 if (sectors.length !== 5) shape.push(`${sectors.length} sectors in sectorShap, expected 5`);
 for (const { sector, rows } of sectors) {
-  if (rows?.length !== 10 || !rows.every(([f, v]) => typeof f === 'string' && v > 0 && v < 1)) {
+  if (rows?.length !== 10 || !rows.every(([f, v]) => typeof f === 'string' && rate(v) && v > 0)) {
     shape.push(`sectorShap ${sector}: expected 10 [feature, value] rows`);
   }
+  if (!stockEntries.some(([, s]) => s.sector === sector)) shape.push(`sectorShap ${sector}: no stock has this sector`);
 }
 for (const s of shape) failures.push(`metrics.json: ${s}`);
 
@@ -84,7 +96,7 @@ for (const s of notCollapsed) {
 const resume = read('resume/resume.html');
 const resumeClaims = [
   `${stockCount} US stocks across ${sectorCount} sectors`,
-  `top-5 driver for ${bondTop5Share} stocks (#1 for ${bondFirstFor})`,
+  `top-5 for ${bondTop5Share} stocks (#1 for ${bondFirstFor})`,
   `on ${collapsed.length} of ${stockCount} stocks the tuned model collapsed`,
   `ROC-AUC averaged ${ensembleAuc}`,
 ];
@@ -92,16 +104,14 @@ for (const claim of resumeClaims) {
   if (!resume.includes(claim)) failures.push(`resume/resume.html should say “${claim}” (computed from metrics.json)`);
 }
 
-// The PDF is built from resume.html by hand (npm run resume), so a source committed after its
-// PDF probably means the PDF was not rebuilt. Commit times, since checkouts reset file times.
-const committedAt = (path) => {
-  try {
-    return Number(execFileSync('git', ['log', '-1', '--format=%ct', '--', path], { cwd: root, encoding: 'utf8' }));
-  } catch {
-    return 0;
-  }
-};
-const stalePdf = committedAt('resume/resume.html') > committedAt(`public/${profile.resume}`);
+// The PDF is built from resume.html by hand (npm run resume), which records both files' hashes.
+// If either has changed since, the live PDF is not the one this source builds.
+const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
+const recorded = existsSync(resolve(root, 'resume/resume.sha256')) ? read('resume/resume.sha256').split(/\s+/) : [];
+if (recorded[0] !== sha256(resume.replaceAll('\r\n', '\n'))
+  || recorded[1] !== sha256(readFileSync(pub(profile.resume)))) {
+  failures.push('the résumé PDF was not built from resume/resume.html as committed; run npm run resume and commit both');
+}
 
 // Files in public/ that nothing links to are not errors, but worth knowing about.
 const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
@@ -109,7 +119,6 @@ const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
 const unused = walk(pub('')).filter((f) => !referenced.has(f));
 
 if (unused.length) console.warn(`Not linked from the site: ${unused.join(', ')}`);
-if (stalePdf) console.warn('resume/resume.html was committed after the PDF; run npm run resume and commit the PDF.');
 if (failures.length) {
   console.error(failures.map((f) => `✗ ${f}`).join('\n'));
   process.exit(1);
@@ -117,4 +126,4 @@ if (failures.length) {
 console.log(`✓ ${referenced.size} linked files exist in public/`);
 console.log(`✓ metrics.json has the expected shape (${stockEntries.length} stocks, ${sectors.length} sectors)`);
 console.log(`✓ always-up identity holds for ${collapsed.length} stocks and fails for ${notCollapsed.length}`);
-console.log(`✓ résumé matches ${resumeClaims.length} computed CS403 numbers`);
+console.log(`✓ résumé matches ${resumeClaims.length} computed CS403 numbers, and its PDF matches its source`);

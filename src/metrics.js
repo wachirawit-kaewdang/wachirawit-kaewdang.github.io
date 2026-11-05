@@ -1,5 +1,5 @@
-// Everything the site says about the CS403 results is computed here from metrics.json, the
-// notebook's per-stock outputs, so a table or a caption cannot drift from the source numbers.
+// The CS403 numbers in tables and captions are computed here from metrics.json, the notebook's
+// per-stock outputs. The results are frozen at source.commit, and check.mjs holds them there.
 import metrics from './metrics.json' with { type: 'json' };
 
 export const source = metrics.source;
@@ -24,18 +24,25 @@ export const notCollapsed = stocks.filter((s) => s.threshold !== 0.3);
 
 // Table 1: averages over every stock. The notebook never records ROC-AUC for the full-feature
 // LSTM, so that cell is "n/r" (not recorded) and the table note says why.
-export const table1Rows = [
+const modelRows = [
   ['LSTM + self-attention', avg((s) => s.lstm.f1), 'n/r†'],
   ['Ensemble (LSTM + RF + LR, soft vote)', avg((s) => s.ensemble.f1), avg((s) => s.ensemble.auc)],
   ['Logistic Regression', avg((s) => s.lr.f1), avg((s) => s.lr.auc)],
   ['Random Forest', avg((s) => s.rf.f1), avg((s) => s.rf.auc)],
 ];
+// The baseline comes first. Its F1 needs each stock's test-set up-day share, which only the
+// collapsed stocks reveal (their accuracy is that share), so it covers those stocks and says so.
+export const alwaysUpAvgF1 = mean(collapsed.map((s) => alwaysUpF1(s.lstm.acc))).toFixed(3);
+export const table1Rows = [
+  ['Always predict “up” (baseline)', `${alwaysUpAvgF1}‡`, '0.500'],
+  ...modelRows,
+];
 export const ensembleAuc = avg((s) => s.ensemble.auc);
+export { stocks };
 
 // The numbers the prose quotes, rounded the way the prose says them.
-const lstmF1 = table1Rows[0][1];
-export const lstmF1About = Number(lstmF1).toFixed(2);
-const recordedAucs = table1Rows.map((row) => Number(row[2])).filter((v) => !Number.isNaN(v));
+export const lstmF1About = Number(modelRows[0][1]).toFixed(2);
+const recordedAucs = modelRows.map((row) => Number(row[2])).filter((v) => !Number.isNaN(v));
 export const aucRange = `${Math.min(...recordedAucs).toFixed(2)}–${Math.max(...recordedAucs).toFixed(2)}`;
 
 const listed = (names) => names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
@@ -44,6 +51,19 @@ const listed = (names) => names.length < 2 ? names.join('') : `${names.slice(0, 
 const bondTop5 = stocks.filter((s) => s.bondYieldRank <= 5);
 export const bondTop5Share = `${bondTop5.length} of ${stockCount}`;
 export const bondFirstFor = listed(stocks.filter((s) => s.bondYieldRank === 1).map((s) => s.ticker));
+
+// Correlation's rank is printed for only some stocks. Where it is, the two methods do not fall on
+// one side: they agree for some stocks and split, in either direction, for others.
+const ordinal = (n) => `${n}${(n < 11 || n > 13) && { 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'}`;
+const bothRanks = stocks.filter((s) => s.bondCorrelationRank != null);
+const split = 10; // ranks this far apart count as a real disagreement
+export const bondAgreeFor = listed(bothRanks
+  .filter((s) => Math.abs(s.bondYieldRank - s.bondCorrelationRank) < split)
+  .map((s) => s.ticker));
+const shapHigher = bothRanks.filter((s) => s.bondCorrelationRank - s.bondYieldRank >= split);
+const corrHigher = bothRanks.filter((s) => s.bondYieldRank - s.bondCorrelationRank >= split);
+export const bondShapOnly = listed(shapHigher.map((s) => `${s.ticker} (${ordinal(s.bondYieldRank)} by SHAP, ${ordinal(s.bondCorrelationRank)} by correlation)`));
+export const bondCorrelationOnly = listed(corrHigher.map((s) => `${s.ticker} (${ordinal(s.bondCorrelationRank)} by correlation, ${ordinal(s.bondYieldRank)} by SHAP)`));
 
 // Figure A.2's shared scale runs to the largest value in any panel.
 export const shapPeak = sectorShap

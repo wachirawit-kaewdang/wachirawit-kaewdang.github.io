@@ -4,7 +4,8 @@ import { ExtLink, Ref, LinkLine, NumberedTable } from './paper.jsx';
 import { APPENDIX, asset } from './paper-utils.js';
 import { profile, projects } from './data.js';
 import {
-  alwaysUpF1, bondFirstFor, bondTop5Share, collapsed, ensembleAuc, lstmF1About, notCollapsed, sectorCount, sectorShap,
+  alwaysUpF1, bondAgreeFor, bondCorrelationOnly, bondFirstFor, bondShapOnly, bondTop5Share, collapsed, ensembleAuc,
+  lstmF1About, notCollapsed, sectorCount, sectorShap,
   shapPeak, stockCount,
 } from './metrics.js';
 
@@ -21,7 +22,7 @@ const featureLabel = (name) => name.replace(/_/g, ' ');
 const sections = [
   'Setup',
   'SHAP and correlation disagree a lot',
-  'Bond yield matters to the model, but correlation misses it',
+  'Bond yield matters to the model, and correlation only sometimes shows it',
   'Checking the results against a baseline',
   'What I’d do differently',
   'My part',
@@ -186,8 +187,10 @@ export default function ProjectCS403() {
         <Heading n={3} />
         <p>
           Bond yield was in the model’s SHAP top 5 for {bondTop5Share} stocks, and was the #1 feature
-          for {bondFirstFor}, even though correlation ranked it low for most of them. That fits financial
-          intuition: bank profits depend on interest rates, and growth stocks are sensitive to them.
+          for {bondFirstFor}. That fits financial intuition: bank profits depend on interest rates, and
+          growth stocks are sensitive to them. Correlation only sometimes agrees. Where the notebook
+          prints both ranks, the two methods put it close together for {bondAgreeFor}, but they split
+          for {bondShapOnly}, and the other way for {bondCorrelationOnly}.
           Grouped by sector, the patterns differ too (<ARef to="figure-a2">Figure A.2</ARef>). Energy
           leans on the S&amp;P 500 trend, while Healthcare and Technology lean on MACD.
         </p>
