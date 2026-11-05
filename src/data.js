@@ -41,24 +41,24 @@ export const projects = [
     featured: true,
     summary:
       `An LSTM with self-attention that predicts 3-day price direction for ${stockCount} US stocks across ` +
-      `${sectorCount} sectors, used to test whether SHAP explains a model better than plain correlation, ` +
-      'and checked against a naive baseline.',
+      `${sectorCount} sectors, used to compare SHAP explanations with plain correlation, ` +
+      'with results set against a naive baseline.',
     // Stated as the abstract's main result, ahead of any metric.
     finding: [
-      `my senior-project model ties a naive “always predict up” baseline on ${collapsedShare} stocks, and `,
+      `our senior-project model ties a naive “always predict up” baseline on ${collapsedShare} stocks, and `,
       appendix('A.4', 'appendix-a4'),
-      ' shows how I caught it',
+      ' shows the evidence',
     ],
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption: [
-        `Every model is close to chance: ROC-AUC is ${aucRange} where 0.50 is chance, and the tuned ` +
+        `Every model with a recorded ROC-AUC is close to chance, at ${aucRange} where 0.50 is chance, and the tuned ` +
           `LSTM’s high F1 comes from predicting “up” on every test day for ${collapsedShare} stocks (`,
         tableA1,
         ').',
       ],
       note:
-        `Averages over the ${stockCount} stocks; test set is the last 20% of Jan 2020 – Apr 2025, split by ` +
+        `Averages over the ${stockCount} stocks, except rows marked ‡; test set is the last 20% of Jan 2020 – Apr 2025, split by ` +
         'date. Thresholds were tuned on that test set, so these figures are if anything optimistic. ' +
         `Computed from the notebook’s per-stock outputs (Project-CS403 @ ${source.commit}). ` +
         '† Not recorded for the full-feature LSTM. ' +
@@ -71,13 +71,14 @@ export const projects = [
     points: [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
       [
-        'SHAP and Pearson correlation ranked features 5 to 12 positions apart on average. SHAP put ' +
+        'SHAP and Pearson correlation ranked features 5 to 12 positions apart on average, about what ' +
+          'unrelated rankings would give (≈9), so that comparison was inconclusive. SHAP put ' +
           `bond yield in the top 5 for ${bondTop5Share} stocks; correlation agreed for ${bondAgreeFor} ` +
-          'but not for all of them; see ',
+          'but split on the others where both ranks are printed; see ',
         appendix('A.3', 'appendix-a3'),
         '.',
       ],
-      'My part: data collection and preparation, and the training approach and model architecture.',
+      'My part: data collection and preparation, the training approach and model architecture, and the SHAP analysis together with my teammate.',
     ],
     tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance', 'Git'],
     caseStudy: '#/cs403',

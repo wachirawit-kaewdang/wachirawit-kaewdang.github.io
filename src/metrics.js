@@ -33,8 +33,12 @@ const modelRows = [
 // The baseline comes first. Its F1 needs each stock's test-set up-day share, which only the
 // collapsed stocks reveal (their accuracy is that share), so it covers those stocks and says so.
 export const alwaysUpAvgF1 = mean(collapsed.map((s) => alwaysUpF1(s.lstm.acc))).toFixed(3);
+// The LSTM over those same stocks sits beside it: 0.707 against 0.710 would otherwise read as a
+// small win, when the 0.710 only differs because it averages all the stocks.
+const lstmSameStocksF1 = mean(collapsed.map((s) => s.lstm.f1)).toFixed(3);
 export const table1Rows = [
   ['Always predict “up” (baseline)', `${alwaysUpAvgF1}‡`, '0.500'],
+  [`LSTM, same ${collapsed.length} stocks`, `${lstmSameStocksF1}‡`, 'n/r†'],
   ...modelRows,
 ];
 export const ensembleAuc = avg((s) => s.ensemble.auc);
@@ -55,6 +59,7 @@ export const bondFirstFor = listed(stocks.filter((s) => s.bondYieldRank === 1).m
 // Correlation's rank is printed for only some stocks. Where it is, the two methods do not fall on
 // one side: they agree for some stocks and split, in either direction, for others.
 const ordinal = (n) => `${n}${(n < 11 || n > 13) && { 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'}`;
+export const bondRankOf = (ticker) => ordinal(stocks.find((s) => s.ticker === ticker).bondYieldRank);
 const bothRanks = stocks.filter((s) => s.bondCorrelationRank != null);
 const split = 10; // ranks this far apart count as a real disagreement
 export const bondAgreeFor = listed(bothRanks

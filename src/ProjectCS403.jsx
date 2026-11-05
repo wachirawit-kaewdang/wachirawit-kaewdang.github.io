@@ -6,7 +6,7 @@ import { profile, projects } from './data.js';
 import {
   alwaysUpF1, bondAgreeFor, bondCorrelationOnly, bondFirstFor, bondShapOnly, bondTop5Share, collapsed, ensembleAuc,
   lstmF1About, notCollapsed, sectorCount, sectorShap,
-  shapPeak, stockCount, stocks,
+  bondRankOf, shapPeak, stockCount, stocks,
 } from './metrics.js';
 
 const img = (name) => asset(`cs403/${name}.webp`);
@@ -21,7 +21,7 @@ const featureLabel = (name) => name.replace(/_/g, ' ');
 
 const sections = [
   'Setup',
-  'SHAP and correlation disagree a lot',
+  'SHAP and correlation disagree, but that proves little',
   'Bond yield matters to the model, and correlation only sometimes shows it',
   'Checking the results against a baseline',
   'What I’d do differently',
@@ -194,8 +194,9 @@ export default function ProjectCS403() {
           <strong>Abstract.</strong> Can SHAP tell us something about a stock-prediction model that
           plain correlation can’t? We trained an LSTM with self-attention on {stockCount} US stocks, explained
           it with SHAP, and compared those explanations with Pearson correlation. The two disagreed by
-          5 to 12 rank positions on average. The model did not beat a naive baseline: on{' '}
-          {collapsed.length} of the {stockCount} stocks it predicted “up” every day, so its F1 tied
+          5 to 12 rank positions on average, about what two unrelated rankings would show, so we can’t
+          say SHAP explains the model better. The model also failed a naive baseline on{' '}
+          {collapsed.length} of the {stockCount} stocks: it predicted “up” every day, so its F1 tied
           always predicting “up” (<ARef to="table-a1">Table A.1</ARef>).
         </p>
       </section>
@@ -229,10 +230,18 @@ export default function ProjectCS403() {
         <Heading n={2} />
         <p>
           For every stock we ranked the 27 features twice: by absolute Pearson correlation with the
-          target, and by mean |SHAP| on the trained LSTM. The two rankings disagreed by roughly 5 to 12
+          target over the training period, and by mean |SHAP| on the trained LSTM. The two rankings disagreed by roughly 5 to 12
           positions per feature on average (<ARef to="figure-a1">Figure A.1</ARef>). Volume change, EMA26
-          and Volume/MA ratio moved the most. Correlation only sees straight-line relationships with
-          the target. SHAP shows what the model actually uses, including non-linear effects.
+          and Volume/MA ratio moved the most.
+        </p>
+        <p>
+          That gap alone proves little. Two unrelated rankings of 27 features differ by about 9 positions
+          on average, and over {stockCount} stocks their per-feature averages also span about 5 to 13. So
+          this work does not show that SHAP explains the model better than correlation, only that they
+          measure different things: correlation sees straight-line links with the target, while SHAP
+          estimates what drives the model’s output. That estimate is rough. It covers the first 30 test
+          days at 100 samples each, and each day’s features were repeated across the 60-day window, a
+          sequence the model never saw in training.
         </p>
         <Figure
           n={1}
@@ -247,9 +256,10 @@ export default function ProjectCS403() {
       <section className="section">
         <Heading n={3} />
         <p>
-          Bond yield was in the model’s SHAP top 5 for {bondTop5Share} stocks, and was the #1 feature
-          for {bondFirstFor}. That fits financial intuition: bank profits depend on interest rates, and
-          growth stocks are sensitive to them. Correlation only sometimes agrees. Where the notebook
+          Bond yield was in the model’s SHAP top 5 for {bondTop5Share} stocks, where about 2 would land
+          by chance, and was the #1 feature for {bondFirstFor}. That fits financial intuition for JPM,
+          since bank profits depend on interest rates, but not everywhere: GS, the other bank, ranks it{' '}
+          {bondRankOf('GS')}. Correlation only sometimes agrees. Where the notebook
           prints both ranks, the two methods put it close together for {bondAgreeFor}, but they split
           for {bondShapOnly}, and the other way for {bondCorrelationOnly}.
           Grouped by sector, the patterns differ too (<ARef to="figure-a2">Figure A.2</ARef>). Energy
@@ -261,10 +271,14 @@ export default function ProjectCS403() {
       <section className="section">
         <Heading n={4} />
         <p>
-          Our tuned model reported an average F1 of about {lstmF1About}, which looked good. When I checked it
-          against the simplest possible baseline, a model that always predicts “up”, the numbers
+          Our tuned model reported an average F1 of about {lstmF1About}, which looked good. Set against
+          the simplest possible baseline, a model that always predicts “up”, the numbers
           matched (<ARef to="table-a1">Table A.1</ARef>). With the decision threshold tuned down to 0.30,
           the model predicted “up” on every test day for {collapsed.length} of the {stockCount} stocks.
+          The notebook doesn’t print daily predictions, so that is inferred: on those stocks its accuracy
+          and F1 fit the always-up formula. The comparison isn’t in the notebook either; this
+          site’s <ExtLink href={`${profile.source}/blob/main/scripts/check.mjs`}>build check</ExtLink> recomputes
+          it from the notebook’s outputs.
         </p>
         <NumberedTable
           number="A.1"
@@ -277,7 +291,8 @@ export default function ProjectCS403() {
           Threshold-free metrics tell the same story: the ensemble’s ROC-AUC averaged {ensembleAuc} across the{' '}
           {stockCount} stocks, only a little better than random (0.5). Predicting 3-day direction from technical
           indicators alone is close to a coin flip (<ARef to="figure-a3">Figure A.3</ARef>). That is the
-          result, not a failure of the explainability work: SHAP still shows what the model relied on.
+          result, not a failure of the explainability work: SHAP still gives a rough view of what the
+          model relied on.
         </p>
         <StockFigure />
       </section>
@@ -298,7 +313,7 @@ export default function ProjectCS403() {
         <p>
           I collected and prepared the training data, and designed the training
           approach and model architecture. My teammate Tumrong Saechoen designed the analysis
-          methodology and the VIX market-sentiment component.
+          methodology and the VIX market-sentiment component. We ran the SHAP analysis together.
         </p>
         <p className="meta">
           <em>Stack.</em> {project.tech.join(' · ')}
