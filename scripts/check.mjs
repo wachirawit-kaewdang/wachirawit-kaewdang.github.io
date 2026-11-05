@@ -7,7 +7,7 @@ import { resolve, relative } from 'node:path';
 import { profile, projects } from '../src/data.js';
 import metrics from '../src/metrics.json' with { type: 'json' };
 import {
-  alwaysUpF1, bondFirstFor, bondTop5Share, collapsed, ensembleAuc, notCollapsed, sectorCount, stockCount,
+  alwaysUpF1, bondCorrelationRankOf, bondFirstFor, bondRankOf, bondTop5Share, collapsed, ensembleAuc, notCollapsed, sectorCount, stockCount,
 } from '../src/metrics.js';
 
 const root = resolve(import.meta.dirname, '..');
@@ -63,6 +63,7 @@ for (const [ticker, s] of stockEntries) {
     !(s.bondCorrelationRank === null || rank(s.bondCorrelationRank)) && 'bondCorrelationRank',
     ...['acc', 'f1'].filter((k) => !rate(s.lstm?.[k])).map((k) => `lstm.${k}`),
     ...['ensemble', 'rf', 'lr'].flatMap((m) => ['acc', 'f1', 'auc'].filter((k) => !rate(s[m]?.[k])).map((k) => `${m}.${k}`)),
+    ...['corr', 'shap'].flatMap((m) => ['acc', 'f1', 'auc'].filter((k) => !rate(s.retrain?.[m]?.[k])).map((k) => `retrain.${m}.${k}`)),
   ].filter(Boolean);
   if (bad.length) shape.push(`${ticker}: ${bad.join(', ')}`);
 }
@@ -99,14 +100,16 @@ for (const s of notCollapsed) {
 // The résumé is hand-set HTML, so its CS403 numbers are checked against the computed ones. Each
 // phrase is how resume.html says it; if a rerun changes a number, update the résumé and rebuild it.
 const resume = read('resume/resume.html');
+const resumeText = resume.replace(/<!--[\s\S]*?-->/g, ''); // a number in a comment isn't on the résumé
 const resumeClaims = [
   `${stockCount} US stocks across ${sectorCount} sectors`,
   `top-5 for ${bondTop5Share} stocks (#1 for ${bondFirstFor})`,
   `on ${collapsed.length} of ${stockCount} stocks the tuned model collapsed`,
   `ROC-AUC averaged ${ensembleAuc}`,
+  `TSLA: ${bondRankOf('TSLA')} by SHAP, ${bondCorrelationRankOf('TSLA')} by correlation`,
 ];
 for (const claim of resumeClaims) {
-  if (!resume.includes(claim)) failures.push(`resume/resume.html should say “${claim}” (computed from metrics.json)`);
+  if (!resumeText.includes(claim)) failures.push(`resume/resume.html should say “${claim}” (computed from metrics.json)`);
 }
 
 // The PDF is built from resume.html by hand (npm run resume), which records both files' hashes.
@@ -137,7 +140,7 @@ const contacts = [
   ...[profile.site, profile.linkedin, profile.github, projects.find((p) => p.caseStudy).link].map(bare),
 ];
 for (const contact of contacts) {
-  if (!resume.includes(contact)) failures.push(`resume/resume.html should include ${contact} (from src/data.js)`);
+  if (!resumeText.includes(contact)) failures.push(`resume/resume.html should include ${contact} (from src/data.js)`);
 }
 if (!read('og/og-image.html').includes(bare(profile.site))) {
   failures.push(`og/og-image.html should include ${bare(profile.site)} (from src/data.js)`);

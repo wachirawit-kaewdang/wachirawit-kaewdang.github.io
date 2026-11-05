@@ -42,6 +42,10 @@ export const table1Rows = [
   ...modelRows,
 ];
 export const ensembleAuc = avg((s) => s.ensemble.auc);
+
+// The notebook's direct test: the LSTM retrained on each method's top 10 features (cell 9).
+export const retrainAuc = { corr: avg((s) => s.retrain.corr.auc), shap: avg((s) => s.retrain.shap.auc) };
+export const retrainCorrWins = stocks.filter((s) => s.retrain.corr.auc > s.retrain.shap.auc).length;
 export { stocks };
 
 // The numbers the prose quotes, rounded the way the prose says them.
@@ -60,6 +64,7 @@ export const bondFirstFor = listed(stocks.filter((s) => s.bondYieldRank === 1).m
 // one side: they agree for some stocks and split, in either direction, for others.
 const ordinal = (n) => `${n}${(n < 11 || n > 13) && { 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'}`;
 export const bondRankOf = (ticker) => ordinal(stocks.find((s) => s.ticker === ticker).bondYieldRank);
+export const bondCorrelationRankOf = (ticker) => ordinal(stocks.find((s) => s.ticker === ticker).bondCorrelationRank);
 const bothRanks = stocks.filter((s) => s.bondCorrelationRank != null);
 const split = 10; // ranks this far apart count as a real disagreement
 export const bondAgreeFor = listed(bothRanks

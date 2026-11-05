@@ -14,6 +14,7 @@ Read from the notebook, located by the header each cell prints and by column nam
   Bond-yield SHAP rank per stock    "=== Bond_yield SHAP Rank across all stocks ===" table
   Bond-yield correlation rank       each stock's "Top 5 Corr" list and rank-difference table;
                                     null where neither prints it (the notebook shows only those)
+  Top-10 feature retrain            per-ticker "Corr top-10: ..." and "SHAP top-10: ..." lines
 sectorShap is kept from the current metrics.json: the notebook only saved it as a chart
 (sector_shap.png), so those values were read off the bar labels. Its bond-yield bars are
 checked against the per-stock table.
@@ -112,9 +113,10 @@ def main():
     metric = r'Acc=([\d.]+) F1=([\d.]+) AUC=([\d.]+)'
     per_ticker = dict(re.findall(r'=== ([A-Z]+) ===\n(.*?)(?==== |\Z)', baselines, re.S))
     corr_ranks = bond_correlation_ranks(find(texts, 'Top 5 Corr:'), find(texts, 'Corr_Rank'))
+    retrain = dict(re.findall(r'=== ([A-Z]+) ===\n(.*?)(?==== |\Z)', find(texts, 'Corr top-10:'), re.S))
 
     tickers = set(lstm)
-    for name, seen in (('ensemble', ensemble), ('bond-yield', bond), ('RF/LR', per_ticker)):
+    for name, seen in (('ensemble', ensemble), ('bond-yield', bond), ('RF/LR', per_ticker), ('retrain', retrain)):
         if set(seen) != tickers:
             sys.exit(f'The {name} table has different stocks: {sorted(set(seen) ^ tickers)}')
 
@@ -127,8 +129,10 @@ def main():
                 sys.exit(f'{ticker}: {here} {row[here]} disagrees with the ensemble table\'s {there} {ens[there]}')
         rf = re.search(r'Random Forest: ' + metric, per_ticker[ticker])
         lr = re.search(r'Logistic Reg:\s+' + metric, per_ticker[ticker])
-        if not (rf and lr):
-            sys.exit(f'{ticker}: Random Forest or Logistic Reg line not found')
+        by_corr = re.search(r'Corr top-10:\s+' + metric, retrain[ticker])
+        by_shap = re.search(r'SHAP top-10:\s+' + metric, retrain[ticker])
+        if not (rf and lr and by_corr and by_shap):
+            sys.exit(f'{ticker}: a Random Forest, Logistic Reg or top-10 retrain line was not found')
         stocks[ticker] = {
             'sector': row['Sector'],
             'threshold': column(row, 'Thresh'),
@@ -137,6 +141,10 @@ def main():
                          (('acc', 'Soft_Acc'), ('f1', 'Soft_F1'), ('auc', 'AUC'))},
             'rf': dict(zip(('acc', 'f1', 'auc'), map(float, rf.groups()))),
             'lr': dict(zip(('acc', 'f1', 'auc'), map(float, lr.groups()))),
+            'retrain': {
+                'corr': dict(zip(('acc', 'f1', 'auc'), map(float, by_corr.groups()))),
+                'shap': dict(zip(('acc', 'f1', 'auc'), map(float, by_shap.groups()))),
+            },
             'bondYieldRank': int(column(bond[ticker], 'Bond_yield Rank')),
             'bondCorrelationRank': corr_ranks.get(ticker),
         }

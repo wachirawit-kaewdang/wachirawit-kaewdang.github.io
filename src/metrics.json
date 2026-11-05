@@ -3,7 +3,7 @@
     "repo": "https://github.com/wachirawit-kaewdang/Project-CS403",
     "notebook": "stock_project.ipynb",
     "commit": "0c4ef04",
-    "note": "Per-stock test-set outputs copied by script from the notebook’s saved cell outputs (cells 5, 7, 12, 20, 27 and 29) by scripts/extract-metrics.py. Sector SHAP values are the numbers printed on the bars of sector_shap.png."
+    "note": "Per-stock test-set outputs copied by script from the notebook’s saved cell outputs (cells 5, 7, 9, 12, 20, 27 and 29) by scripts/extract-metrics.py. Sector SHAP values are the numbers printed on the bars of sector_shap.png."
   },
   "stocks": {
     "NVDA": {
@@ -27,6 +27,18 @@
         "acc": 0.5143,
         "f1": 0.3704,
         "auc": 0.5316
+      },
+      "retrain": {
+        "corr": {
+          "acc": 0.4704,
+          "f1": 0.4508,
+          "auc": 0.4662
+        },
+        "shap": {
+          "acc": 0.4783,
+          "f1": 0.2584,
+          "auc": 0.5102
+        }
       },
       "bondYieldRank": 3,
       "bondCorrelationRank": null
@@ -53,6 +65,18 @@
         "f1": 0.4716,
         "auc": 0.5198
       },
+      "retrain": {
+        "corr": {
+          "acc": 0.581,
+          "f1": 0.5859,
+          "auc": 0.607
+        },
+        "shap": {
+          "acc": 0.4625,
+          "f1": 0.4963,
+          "auc": 0.4575
+        }
+      },
       "bondYieldRank": 2,
       "bondCorrelationRank": 15
     },
@@ -77,6 +101,18 @@
         "acc": 0.5388,
         "f1": 0.6523,
         "auc": 0.5486
+      },
+      "retrain": {
+        "corr": {
+          "acc": 0.4822,
+          "f1": 0.1325,
+          "auc": 0.5426
+        },
+        "shap": {
+          "acc": 0.4704,
+          "f1": 0.2872,
+          "auc": 0.5145
+        }
       },
       "bondYieldRank": 5,
       "bondCorrelationRank": null
@@ -103,6 +139,18 @@
         "f1": 0.66,
         "auc": 0.5564
       },
+      "retrain": {
+        "corr": {
+          "acc": 0.502,
+          "f1": 0.5227,
+          "auc": 0.5617
+        },
+        "shap": {
+          "acc": 0.4348,
+          "f1": 0.4875,
+          "auc": 0.4402
+        }
+      },
       "bondYieldRank": 12,
       "bondCorrelationRank": null
     },
@@ -127,6 +175,18 @@
         "acc": 0.5347,
         "f1": 0.6968,
         "auc": 0.5726
+      },
+      "retrain": {
+        "corr": {
+          "acc": 0.5296,
+          "f1": 0.5882,
+          "auc": 0.5649
+        },
+        "shap": {
+          "acc": 0.5415,
+          "f1": 0.6506,
+          "auc": 0.4748
+        }
       },
       "bondYieldRank": 22,
       "bondCorrelationRank": 2
@@ -153,6 +213,18 @@
         "f1": 0.6898,
         "auc": 0.5646
       },
+      "retrain": {
+        "corr": {
+          "acc": 0.5731,
+          "f1": 0.6966,
+          "auc": 0.5511
+        },
+        "shap": {
+          "acc": 0.4901,
+          "f1": 0.6031,
+          "auc": 0.4387
+        }
+      },
       "bondYieldRank": 19,
       "bondCorrelationRank": null
     },
@@ -177,6 +249,18 @@
         "acc": 0.5388,
         "f1": 0.6458,
         "auc": 0.4787
+      },
+      "retrain": {
+        "corr": {
+          "acc": 0.4032,
+          "f1": 0.4881,
+          "auc": 0.4152
+        },
+        "shap": {
+          "acc": 0.4466,
+          "f1": 0.44,
+          "auc": 0.4739
+        }
       },
       "bondYieldRank": 1,
       "bondCorrelationRank": 2
@@ -203,6 +287,18 @@
         "f1": 0.3118,
         "auc": 0.6143
       },
+      "retrain": {
+        "corr": {
+          "acc": 0.5375,
+          "f1": 0.3874,
+          "auc": 0.5868
+        },
+        "shap": {
+          "acc": 0.4704,
+          "f1": 0.3619,
+          "auc": 0.6043
+        }
+      },
       "bondYieldRank": 16,
       "bondCorrelationRank": null
     },
@@ -228,6 +324,18 @@
         "f1": 0.1527,
         "auc": 0.4911
       },
+      "retrain": {
+        "corr": {
+          "acc": 0.5455,
+          "f1": 0.549,
+          "auc": 0.5513
+        },
+        "shap": {
+          "acc": 0.5494,
+          "f1": 0.4818,
+          "auc": 0.5566
+        }
+      },
       "bondYieldRank": 1,
       "bondCorrelationRank": null
     },
@@ -252,6 +360,18 @@
         "acc": 0.6122,
         "f1": 0.5992,
         "auc": 0.6696
+      },
+      "retrain": {
+        "corr": {
+          "acc": 0.5731,
+          "f1": 0.625,
+          "auc": 0.5839
+        },
+        "shap": {
+          "acc": 0.5613,
+          "f1": 0.6925,
+          "auc": 0.5206
+        }
       },
       "bondYieldRank": 2,
       "bondCorrelationRank": 18

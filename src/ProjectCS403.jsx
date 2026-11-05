@@ -6,7 +6,7 @@ import { profile, projects } from './data.js';
 import {
   alwaysUpF1, bondAgreeFor, bondCorrelationOnly, bondFirstFor, bondShapOnly, bondTop5Share, collapsed, ensembleAuc,
   lstmF1About, notCollapsed, sectorCount, sectorShap,
-  bondRankOf, shapPeak, stockCount, stocks,
+  bondRankOf, retrainAuc, retrainCorrWins, shapPeak, stockCount, stocks,
 } from './metrics.js';
 
 const img = (name) => asset(`cs403/${name}.webp`);
@@ -115,17 +115,20 @@ function SectorFigure() {
   );
 }
 
-// Figure A.3, redrawn from the notebook's numbers: the tuned LSTM per stock, with the two
-// reference points the argument needs. Chance on accuracy, and on F1 the always-up value, which
-// is only known for the stocks that collapsed; there the tick lands on the end of the bar.
+// Figure A.3, redrawn from the notebook's numbers: the tuned LSTM per stock, with the reference
+// the argument needs, what always predicting "up" scores. That is only known for the stocks that
+// collapsed, where the tick lands on the end of the bar. 0.5 would flatter accuracy here: most of
+// the bars pass it only because more days went up than down.
 function StockFigure() {
   const panels = [
     {
       title: 'Accuracy',
-      note: 'tick: chance, 0.5',
+      note: 'tick: always “up”',
       value: (s) => s.lstm.acc,
-      tick: () => 0.5,
-      spoken: () => ', chance is 0.500',
+      tick: (s) => (collapsed.includes(s) ? s.lstm.acc : null),
+      spoken: (s) => (collapsed.includes(s)
+        ? `, always “up” gives ${s.lstm.acc.toFixed(3)}`
+        : ', always “up” value not known'),
     },
     {
       title: 'F1',
@@ -164,8 +167,8 @@ function StockFigure() {
       </div>
       <figcaption>
         <span className="caplabel">Figure A.3.</span> Test-set accuracy and F1 of the tuned LSTM per
-        stock, on a 0–1 scale. Accuracy stays close to chance even where F1 looks high, and on the{' '}
-        {collapsed.length} stocks with an F1 tick the bar ends exactly on it.{' '}
+        stock, on a 0–1 scale. A tick marks what always predicting “up” would score. It is known only
+        for the {collapsed.length} stocks that collapsed, and on those the bars end exactly on it.{' '}
         <a href={img('final_summary')} target="_blank" rel="noreferrer">Original chart, with the ensemble and VIX runs (opens in a new tab)</a>
       </figcaption>
     </figure>
@@ -205,10 +208,11 @@ export default function ProjectCS403() {
           <strong>Abstract.</strong> Can SHAP tell us something about a stock-prediction model that
           plain correlation can’t? We trained an LSTM with self-attention on {stockCount} US stocks, explained
           it with SHAP, and compared those explanations with Pearson correlation. The two disagreed by
-          5 to 12 rank positions on average, about what two unrelated rankings would show, so we can’t
-          say SHAP explains the model better. The model also failed a naive baseline on{' '}
-          {collapsed.length} of the {stockCount} stocks: it predicted “up” every day, so its F1 tied
-          always predicting “up” (<ARef to="table-a1">Table A.1</ARef>).
+          5 to 12 rank positions on average, about what two unrelated rankings would show, and
+          retraining on each method’s top features did not favour SHAP, so we can’t say it explains the
+          model better. Set against a naive baseline, the model tied on {collapsed.length} of the{' '}
+          {stockCount} stocks: it predicted “up” every day, so its F1 matched always predicting “up”
+          (<ARef to="table-a1">Table A.1</ARef>).
         </p>
       </section>
 
@@ -253,6 +257,13 @@ export default function ProjectCS403() {
           estimates what drives the model’s output. That estimate is rough. It covers the first 30 test
           days at 100 samples each, and each day’s features were repeated across the 60-day window, a
           sequence the model never saw in training.
+        </p>
+        <p>
+          The notebook also put this to a direct test, retraining the LSTM on each method’s top 10
+          features for each stock. Correlation’s features averaged ROC-AUC {retrainAuc.corr} and SHAP’s{' '}
+          {retrainAuc.shap}, and correlation scored higher on {retrainCorrWins} of the {stockCount} stocks.
+          Both are close to chance, and this was one unseeded run with a shorter 20-day window, so it
+          shows only that SHAP’s picks were no better here.
         </p>
         <Figure
           n={1}
@@ -300,10 +311,10 @@ export default function ProjectCS403() {
         />
         <p>
           Threshold-free metrics tell the same story: the ensemble’s ROC-AUC averaged {ensembleAuc} across the{' '}
-          {stockCount} stocks, only a little better than random (0.5). Predicting 3-day direction from technical
-          indicators alone is close to a coin flip (<ARef to="figure-a3">Figure A.3</ARef>). That is the
-          result, not a failure of the explainability work: SHAP still gives a rough view of what the
-          model relied on.
+          {stockCount} stocks, only a little better than random (0.5). Predicting 3-day direction from these
+          features is close to a coin flip, and on the {collapsed.length} stocks that collapsed neither score
+          shows any skill (<ARef to="figure-a3">Figure A.3</ARef>). SHAP still gives a rough view of what
+          the model relied on, within the limits in A.2.
         </p>
         <StockFigure />
       </section>
