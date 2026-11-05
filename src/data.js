@@ -79,7 +79,7 @@ export const projects = [
       ],
       'My part: data collection and preparation, and the training approach and model architecture.',
     ],
-    tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance'],
+    tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance', 'Git'],
     caseStudy: '#/cs403',
     link: `${github}/Project-CS403`,
   },
@@ -92,7 +92,7 @@ export const projects = [
     points: [
       'My part: the MyRecipe management feature, recipe deletion, and wiring the frontend to the backend API.',
     ],
-    tech: ['React', 'Vite', 'JavaScript', 'Node.js', 'Express', 'REST APIs'],
+    tech: ['React', 'Vite', 'JavaScript', 'HTML/CSS', 'Node.js', 'Express', 'REST APIs'],
     // The repository is a private GitHub Classroom repo, so there is nothing public to link.
     codeNote: 'In a private course repository (GitHub Classroom), so it cannot be linked.',
   },

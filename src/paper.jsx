@@ -4,13 +4,15 @@ import { jumpTo, tableId } from './paper-utils.js';
 
 // A hyperref-style cross-reference ("Table 1", "§1.1") to something on the same page. Inside a
 // hash route (the appendix) the link keeps the route, as "#/cs403/table-a1", and the address bar
-// is updated to it, so the reference can be copied and still opens the right page.
+// is kept up to date too, so the reference can be copied and still opens the right page.
 export function Ref({ to, route, children }) {
   const href = route ? `${route}/${to}` : `#${to}`;
   const follow = (e) => {
-    if (!jumpTo(to)) return;
+    if (!document.getElementById(to)) return;
     e.preventDefault();
-    if (route) history.replaceState(null, '', href);
+    // A history entry per jump, added before scrolling, so Back returns to the reading position.
+    history.pushState(null, '', href);
+    jumpTo(to);
   };
   return (
     <a className="ref" href={href} onClick={follow}>
@@ -51,7 +53,8 @@ export function LinkLine({ className, children }) {
 // under the bottom rule for sources and the test setup.
 export function NumberedTable({ number, caption, note, columns, rows }) {
   return (
-    <div className="results" id={tableId(number)} tabIndex={-1}>
+    // tabIndex 0: on a narrow phone the table scrolls here, and the keyboard needs to reach it.
+    <div className="results" id={tableId(number)} tabIndex={0} role="group" aria-label={`Table ${number}`}>
       <table>
         <caption>
           <span className="caplabel">Table {number}.</span> {caption}

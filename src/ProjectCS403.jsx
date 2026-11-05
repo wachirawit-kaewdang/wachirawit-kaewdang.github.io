@@ -6,7 +6,7 @@ import { profile, projects } from './data.js';
 import {
   alwaysUpF1, bondAgreeFor, bondCorrelationOnly, bondFirstFor, bondShapOnly, bondTop5Share, collapsed, ensembleAuc,
   lstmF1About, notCollapsed, sectorCount, sectorShap,
-  shapPeak, stockCount,
+  shapPeak, stockCount, stocks,
 } from './metrics.js';
 
 const img = (name) => asset(`cs403/${name}.webp`);
@@ -61,16 +61,33 @@ const ARef = (props) => <Ref route={APPENDIX} {...props} />;
 // feature §A.3 is about, is set in bold ink; the sixth grid cell is the key.
 const shapMax = shapPeak.value;
 
+function Bar({ share, tick, label }) {
+  return (
+    <div className="bar">
+      <span className="track" aria-hidden="true">
+        <span className="fill" style={{ width: `${share * 100}%` }} />
+        {tick != null && <span className="tick" style={{ left: `${tick * 100}%` }} />}
+      </span>
+      <span className="val">{label}</span>
+    </div>
+  );
+}
+
 function SectorFigure() {
   return (
     <figure className="figure data-figure" id="figure-a2" tabIndex={-1}>
       <div className="multiples">
-        {sectorShap.map(({ sector, stocks, rows }) => {
+        <p className="key">
+          All bars share one scale, from 0 to {shapMax.toFixed(4)} ({shapPeak.sector}’s{' '}
+          {featureLabel(shapPeak.feature)}). Bond yield is in <strong>bold</strong>.
+        </p>
+        {sectorShap.map(({ sector, stocks: tickers, rows }) => {
           return (
             <table key={sector} className="bars">
               <caption>
-                {sector} <span>({stocks})</span>
+                {sector} <span>({tickers})</span>
               </caption>
+              <colgroup><col className="labels" /><col /></colgroup>
               <thead className="visually-hidden">
                 <tr><th scope="col">Feature</th><th scope="col">Mean |SHAP|</th></tr>
               </thead>
@@ -79,10 +96,7 @@ function SectorFigure() {
                   <tr key={feature} className={feature === 'Bond_yield' ? 'mark' : undefined}>
                     <th scope="row">{featureLabel(feature)}</th>
                     <td>
-                      <span className="track" aria-hidden="true">
-                        <span className="fill" style={{ width: `${(value / shapMax) * 100}%` }} />
-                      </span>
-                      <span className="val">{value.toFixed(4)}</span>
+                      <Bar share={value / shapMax} label={value.toFixed(4)} />
                     </td>
                   </tr>
                 ))}
@@ -90,11 +104,6 @@ function SectorFigure() {
             </table>
           );
         })}
-        <p className="key">
-          All bars share one scale, from 0 to {shapMax.toFixed(4)} ({shapPeak.sector}’s{' '}
-          {featureLabel(shapPeak.feature)}). Bond yield
-          is in <strong>bold</strong>.
-        </p>
       </div>
       <figcaption>
         <span className="caplabel">Figure A.2.</span> Mean |SHAP| of the top 10 features in each
@@ -104,12 +113,62 @@ function SectorFigure() {
   );
 }
 
-function Contacts({ className }) {
+// Figure A.3, redrawn from the notebook's numbers: the tuned LSTM per stock, with the two
+// reference points the argument needs. Chance on accuracy, and on F1 the always-up value, which
+// is only known for the stocks that collapsed; there the tick lands on the end of the bar.
+function StockFigure() {
+  const panels = [
+    { title: 'Accuracy', note: 'tick: chance, 0.5', value: (s) => s.lstm.acc, tick: () => 0.5 },
+    {
+      title: 'F1',
+      note: 'tick: always “up”',
+      value: (s) => s.lstm.f1,
+      tick: (s) => (collapsed.includes(s) ? alwaysUpF1(s.lstm.acc) : null),
+    },
+  ];
+  return (
+    <figure className="figure data-figure" id="figure-a3" tabIndex={-1}>
+      <div className="multiples pair">
+        {panels.map(({ title, note, value, tick }) => (
+          <table key={title} className="bars tickers">
+            <caption>
+              {title} <span>({note})</span>
+            </caption>
+            <colgroup><col className="labels" /><col /></colgroup>
+            <thead className="visually-hidden">
+              <tr><th scope="col">Stock</th><th scope="col">{title}</th></tr>
+            </thead>
+            <tbody>
+              {stocks.map((s) => (
+                <tr key={s.ticker}>
+                  <th scope="row">{s.ticker}</th>
+                  <td>
+                    <Bar share={value(s)} tick={tick(s)} label={value(s).toFixed(3)} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ))}
+      </div>
+      <figcaption>
+        <span className="caplabel">Figure A.3.</span> Test-set accuracy and F1 of the tuned LSTM per
+        stock, on a 0–1 scale. Accuracy stays close to chance even where F1 looks high, and on the{' '}
+        {collapsed.length} stocks with an F1 tick the bar ends exactly on it.{' '}
+        <a href={img('final_summary')} target="_blank" rel="noreferrer">Original chart, with the ensemble and VIX runs (opens in a new tab)</a>
+      </figcaption>
+    </figure>
+  );
+}
+
+function Contacts({ className, lead = 'code' }) {
+  const code = <ExtLink className={lead === 'code' ? 'primary' : undefined} href={repo}>Code on GitHub</ExtLink>;
+  const email = <a className={lead === 'email' ? 'primary' : undefined} href={`mailto:${profile.email}`}>Email</a>;
   return (
     <LinkLine className={className}>
-      <ExtLink className="primary" href={repo}>Code on GitHub</ExtLink>
+      {lead === 'email' ? email : code}
+      {lead === 'email' ? code : email}
       <ExtLink href={asset(profile.resume)}>Résumé (PDF)</ExtLink>
-      <a href={`mailto:${profile.email}`}>Email</a>
     </LinkLine>
   );
 }
@@ -134,8 +193,10 @@ export default function ProjectCS403() {
         <p>
           <strong>Abstract.</strong> Can SHAP tell us something about a stock-prediction model that
           plain correlation can’t? We trained an LSTM with self-attention on {stockCount} US stocks, explained
-          it with SHAP, and compared those explanations with Pearson correlation. We also checked
-          whether the model beat a naive baseline (<ARef to="table-a1">Table A.1</ARef>).
+          it with SHAP, and compared those explanations with Pearson correlation. The two disagreed by
+          5 to 12 rank positions on average. The model did not beat a naive baseline: on{' '}
+          {collapsed.length} of the {stockCount} stocks it predicted “up” every day, so its F1 tied
+          always predicting “up” (<ARef to="table-a1">Table A.1</ARef>).
         </p>
       </section>
 
@@ -203,7 +264,7 @@ export default function ProjectCS403() {
           Our tuned model reported an average F1 of about {lstmF1About}, which looked good. When I checked it
           against the simplest possible baseline, a model that always predicts “up”, the numbers
           matched (<ARef to="table-a1">Table A.1</ARef>). With the decision threshold tuned down to 0.30,
-          the model predicted “up” on every test day for {collapsed.length} of the {stockCount} stocks, in a rising market.
+          the model predicted “up” on every test day for {collapsed.length} of the {stockCount} stocks.
         </p>
         <NumberedTable
           number="A.1"
@@ -218,14 +279,7 @@ export default function ProjectCS403() {
           indicators alone is close to a coin flip (<ARef to="figure-a3">Figure A.3</ARef>). That is the
           result, not a failure of the explainability work: SHAP still shows what the model relied on.
         </p>
-        <Figure
-          n={3}
-          name="final_summary"
-          width={1600}
-          height={476}
-          alt="Bar charts of accuracy and F1 for each of the 10 stocks. Accuracy stays between about 0.5 and 0.6, while F1 sits near 0.66 to 0.76."
-          caption="Accuracy and F1 per stock. Accuracy stays close to 0.5–0.6 even where F1 looks high."
-        />
+        <StockFigure />
       </section>
 
       <section className="section">
@@ -252,8 +306,8 @@ export default function ProjectCS403() {
       </section>
 
       <footer className="closing">
-        <p>Questions about the method or the data? The code and notebook are on GitHub.</p>
-        <Contacts className="contactline left" />
+        <p>Want to talk through the method or the data? Email is quickest; the code and notebook are on GitHub.</p>
+        <Contacts className="contactline left" lead="email" />
         <p className="back"><a href="#project-1">← Back to the portfolio (§1.1)</a></p>
       </footer>
     </main>

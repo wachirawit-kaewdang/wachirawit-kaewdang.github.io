@@ -49,6 +49,7 @@ function RunningHead({ appendix }) {
                 ← Portfolio
               </a>
               {featured?.link && <ExtLink href={featured.link}>Code</ExtLink>}
+              <a href={`mailto:${profile.email}`}>Email</a>
             </>
           ) : (
             sections.map((s, i) => (
@@ -204,7 +205,7 @@ function Skills() {
           return (
             <div key={s.group}>
               <dt>{s.group}</dt>
-              {shown.length > 0 ? <dd>{shown.join(', ')}</dd> : <dd className="also">None in the projects above.</dd>}
+              {shown.length > 0 && <dd>{shown.join(', ')}</dd>}
               {also.length > 0 && (
                 <dd className="also">
                   <em>Also used:</em> {also.join(', ')}
@@ -243,7 +244,7 @@ function Contact() {
   return (
     <section id="contact" className="section" tabIndex={-1} aria-labelledby="contact-title">
       <SectionHeading id="contact" />
-      <p>The quickest way to reach me is email or LinkedIn.</p>
+      <p>{profile.status} The quickest way to reach me is email or LinkedIn.</p>
       <LinkLine className="contactline left">
         <a className="primary" href={`mailto:${profile.email}`}>{profile.email}</a>
         <ExtLink href={profile.linkedin}>LinkedIn</ExtLink>

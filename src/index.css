@@ -176,13 +176,19 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .case .section > p + .meta { margin-top: 1rem; }
 .figure { margin: 1.25rem 0 0.5rem; border-radius: 2px; }
 .figure img { display: block; width: 100%; height: auto; background: #fff; border: 1px solid var(--hair); }
-.figure figcaption { margin-top: 0.6rem; font-size: 0.95rem; line-height: 1.45; text-wrap: pretty; }
+.figure figcaption { max-width: 34rem; margin-top: 0.6rem; font-size: 0.95rem; line-height: 1.45; text-wrap: pretty; }
+/* On phones a 1600px heatmap at full column width is unreadable, so it keeps a legible size and
+   scrolls inside its own frame. */
+@media (max-width: 36rem) {
+  .figure > a { display: block; overflow-x: auto; }
+  .figure > a img { width: 42rem; max-width: none; }
+}
 /* Wide charts get room on wide screens: the figure breaks out of the reading column to 64rem,
    centred on it, while its caption stays at the reading measure. Only where 64rem plus gutters
    fits, so it never causes sideways scrolling. */
 @media (min-width: 72rem) {
   .figure { width: 64rem; margin-left: calc(50% - 32rem); }
-  .figure figcaption { max-width: var(--measure); margin-inline: auto; }
+  .figure figcaption { margin-inline: auto; }
 }
 /* Figure A.2 drawn as small multiples: one compact table per sector, bars scaled within it. */
 .multiples { display: grid; grid-template-columns: 1fr; gap: 1.25rem 2rem; }
@@ -192,15 +198,22 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .bars caption { caption-side: top; text-align: left; font-weight: 600; padding-bottom: 0.35rem; }
 .bars caption span { font-weight: 400; color: var(--ink-soft); }
 /* A fixed label column (wide enough for the longest feature name) keeps every track the same
-   length, so one shared scale really is one scale across all five panels. */
-.bars th { font-weight: 400; text-align: left; white-space: nowrap; padding: 0.18rem 0.75rem 0.18rem 0; width: 8.25rem; }
+   length, so one shared scale really is one scale across all five panels. It is set on the
+   column, because the only header row is visually hidden and cannot size it. */
+.bars col.labels { width: 8.25rem; }
+.bars.tickers col.labels { width: 3.5rem; }
+.bars th { font-weight: 400; text-align: left; white-space: nowrap; padding: 0.18rem 0.75rem 0.18rem 0; }
 .bars td { padding: 0.18rem 0; }
-.bars td { display: flex; align-items: center; gap: 0.45rem; }
-.bars .track { flex: 1; height: 0.55rem; box-shadow: inset 1px 0 0 var(--ink-soft); }
+.bars .bar { display: flex; align-items: center; gap: 0.45rem; }
+.bars .track { position: relative; flex: 1; height: 0.55rem; box-shadow: inset 1px 0 0 var(--ink-soft); }
+.bars .tick { position: absolute; top: -0.15rem; bottom: -0.15rem; width: 2px; margin-left: -1px; background: var(--ink); }
 .bars .fill { display: block; height: 100%; background: color-mix(in srgb, var(--ink) 32%, transparent); }
 .bars .mark th, .bars .mark .val { color: var(--ink); font-weight: 600; }
 .bars .mark .fill { background: var(--ink); }
+/* The key comes first in the source and on narrow screens, so it is read before 50 rows of bars;
+   with three columns it takes the empty sixth cell. */
 .multiples .key { align-self: center; margin: 0; font-size: 0.9rem; color: var(--ink-soft); max-width: 24rem; }
+@media (min-width: 72rem) { .multiples .key { order: 1; } .multiples.pair { grid-template-columns: 1fr 1fr; } }
 .multiples .key strong { color: var(--ink); }
 .bars .val { font-variant-numeric: lining-nums tabular-nums; color: var(--ink-soft); min-width: 3.4em; text-align: right; }
 .data-figure .multiples { padding: 0.75rem 0 0.25rem; }
