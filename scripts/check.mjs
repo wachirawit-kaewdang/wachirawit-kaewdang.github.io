@@ -68,11 +68,16 @@ for (const [ticker, s] of stockEntries) {
 }
 const sectors = metrics.sectorShap ?? [];
 if (sectors.length !== 5) shape.push(`${sectors.length} sectors in sectorShap, expected 5`);
-for (const { sector, rows } of sectors) {
+for (const { sector, stocks, rows } of sectors) {
   if (rows?.length !== 10 || !rows.every(([f, v]) => typeof f === 'string' && rate(v) && v > 0)) {
     shape.push(`sectorShap ${sector}: expected 10 [feature, value] rows`);
   }
-  if (!stockEntries.some(([, s]) => s.sector === sector)) shape.push(`sectorShap ${sector}: no stock has this sector`);
+  // Figure A.2 prints these tickers beside each sector's bars.
+  const tickers = stockEntries.filter(([, s]) => s.sector === sector).map(([ticker]) => ticker);
+  if (!tickers.length) shape.push(`sectorShap ${sector}: no stock has this sector`);
+  if (stocks?.split(', ').sort().join() !== tickers.sort().join()) {
+    shape.push(`sectorShap ${sector}: lists ${stocks}, but its stocks are ${tickers.join(', ')}`);
+  }
 }
 for (const s of shape) failures.push(`metrics.json: ${s}`);
 

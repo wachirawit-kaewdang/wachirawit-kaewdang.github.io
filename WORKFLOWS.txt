@@ -66,6 +66,8 @@ What CI checks (npm run check)
   [0, 1].
 - The 0.30-threshold stocks have F1 equal to always-up, 2p / (1 + p); the others do not.
 - resume/resume.html quotes the computed CS403 numbers, and the PDF was built from it.
+- metrics.json is exactly what the extractor rebuilds from the notebook at its frozen commit.
+  sectorShap's values came from a chart, so only its bond-yield bars are compared.
 - The resume PDF is one page and uses only STIX Two Text.
 - The resume and og/og-image.html contain the contact details in src/data.js. If you change
   the site address, rebuild og-image.png too; the check reads only its HTML source.
