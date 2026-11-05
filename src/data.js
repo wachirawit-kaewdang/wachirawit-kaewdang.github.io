@@ -100,10 +100,11 @@ export const projects = [
     title: 'HTTP Web Server from Scratch',
     context: 'CS322 Computer Networks · solo',
     summary:
-      'An HTTP/1.0 server written directly on Python sockets — no frameworks — serving static ' +
-      'HTML and images with correct status codes and content-type headers.',
+      'An HTTP/1.0 server written directly on Python sockets — no frameworks — serving an ' +
+      'HTML page and a GIF with the right content-type headers, and returning 404 for anything else.',
     points: [],
     tech: ['Python', 'Sockets', 'TCP/IP', 'HTTP'],
+    codeNote: 'Course assignment; code not published.',
   },
 ];
 
