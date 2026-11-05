@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "resume": "node scripts/build-resume.mjs",
     "check": "node scripts/check.mjs",
+    "render-check": "node scripts/render-check.mjs",
     "help": "node -e \"process.stdout.write(require('fs').readFileSync('WORKFLOWS.txt','utf8'))\""
   },
   "dependencies": {

@@ -4,7 +4,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve, relative } from 'node:path';
-import { profile } from '../src/data.js';
+import { profile, projects } from '../src/data.js';
 import metrics from '../src/metrics.json' with { type: 'json' };
 import {
   alwaysUpF1, bondFirstFor, bondTop5Share, collapsed, ensembleAuc, notCollapsed, sectorCount, stockCount,
@@ -113,6 +113,31 @@ if (recorded[0] !== sha256(resume.replaceAll('\r\n', '\n'))
   failures.push('the résumé PDF was not built from resume/resume.html as committed; run npm run resume and commit both');
 }
 
+// The PDF is what recruiters download, so it must stay on one page and in the résumé's own font.
+// Chrome falls back to another font without a word when a character is missing from STIX.
+const pdf = readFileSync(pub(profile.resume)).toString('latin1');
+const pages = pdf.match(/\/Type\s*\/Page\b(?!s)/g)?.length ?? 0;
+if (pages !== 1) failures.push(`the résumé PDF has ${pages} pages, expected 1`);
+const fonts = [...new Set([...pdf.matchAll(/\/BaseFont\s*\/([^\s/>]+)/g)].map((m) => m[1]))];
+const stray = fonts.filter((font) => !font.includes('STIXTwoText'));
+if (!fonts.length || stray.length) {
+  failures.push(`the résumé PDF uses fonts other than STIX Two Text: ${stray.join(', ') || 'none found'}`);
+}
+
+// The contact details are typed into the résumé and share image too, so a change in data.js has
+// to reach them. The share image is a PNG built by hand, so this checks only its source.
+const bare = (url) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+const contacts = [
+  profile.email,
+  ...[profile.site, profile.linkedin, profile.github, projects.find((p) => p.caseStudy).link].map(bare),
+];
+for (const contact of contacts) {
+  if (!resume.includes(contact)) failures.push(`resume/resume.html should include ${contact} (from src/data.js)`);
+}
+if (!read('og/og-image.html').includes(bare(profile.site))) {
+  failures.push(`og/og-image.html should include ${bare(profile.site)} (from src/data.js)`);
+}
+
 // Files in public/ that nothing links to are not errors, but worth knowing about.
 const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
   e.isDirectory() ? walk(resolve(dir, e.name)) : [relative(pub(''), resolve(dir, e.name)).replaceAll('\\', '/')]);
@@ -126,4 +151,5 @@ if (failures.length) {
 console.log(`✓ ${referenced.size} linked files exist in public/`);
 console.log(`✓ metrics.json has the expected shape (${stockEntries.length} stocks, ${sectors.length} sectors)`);
 console.log(`✓ always-up identity holds for ${collapsed.length} stocks and fails for ${notCollapsed.length}`);
-console.log(`✓ résumé matches ${resumeClaims.length} computed CS403 numbers, and its PDF matches its source`);
+console.log(`✓ résumé matches ${resumeClaims.length} computed CS403 numbers and ${contacts.length} contact details`);
+console.log(`✓ résumé PDF is one page in ${fonts.length} STIX fonts, and its recorded hashes match`);

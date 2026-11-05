@@ -8,6 +8,7 @@ Everyday
 npm run dev       Dev server at http://localhost:5173 (the appendix is at #/cs403).
 npm run lint      oxlint over the source.
 npm run check     Checks a build cannot catch (see "What CI checks" below).
+npm run render-check  Opens the built site in headless Chrome; run npm run build first.
 npm run build     Production build to dist/. Fails if index.html keeps a %NAME% placeholder.
 
 Content lives in src/data.js. The CS403 tables and quoted counts are computed by src/metrics.js
@@ -16,8 +17,8 @@ are frozen" below.
 
 Deploying
 ---------
-Push to main. GitHub Actions (.github/workflows/deploy.yml) runs npm ci, lint, check and
-build, then publishes dist/ to GitHub Pages. Pull requests, and manual runs on other branches,
+Push to main. GitHub Actions (.github/workflows/deploy.yml) runs npm ci, lint, check,
+build and render-check, then publishes dist/ to GitHub Pages. Pull requests, and manual runs on other branches,
 run the same steps but never deploy.
 
 The CS403 results are frozen
@@ -65,4 +66,8 @@ What CI checks (npm run check)
   [0, 1].
 - The 0.30-threshold stocks have F1 equal to always-up, 2p / (1 + p); the others do not.
 - resume/resume.html quotes the computed CS403 numbers, and the PDF was built from it.
+- The resume PDF is one page and uses only STIX Two Text.
+- The resume and og/og-image.html contain the contact details in src/data.js. If you change
+  the site address, rebuild og-image.png too; the check reads only its HTML source.
+- After the build, both pages render in headless Chrome with no literal NaN or undefined.
 Warning only: files in public/ nothing links to.

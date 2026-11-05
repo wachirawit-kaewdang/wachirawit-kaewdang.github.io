@@ -27,6 +27,8 @@ jobs:
       # Every file the site links to must exist in public/ (see scripts/check.mjs).
       - run: npm run check
       - run: npm run build
+      # The built site must actually render in a browser (see scripts/render-check.mjs).
+      - run: npm run render-check
       - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:

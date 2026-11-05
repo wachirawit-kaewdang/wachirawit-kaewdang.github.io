@@ -11,7 +11,8 @@ const collapsedShare = `${collapsed.length} of ${stockCount}`;
 const appendix = (label, to) => ({ label: `Appendix ${label}`, to });
 const tableA1 = { label: 'Table A.1', to: 'table-a1' };
 
-// Every GitHub and site URL is built from the username, so a rename is a one-line change.
+// Every GitHub and site URL is built from the username. A rename also has to reach the résumé and
+// share image, which are typed by hand; npm run check fails until they match.
 const username = 'wachirawit-kaewdang';
 const github = `https://github.com/${username}`;
 
