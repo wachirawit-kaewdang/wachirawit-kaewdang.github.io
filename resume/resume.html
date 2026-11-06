@@ -77,11 +77,9 @@
       <p class="sub">github.com/wachirawit-kaewdang/Project-CS403</p>
       <ul>
         <li>Built a deep learning pipeline predicting 3-day price direction for 10 US stocks across 5 sectors (2020–2025), from 27 engineered features: momentum and volatility, moving averages, RSI / MACD / Stochastic, volume and OBV, S&amp;P 500 market context and bond yield.</li>
-        <li>Architecture: LSTM with self-attention (3 layers, hidden size 128) over a 60-day window, trained with Focal Loss and class weights to handle imbalance.</li>
-        <li>Compared against Random Forest, Logistic Regression, a soft-voting ensemble and a VIX market-fear feature set.</li>
-        <li>Compared SHAP (KernelExplainer) with Pearson correlation: rankings differed by 5–12 positions, close to the 9 expected by chance, and retraining on top features did not favour SHAP. SHAP ranked bond yield top-5 for 6 of 10 stocks (#1 for JPM and AMZN); correlation agreed for JPM but split for others (TSLA: 2nd by SHAP, 15th by correlation).</li>
+        <li>Architecture: LSTM with self-attention (3 layers, hidden size 128) over a 60-day window, trained with Focal Loss and class weights, and compared with Random Forest, Logistic Regression, a soft-voting ensemble and a VIX feature set.</li>
+        <li>Compared SHAP (KernelExplainer) with Pearson correlation: SHAP ranked bond yield top-5 for 6 of 10 stocks (#1 for JPM and AMZN); correlation agreed for JPM but split for others (TSLA: 2nd by SHAP, 15th by correlation). Overall rank gaps of 5–12 positions were close to the 9 expected by chance, which we documented.</li>
         <li>Evaluated results against a naive baseline: on 7 of 10 stocks the tuned model collapsed to always predicting “up”, so its F1 matched an always-up model; the ensemble’s threshold-free ROC-AUC averaged 0.568, showing short-term direction is close to random. Identified threshold and early-stopping leakage and documented fixes.</li>
-        <li>Kept quarterly fundamentals (P/E, EPS, market cap) out of training because fill-forward would add noise (not tested); used them for descriptive analysis.</li>
         <li>My contribution: data collection and preparation, training approach and model architecture, and joint SHAP analysis. Two-person project.</li>
       </ul>
       <p class="stack">Python · PyTorch · SHAP · scikit-learn · pandas · NumPy · Jupyter</p>
@@ -89,7 +87,13 @@
     <div class="entry">
       <div class="head"><b>This Portfolio and Its Data Checks</b><span>Personal project, built with Claude Code</span></div>
       <ul>
-        <li>React + Vite site; CI rebuilds its CS403 metrics from the notebook, checks this résumé, and renders both pages in headless Chrome before deploying.</li>
+        <li>React + Vite site; CI rebuilds its CS403 metrics from the notebook and checks both pages in headless Chrome before deploying.</li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="head"><b>QA Automation Exercise – Robot Framework</b><span>Take-home exercise</span></div>
+      <ul>
+        <li>11 passing automated tests with reports, covering UI login flows (SeleniumLibrary), a REST API (RequestsLibrary) and a Python script, plus 18 written test cases for a mobile login flow, prioritised High to Low.</li>
       </ul>
     </div>
     <div class="entry">
@@ -114,8 +118,8 @@
       <dt>ML &amp; Data</dt><dd>PyTorch, scikit-learn, SHAP, pandas, NumPy, Jupyter – time series, feature engineering, explainable AI</dd>
       <dt>Web</dt><dd>React, Vite, Node.js, Express, Django, REST API design, HTML/CSS</dd>
       <dt>Databases</dt><dd>MySQL, MongoDB</dd>
-      <dt>Tools</dt><dd>Git, Docker, automated testing (TDD), object-oriented design</dd>
-      <dt>Spoken</dt><dd>Thai (native), English (professional working proficiency)</dd>
+      <dt>Tools</dt><dd>Git, Docker, automated testing (TDD), Robot Framework, object-oriented design</dd>
+      <dt>Spoken</dt><dd>Thai (native), English (conversational)</dd>
     </dl>
 
   </body>
