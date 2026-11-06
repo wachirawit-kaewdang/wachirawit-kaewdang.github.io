@@ -41,7 +41,9 @@ it only as sector_shap.png; its bond-yield bars are checked against the per-stoc
 
 If the results are ever moved to a new commit, all of this is by hand, before changing
 frozenAt in scripts/check.mjs:
-- Replace the charts in public/cs403/ and re-read sectorShap from sector_shap.png.
+- Replace the charts in public/cs403/ and re-read sectorShap from sector_shap.png and
+  rankGap from rank_disagreement_summary.png. The extractor keeps both, and their hash alone
+  won't tell you they're out of date.
 - Re-read the typed claims in src/data.js, src/ProjectCS403.jsx and resume/resume.html:
   "5 to 12 positions", the features that moved most, 27 features, "close to chance",
   "close to a coin flip", which sector leans on what, the bond-yield reading, and the model

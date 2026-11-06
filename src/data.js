@@ -1,7 +1,8 @@
 // All site content lives here, so updating the portfolio never means touching layout code.
 // The CS403 numbers come from metrics.js, which computes them from the notebook's outputs.
 import {
-  aucRange, bondAgreeFor, bondTop5Share, collapsed, notebookUrl, sectorCount, source, stockCount, table1Rows,
+  aucRange, bondAgreeFor, bondTop5Share, collapsed, lstmF1About, notebookUrl, rankGapRange, sectorCount, source,
+  stockCount, table1Rows,
 } from './metrics.js';
 
 const collapsedShare = `${collapsed.length} of ${stockCount}`;
@@ -46,7 +47,7 @@ export const projects = [
       'with results set against a naive baseline.',
     // Stated as the abstract's main result, ahead of any metric.
     finding: [
-      `We checked our senior-project model against a naive “always predict up” baseline and it tied on ${collapsedShare} stocks; `,
+      `We checked our senior-project model against a naive “always predict up” baseline and found its ${lstmF1About} F1 wasn’t skill: on ${collapsedShare} stocks it only matched always predicting “up”. `,
       appendix('A.4', 'appendix-a4'),
       ' shows the evidence',
     ],
@@ -60,7 +61,8 @@ export const projects = [
       ],
       note: [
         `Averages over the ${stockCount} stocks, except rows marked ‡; test set is the last 20% of Jan 2020 – Apr 2025, split by ` +
-          'date. Thresholds were tuned on that test set, so these figures are if anything optimistic. ' +
+          'date. The LSTM and ensemble thresholds were tuned on that test set, so those figures are if anything optimistic; ' +
+          'Random Forest and Logistic Regression use the default 0.5, so their F1 isn’t directly comparable. ' +
           'Computed from the notebook’s per-stock outputs (',
         { label: `Project-CS403 @ ${source.commit}`, href: notebookUrl },
         '). † Not recorded for the full-feature LSTM. ' +
@@ -74,7 +76,7 @@ export const projects = [
     points: [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
       [
-        'SHAP and Pearson correlation ranked features 5 to 12 positions apart on average, about what ' +
+        `SHAP and Pearson correlation ranked features ${rankGapRange} positions apart on average, about what ` +
           'unrelated rankings would give (≈9), and retraining on each method’s top features did not favour SHAP. SHAP put ' +
           `bond yield in the top 5 for ${bondTop5Share} stocks; correlation agreed for ${bondAgreeFor} ` +
           'but split on the others where both ranks are printed; see ',
@@ -86,6 +88,19 @@ export const projects = [
     tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance', 'Git'],
     caseStudy: '#/cs403',
     link: `${github}/Project-CS403`,
+  },
+  {
+    title: 'This Portfolio and Its Data Checks',
+    context: 'Personal project · built with Claude Code',
+    summary:
+      'The site you are reading: React + Vite, with the CS403 tables computed from the notebook’s ' +
+      'saved outputs instead of typed by hand.',
+    points: [
+      'On every push to main, CI rebuilds the per-stock CS403 metrics from the notebook at a frozen commit and stops the deploy if they differ.',
+      'The same run checks the résumé PDF against its source and the site’s contact details, then opens both pages in headless Chrome.',
+    ],
+    tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions'],
+    link: `${github}/${username}.github.io`,
   },
   {
     title: 'Recipe Web Application',
@@ -109,19 +124,6 @@ export const projects = [
     points: [],
     tech: ['Python', 'Sockets', 'TCP/IP', 'HTTP'],
     codeNote: 'Course assignment; code not published.',
-  },
-  {
-    title: 'This Portfolio and Its Data Checks',
-    context: 'Personal project · built with Claude Code',
-    summary:
-      'The site you are reading: React + Vite, with the CS403 tables computed from the notebook’s ' +
-      'saved outputs instead of typed by hand.',
-    points: [
-      'On every push to main, CI rebuilds the per-stock CS403 metrics from the notebook at a frozen commit and stops the deploy if they differ.',
-      'The same run checks the résumé PDF against its source and the site’s contact details, then opens both pages in headless Chrome.',
-    ],
-    tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions'],
-    link: `${github}/${username}.github.io`,
   },
 ];
 

@@ -4,7 +4,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve, relative } from 'node:path';
-import { education, profile, projects } from '../src/data.js';
+import { education, profile, projects, skills } from '../src/data.js';
 import metrics from '../src/metrics.json' with { type: 'json' };
 import {
   alwaysUpF1, aucRange, bondAgreeFor, bondCorrelationOnly, bondCorrelationRankOf, bondRankRows, bondShapOnly, lstmF1About, rankGapRange,
@@ -229,6 +229,9 @@ if (JSON.stringify(computed) !== JSON.stringify(expectedOutputs)) {
 // Appendix A claims the 0.30-threshold stocks collapsed to always-up, so their F1 must equal
 // 2p / (1 + p) for accuracy p. If a rerun of the notebook breaks that, the claim must change too.
 for (const s of collapsed) {
+  // The identity alone proves no down day was called correctly. A second model landing on the same
+  // accuracy is the supporting evidence that these stocks really did collapse to "up".
+  if (s.lstm.acc !== s.vix.acc) failures.push(`metrics.json: ${s.ticker}'s LSTM and VIX accuracy differ`);
   if (Math.abs(s.lstm.f1 - alwaysUpF1(s.lstm.acc)) > 0.0006) {
     failures.push(`metrics.json: ${s.ticker} F1 ${s.lstm.f1} is not the always-up value for accuracy ${s.lstm.acc}`);
   }
@@ -253,7 +256,9 @@ const resumeClaims = [
   `TSLA: ${bondRankOf('TSLA')} by SHAP, ${bondCorrelationRankOf('TSLA')} by correlation`,
   // Typed facts, frozen with the results and read back from the notebook by hand.
   '27 engineered features',
-  '5–12 positions',
+  `${rankGapRange.replace(' to ', '–')} positions`,
+  'Two-person project',
+  profile.location,
   '60-day window',
   '3 layers, hidden size 128',
   education.school,
@@ -262,6 +267,11 @@ const resumeClaims = [
 ];
 for (const claim of resumeClaims) {
   if (!resumeText.includes(claim)) failures.push(`resume/resume.html should say “${claim}”`);
+}
+// Every skill on the site is on the résumé, allowing for the two it words differently.
+const resumeWording = { 'REST APIs': 'REST API design', 'Testing (TDD)': 'testing (TDD)' };
+for (const skill of skills.flatMap((group) => group.items)) {
+  if (!resumeText.includes(resumeWording[skill] ?? skill)) failures.push(`resume/resume.html should list the skill ${skill}`);
 }
 
 // The PDF is built from resume.html by hand (npm run resume), which records both files' hashes.
@@ -325,5 +335,5 @@ if (failures.length) {
 console.log(`✓ ${referenced.size} linked files exist in public/`);
 console.log(`✓ metrics.json has the expected shape (${stockEntries.length} stocks, ${sectors.length} sectors)`);
 console.log(`✓ always-up identity holds for ${collapsed.length} stocks and fails for ${notCollapsed.length}`);
-console.log(`✓ résumé matches ${resumeClaims.length} computed CS403 numbers and ${contacts.length} contact details`);
+console.log(`✓ résumé matches ${resumeClaims.length} CS403 and education facts, all skills and ${contacts.length} contact details`);
 console.log(`✓ résumé PDF is one page in ${fonts.length} STIX fonts, and its recorded hashes match`);

@@ -22,6 +22,15 @@ const shownInProjects = new Set(projects.flatMap((p) => p.tech));
 // The page's own title from index.html, restored when leaving the appendix.
 const homeTitle = document.title;
 
+// After Back or Forward the browser restores the position but not focus, which can be left far
+// away, so the next Tab would jump there. This moves it to the jump target nearest the reading place.
+function focusNearby() {
+  const here = [...document.querySelectorAll('main [tabindex="-1"]')]
+    .filter((element) => element.getBoundingClientRect().top < window.innerHeight)
+    .at(-1);
+  (here ?? document.getElementById('main'))?.focus({ preventScroll: true });
+}
+
 // Tiny hash router: "#/cs403" shows the case study, anything else shows the home page.
 // Hash URLs work on GitHub Pages without any server configuration.
 function useHash() {
@@ -46,8 +55,11 @@ function useCurrentSection(ids) {
       const atEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
       const started = ids.filter((id) =>
         document.getElementById(id)?.getBoundingClientRect().top < window.innerHeight * 0.5);
+      // A section just linked to wins while it's near the top, even if a short one follows it.
       const named = window.location.hash.replace(/^.*[#/]/, '');
-      setCurrent(atEnd ? (ids.includes(named) ? named : ids.at(-1)) : started.at(-1) ?? null);
+      const namedTop = ids.includes(named) ? document.getElementById(named)?.getBoundingClientRect().top : null;
+      const landed = namedTop != null && namedTop >= 0 && namedTop < window.innerHeight * 0.5;
+      setCurrent(landed ? named : atEnd ? ids.at(-1) : started.at(-1) ?? null);
     };
     update();
     window.addEventListener('scroll', update, { passive: true });
@@ -148,9 +160,8 @@ function Abstract() {
       </p>
       {featured >= 0 && (
         <p>
-          <strong>Main result</strong> (<Ref to="table-1">Table 1</Ref>,{' '}
-          <Ref to={projectId(featured)}>§{sectionNumber('projects')}.{featured + 1}</Ref>).{' '}
-          <Prose pieces={projects[featured].finding} />.
+          <strong>Main result.</strong> <Prose pieces={projects[featured].finding} />, with{' '}
+          <Ref to="table-1">Table 1</Ref> in <Ref to={projectId(featured)}>§{sectionNumber('projects')}.{featured + 1}</Ref>.
         </p>
       )}
       <p className="availability">
@@ -348,14 +359,20 @@ export default function App() {
     const samePage = wasCaseStudy.current === isCaseStudy;
     mounted.current = true;
     if (!history.state?.seen) history.replaceState({ seen: true }, '');
-    if (returning && samePage) return;
+    if (returning && samePage) {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const { top, bottom } = document.activeElement.getBoundingClientRect();
+        if (document.activeElement === document.body || bottom < 0 || top > window.innerHeight) focusNearby();
+      }));
+      return;
+    }
 
     document.title = isCaseStudy ? `Appendix A: Stock Direction Prediction · ${profile.name}` : homeTitle;
     // Back or Forward between the two pages: the browser can't restore a page that wasn't there.
     const spot = returning ? spots.current[isCaseStudy ? 'appendix' : 'home'] : null;
     if (spot !== null) {
       window.scrollTo({ top: spot, behavior: 'instant' });
-      document.getElementById('main')?.focus({ preventScroll: true });
+      focusNearby();
       setMissing(false);
       wasCaseStudy.current = isCaseStudy;
       return;
@@ -366,7 +383,8 @@ export default function App() {
       const anchor = hash.slice(APPENDIX.length + 1);
       if (!(anchor && jumpTo(anchor, { tint: false }))) {
         found = !anchor;
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        // A reload of the plain page keeps the browser's restored position.
+        if (anchor || !firstLoad) window.scrollTo({ top: 0, behavior: 'instant' });
         // On a fresh load the browser starts at the top, so Tab still meets the running head.
         if (!firstLoad) document.getElementById('appendix-title')?.focus({ preventScroll: true });
       }

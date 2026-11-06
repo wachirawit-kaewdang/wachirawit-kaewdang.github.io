@@ -136,7 +136,6 @@ function GapFigure() {
                       share={value / gapScale}
                       tick={unrelatedGap / gapScale}
                       label={value.toFixed(1)}
-                      spoken=", unrelated rankings give about 9"
                     />
                   </td>
                 </tr>
@@ -149,7 +148,7 @@ function GapFigure() {
         <span className="caplabel">Figure A.1.</span> Average gap between each feature’s correlation
         and SHAP ranks over the {stockCount} stocks. The averages run from {rankGapRange}, around the 9 that
         unrelated rankings give. Bond yield is in <strong>bold</strong>.{' '}
-        <a href={img('rank_disagreement_summary')} target="_blank" rel="noreferrer">Original chart, with the per-stock heatmap (opens in a new tab)</a>
+        <a href={img('rank_disagreement_summary')} target="_blank" rel="noreferrer">Original chart, with the per-stock heatmap<span className="newtab"> (opens in a new tab)</span></a>
       </figcaption>
     </figure>
   );
@@ -190,7 +189,7 @@ function SectorFigure() {
       </div>
       <figcaption>
         <span className="caplabel">Figure A.2.</span> Mean |SHAP| of the top 10 features in each
-        sector. <a href={img('sector_shap')} target="_blank" rel="noreferrer">Original chart (opens in a new tab)</a>
+        sector. <a href={img('sector_shap')} target="_blank" rel="noreferrer">Original chart<span className="newtab"> (opens in a new tab)</span></a>
       </figcaption>
     </figure>
   );
@@ -251,8 +250,8 @@ function StockFigure() {
         <span className="caplabel">Figure A.3.</span> Test-set accuracy and F1 of the tuned LSTM per
         stock, on a 0–1 scale. A tick marks what always predicting “up” would score, which the
         notebook’s outputs reveal for {collapsed.length + vixRevealed.length} stocks. On the {collapsed.length} that
-        collapsed the bars end exactly on it.{' '}
-        <a href={img('final_summary')} target="_blank" rel="noreferrer">Original chart, with the ensemble and VIX runs (opens in a new tab)</a>
+        collapsed the bars end exactly on it, and COST’s accuracy happens to match too.{' '}
+        <a href={img('final_summary')} target="_blank" rel="noreferrer">Original chart, with the ensemble and VIX runs<span className="newtab"> (opens in a new tab)</span></a>
       </figcaption>
     </figure>
   );
@@ -290,7 +289,7 @@ export default function ProjectCS403() {
           <strong>Abstract.</strong> Can SHAP tell us something about a stock-prediction model that
           plain correlation can’t? We trained an LSTM with self-attention on {stockCount} US stocks, explained
           it with SHAP, and compared those explanations with Pearson correlation. The two disagreed by
-          5 to 12 rank positions on average, about what two unrelated rankings would show, and
+          {rankGapRange} rank positions on average, about what two unrelated rankings would show, and
           retraining on each method’s top features did not favour SHAP, so we can’t say it explains the
           model better. Set against a naive baseline, the model tied on {collapsed.length} of the{' '}
           {stockCount} stocks: it predicted “up” every day, so its F1 matched always predicting “up”
@@ -327,7 +326,7 @@ export default function ProjectCS403() {
         <Heading n={2} />
         <p>
           For every stock we ranked the 27 features twice: by absolute Pearson correlation with the
-          target over the training period, and by mean |SHAP| on the trained LSTM. The two rankings disagreed by roughly 5 to 12
+          target over the training period, and by mean |SHAP| on the trained LSTM. The two rankings disagreed by roughly {rankGapRange}
           positions per feature on average (<ARef to="figure-a1">Figure A.1</ARef>). Volume change, EMA26
           and Volume/MA ratio moved the most.
         </p>
@@ -370,8 +369,8 @@ export default function ProjectCS403() {
         <p>
           If you open the notebook, note that its closing summary cell says top 5 for 8 of 10 stocks, #1
           for both banks, and that SHAP gives richer insight than correlation. Those lines are typed text,
-          and the notebook’s own printed tables don’t support them. Every figure here comes from those
-          tables instead.
+          and the notebook’s own printed tables don’t support them. The numbers here come from those
+          tables, and Figures A.1 and A.2 from the values printed on its charts.
         </p>
         <p>
           Grouped by sector, the patterns differ too (<ARef to="figure-a2">Figure A.2</ARef>). Energy
