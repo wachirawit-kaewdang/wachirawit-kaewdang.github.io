@@ -78,6 +78,8 @@ What CI checks (npm run verify, plus the notebook comparison)
   match pinned file hashes, and Table 1's computed results match
   fixed expected values in scripts/checks/metrics.mjs. If the freeze ever moves, both must be updated.
 - The resume PDF is one page and uses only STIX Two Text.
+- The resume, site and share image contain nothing shaped like a phone number. The private
+  resume is kept outside this repo.
 - The resume and og/og-image.html contain the contact details in src/data.js. If you change
   the site address, rebuild og-image.png too; the check reads only its HTML source.
 - After the build, both pages render in headless Chrome with no literal NaN or undefined.

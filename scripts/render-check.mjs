@@ -21,16 +21,21 @@ const pages = [
     path: '/',
     expected: ['Wachirawit Kaewdang', 'Abstract. I checked our senior-project model', `${rankGapRange} positions apart`, 'did not favour SHAP', 'Contact'],
     tables: { 'table-1': table1Rows },
+    headers: { 'table-1': ['Model', 'F1', 'ROC-AUC'] },
   },
   {
     path: '/#/cs403',
     // Numbers and conclusions in the appendix's prose, which nothing else reads.
-    expected: ['Appendix A', 'Figure A.3', 'A.6', `${rankGapRange} rank positions`, 'about 5 to 13', 'first 30 test days',
+    expected: ['Appendix A', 'Figure A.3', 'A.6', `disagreed by ${rankGapRange} rank positions`, `roughly ${rankGapRange} positions`, 'about 5 to 13', 'first 30 test days',
       '20-day window', `averaged ROC-AUC ${retrainAuc.corr} and SHAP’s ${retrainAuc.shap}`,
       `higher on ${retrainCorrWins} of the`, `averaged ${ensembleAuc}`, 'did not favour SHAP'],
     tables: {
       'table-a1': bondRankRows,
       'table-a2': collapsed.map((s) => [s.ticker, pct(s.lstm.acc), pct(s.lstm.f1), pct(alwaysUpF1(s.lstm.acc))]),
+    },
+    headers: {
+      'table-a1': ['Stock', 'SHAP rank', 'Correlation rank'],
+      'table-a2': ['Stock', 'Accuracy', 'Our F1', 'Always-up F1'],
     },
     // Figure A.1's tick marks 9 on a 0–12 scale, on every one of its 27 rows.
     ticks: { 'figure-a1': { left: '75%', count: 27 } },
@@ -59,7 +64,7 @@ function rowsOf(dom, id) {
     [...row.matchAll(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/g)].map(([, cell]) => plain(cell)));
 }
 
-async function read({ path, expected, tables = {}, ticks = {} }) {
+async function read({ path, expected, tables = {}, headers = {}, ticks = {} }) {
   // Not the Sync call: that would block the server this same process is running.
   const { stdout: dom } = await run(chrome, [
     '--headless=new',
@@ -80,6 +85,12 @@ async function read({ path, expected, tables = {}, ticks = {} }) {
   for (const [id, rows] of Object.entries(tables)) {
     const shown = rowsOf(dom, id);
     if (JSON.stringify(shown) !== JSON.stringify(rows)) failures.push(`${path} #${id} shows ${JSON.stringify(shown)}, expected ${JSON.stringify(rows)}`);
+  }
+  for (const [id, names] of Object.entries(headers)) {
+    const start = dom.indexOf(`id="${id}"`);
+    const head = dom.slice(dom.indexOf('<thead', start), dom.indexOf('</thead>', start));
+    const shown = [...head.matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map(([, cell]) => plain(cell));
+    if (JSON.stringify(shown) !== JSON.stringify(names)) failures.push(`${path} #${id} has headers ${JSON.stringify(shown)}`);
   }
   for (const [id, { left, count }] of Object.entries(ticks)) {
     const start = dom.indexOf(`id="${id}"`);

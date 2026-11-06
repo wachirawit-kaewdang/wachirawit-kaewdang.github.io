@@ -20,7 +20,7 @@ const github = `https://github.com/${username}`;
 export const profile = {
   name: 'Wachirawit Kaewdang',
   nickname: 'Ohm',
-  role: 'Machine Learning, Software & QA Engineer',
+  role: 'Machine Learning & Software Engineer',
   location: 'Bangkok, Thailand',
   email: 'wachirawit.kaewdang@gmail.com',
   github,
@@ -54,19 +54,16 @@ export const projects = [
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption: [
-        `Every model with a recorded ROC-AUC is close to chance, at ${aucRange} where 0.50 is chance, and the tuned ` +
+        `Every model here with a recorded ROC-AUC is close to chance, at ${aucRange} where 0.50 is chance, and the tuned ` +
           `LSTM’s high F1 comes from predicting “up” on every test day for ${collapsedShare} stocks (`,
         tableA2,
         ').',
       ],
       note: [
-        `Averages over the ${stockCount} stocks, except rows marked ‡; test set is the last 20% of Jan 2020 – Apr 2025, split by ` +
-          'date. The LSTM and ensemble thresholds were tuned on that test set, so those figures are if anything optimistic; ' +
-          'Random Forest and Logistic Regression use the default 0.5, so their F1 isn’t directly comparable. ' +
-          'Computed from the notebook’s per-stock outputs (',
+        'Test set: the last 20% of Jan 2020 – Apr 2025. LSTM and ensemble thresholds were tuned on it, so those rows are ' +
+          'if anything optimistic; Random Forest and Logistic Regression use the default 0.5. Source: ',
         { label: `Project-CS403 @ ${source.commit}`, href: notebookUrl },
-        '). † Not recorded for the full-feature LSTM. ' +
-          `‡ Over the ${collapsed.length} stocks where the tuned LSTM collapsed, which reveals the test-set up-day share; its F1 equals the baseline on each.`,
+        `. † Not recorded. ‡ The ${collapsed.length} stocks where the LSTM collapsed; other rows average all ${stockCount}.`,
       ],
       columns: ['Model', 'F1', 'ROC-AUC'],
       rows: table1Rows,
@@ -133,7 +130,7 @@ export const skills = [
   { group: 'Languages', items: ['Python', 'JavaScript', 'Java', 'C', 'C++', 'SQL'] },
   { group: 'ML & Data', items: ['PyTorch', 'scikit-learn', 'SHAP', 'pandas', 'NumPy', 'Jupyter'] },
   { group: 'Web', items: ['React', 'Vite', 'Node.js', 'Express', 'Django', 'REST APIs', 'HTML/CSS'] },
-  { group: 'Data & Tools', items: ['MySQL', 'MongoDB', 'Git', 'Docker', 'Testing (TDD)'] },
+  { group: 'Data & Tools', items: ['MySQL', 'MongoDB', 'Git', 'Docker', 'Testing (TDD)', 'Robot Framework'] },
 ];
 
 export const education = {

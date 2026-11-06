@@ -17,7 +17,7 @@ Read from the notebook, located by the header each cell prints and by column nam
   Top-10 feature retrain            per-ticker "Corr top-10: ..." and "SHAP top-10: ..." lines
 sectorShap and rankGap are kept from the current metrics.json: the notebook only saved them as
 charts (sector_shap.png, rank_disagreement_summary.png), so those values were read off the bar
-labels, and scripts/check.mjs pins them by hash. Its bond-yield bars are
+labels, and scripts/checks/metrics.mjs pins them by hash. Its bond-yield bars are
 checked against the per-stock table.
 """
 import json

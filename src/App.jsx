@@ -31,6 +31,23 @@ function focusNearby() {
   (here ?? document.getElementById('main'))?.focus({ preventScroll: true });
 }
 
+// The reading position per address, for a reload. Storage can be blocked, and that only costs the place.
+const readingKey = () => `reading:${window.location.hash}`;
+function saveReading() {
+  try {
+    sessionStorage.setItem(readingKey(), String(window.scrollY));
+  } catch { /* the reader just keeps the browser's own behaviour */ }
+}
+function savedReading() {
+  try {
+    if (performance.getEntriesByType('navigation')[0]?.type !== 'reload') return null;
+    const saved = sessionStorage.getItem(readingKey());
+    return saved === null ? null : Number(saved);
+  } catch {
+    return null;
+  }
+}
+
 // Tiny hash router: "#/cs403" shows the case study, anything else shows the home page.
 // Hash URLs work on GitHub Pages without any server configuration.
 function useHash() {
@@ -341,10 +358,17 @@ export default function App() {
       history.replaceState({ ...history.state, seen: true, top: window.scrollY }, '');
       setMissing(false);
     };
+    // A reload rebuilds the page after the browser has tried to restore the position, so that
+    // restore fails on a real connection. The place is saved as the reader scrolls instead.
+    const onLeave = () => saveReading();
     window.addEventListener('popstate', onPop);
+    window.addEventListener('scroll', onLeave, { passive: true });
+    window.addEventListener('pagehide', onLeave);
     document.addEventListener('click', onClick, true);
     return () => {
       window.removeEventListener('popstate', onPop);
+      window.removeEventListener('scroll', onLeave);
+      window.removeEventListener('pagehide', onLeave);
       document.removeEventListener('click', onClick, true);
     };
   }, []);
@@ -361,6 +385,7 @@ export default function App() {
     mounted.current = true;
     if (!history.state?.seen) history.replaceState({ seen: true }, '');
     if (returning && samePage) {
+      setMissing(false);
       requestAnimationFrame(() => requestAnimationFrame(() => {
         const { top, bottom } = document.activeElement.getBoundingClientRect();
         if (document.activeElement === document.body || bottom < 0 || top > window.innerHeight) focusNearby();
@@ -374,7 +399,19 @@ export default function App() {
     if (spot != null) {
       window.scrollTo({ top: spot, behavior: 'instant' });
       focusNearby();
+      // The notice depends on whether the page has the target, which only an effect can see.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMissing(false);
+      wasCaseStudy.current = isCaseStudy;
+      return;
+    }
+
+    // Fonts arrive after the first paint and can change the page's height, so it's set again then.
+    const reading = firstLoad ? savedReading() : null;
+    if (reading !== null) {
+      const restore = () => window.scrollTo({ top: reading, behavior: 'instant' });
+      restore();
+      document.fonts?.ready.then(restore);
       wasCaseStudy.current = isCaseStudy;
       return;
     }

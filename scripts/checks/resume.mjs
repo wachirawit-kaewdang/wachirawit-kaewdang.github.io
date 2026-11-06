@@ -4,7 +4,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { education, profile, projects, skills } from '../../src/data.js';
 import {
-  bondCorrelationRankOf, bondFirstFor, bondRankOf, bondTop5Share, collapsed, ensembleAuc, rankGapRange, sectorCount, stockCount,
+  bondCorrelationRankOf, bondFirstFor, bondOppositeFor, bondRankOf, bondSplitFor, bondTop5Share, collapsed, ensembleAuc,
+  lstmF1About, rankGapRange, sectorCount, stockCount,
 } from '../../src/metrics.js';
 import { pub, read, root, sha256 } from './shared.mjs';
 
@@ -20,9 +21,12 @@ const resumeClaims = [
   `top-5 for ${bondTop5Share} stocks (#1 for ${bondFirstFor})`,
   `on ${collapsed.length} of ${stockCount} stocks the tuned model collapsed`,
   `ROC-AUC averaged ${ensembleAuc}`,
+  `its ${lstmF1About} F1`,
+  `split for ${bondSplitFor.replace(' and ', ', ')} and ${bondOppositeFor}`,
   `TSLA: ${bondRankOf('TSLA')} by SHAP, ${bondCorrelationRankOf('TSLA')} by correlation`,
   // Typed facts, frozen with the results and read back from the notebook by hand.
   '27 engineered features',
+  'the 9 expected by chance',
   `${rankGapRange.replace(' to ', '–')} positions`,
   'Two-person project',
   profile.location,
@@ -41,10 +45,20 @@ for (const role of profile.role.replace(' Engineer', '').split(/, | & /)) {
 for (const claim of resumeClaims) {
   if (!resumeText.includes(claim)) failures.push(`resume/resume.html should say “${claim}”`);
 }
-// Every skill on the site is on the résumé, allowing for the two it words differently.
-const resumeWording = { 'REST APIs': 'REST API design', 'Testing (TDD)': 'testing (TDD)' };
+// Every skill on the site is on the résumé as a whole item, allowing for the two it words differently.
+const resumeWording = { 'REST APIs': 'REST API design', 'Testing (TDD)': 'automated testing (TDD)' };
+const skillsBlock = resumeText.slice(resumeText.indexOf('Technical skills'));
+const resumeSkills = [...skillsBlock.matchAll(/<dd>(.*?)<\/dd>/g)]
+  .flatMap(([, line]) => line.split(' – ')[0].split(', ').map((item) => item.trim()));
 for (const skill of skills.flatMap((group) => group.items)) {
-  if (!resumeText.includes(resumeWording[skill] ?? skill)) failures.push(`resume/resume.html should list the skill ${skill}`);
+  if (!resumeSkills.includes(resumeWording[skill] ?? skill)) failures.push(`resume/resume.html should list the skill ${skill}`);
+}
+
+// The public résumé and site must never carry a phone number; the private résumé is kept outside
+// this repo. The PDF's hash ties it to this HTML, so checking the source covers it too.
+const phoneShape = /(?:\+66|\b0)\d{1,2}[\s-]?\d{3}[\s-]?\d{4}\b/;
+for (const file of ['resume/resume.html', 'src/data.js', 'index.html', 'public/404.html', 'og/og-image.html']) {
+  if (phoneShape.test(read(file))) failures.push(`${file} contains something shaped like a phone number`);
 }
 
 // The PDF is built from resume.html by hand (npm run resume), which records both files' hashes.
@@ -81,7 +95,7 @@ for (const detail of [bare(profile.site), profile.name, profile.role.replace('&'
   if (!shareSource.includes(detail)) failures.push(`og/og-image.html should include ${detail} (from src/data.js)`);
 }
 // The share image is captured from this file by hand, so an edit here means the PNG is out of date.
-const shareSourceHash = '60ae93e0f3fb9cdf9140807bcdb75f12f047db834b445a274d21b42153d6323c';
+const shareSourceHash = 'edd4a6b0faf437418e42812003909e27278b7323e422bf44e80d63d0a78edc98';
 if (sha256(shareSource.replaceAll('\r\n', '\n')) !== shareSourceHash) {
   failures.push('og/og-image.html changed: rebuild public/og-image.png, then update both hashes (scripts/checks/)');
 }

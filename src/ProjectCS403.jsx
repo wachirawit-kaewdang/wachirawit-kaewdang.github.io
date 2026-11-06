@@ -288,7 +288,7 @@ export default function ProjectCS403() {
         <p>
           <strong>Abstract.</strong> Can SHAP tell us something about a stock-prediction model that
           plain correlation can’t? We trained an LSTM with self-attention on {stockCount} US stocks, explained
-          it with SHAP, and compared those explanations with Pearson correlation. The two disagreed by
+          it with SHAP, and compared those explanations with Pearson correlation. The two disagreed by{' '}
           {rankGapRange} rank positions on average, about what two unrelated rankings would show, and
           retraining on each method’s top features did not favour SHAP, so we can’t say it explains the
           model better. Set against a naive baseline, the model tied on {collapsed.length} of the{' '}
@@ -326,7 +326,7 @@ export default function ProjectCS403() {
         <Heading n={2} />
         <p>
           For every stock we ranked the 27 features twice: by absolute Pearson correlation with the
-          target over the training period, and by mean |SHAP| on the trained LSTM. The two rankings disagreed by roughly {rankGapRange}
+          target over the training period, and by mean |SHAP| on the trained LSTM. The two rankings disagreed by roughly {rankGapRange}{' '}
           positions per feature on average (<ARef to="figure-a1">Figure A.1</ARef>). Volume change, EMA26
           and Volume/MA ratio moved the most.
         </p>
@@ -389,14 +389,14 @@ export default function ProjectCS403() {
           The notebook doesn’t print daily predictions, so that is inferred: on those stocks its accuracy
           and F1 fit the always-up formula. The comparison isn’t in the{' '}
           <ExtLink href={notebookUrl}>notebook</ExtLink> either; this
-          site’s <ExtLink href={`${profile.source}/blob/main/scripts/check.mjs`}>build check</ExtLink> recomputes
+          site’s <ExtLink href={`${profile.source}/blob/main/scripts/checks/metrics.mjs`}>build check</ExtLink> recomputes
           it from the notebook’s outputs.
         </p>
         <NumberedTable
           number="A.2"
           caption={`The ${collapsed.length} stocks tuned to a 0.30 threshold, where the model predicted “up” on every test day. Its accuracy is then the share of up days p, so its F1 must equal an always-up model’s, 2p / (1 + p), and it does on every row.`}
           note={`${thresholds} used other thresholds and did not collapse to always-up, so the identity does not apply to them. ${vixNote} Accuracy and F1 are the notebook’s test-set outputs.`}
-          columns={['Stock', 'Accuracy', 'Our F1', 'F1 of “always up”']}
+          columns={['Stock', 'Accuracy', 'Our F1', 'Always-up F1']}
           rows={collapsed.map((s) => [s.ticker, pct(s.lstm.acc), pct(s.lstm.f1), pct(alwaysUpF1(s.lstm.acc))])}
         />
         <p>
