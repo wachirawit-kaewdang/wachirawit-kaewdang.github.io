@@ -1,12 +1,12 @@
 // Appendix A of the portfolio: the CS403 senior project write-up, shown at #/cs403. Set like the
-// home page, with its own A-numbering: sections A.1–A.6, Table A.1 and Figures A.1–A.3.
+// home page, with its own A-numbering: sections A.1–A.6, Tables A.1–A.2 and Figures A.1–A.3.
 import { ExtLink, Ref, LinkLine, NumberedTable } from './paper.jsx';
 import { APPENDIX, asset } from './paper-utils.js';
 import { profile, projects } from './data.js';
 import {
-  alwaysUpF1, bondAgreeFor, bondCorrelationOnly, bondFirstFor, bondShapOnly, bondTop5Share, collapsed, ensembleAuc,
+  alwaysUpF1, bondAgreeFor, bondFirstFor, bondTop5Share, collapsed, ensembleAuc,
   lstmF1About, notCollapsed, sectorCount, sectorShap,
-  bondRankOf, retrainAuc, retrainCorrWins, shapPeak, stockCount, stocks,
+  bondOppositeFor, bondRankOf, bondRankRows, bondSplitFor, notebookUrl, rankGap, rankGapRange, retrainAuc, retrainCorrWins, shapPeak, stockCount, stocks, upShare, vixRevealed,
 } from './metrics.js';
 
 const img = (name) => asset(`cs403/${name}.webp`);
@@ -14,8 +14,11 @@ const img = (name) => asset(`cs403/${name}.webp`);
 const project = projects.find((p) => p.caseStudy);
 const repo = project.link;
 
-// Table A.1's rows and Figure A.2's values are computed in metrics.js from the notebook's outputs.
+// The tables' rows and Figure A.2's values are computed in metrics.js from the notebook's outputs.
 const pct = (v) => v.toFixed(3);
+// The VIX run collapsed where the LSTM didn't, which shows how the LSTM did against always-up there.
+const vixNote = `The VIX run collapsed on ${vixRevealed.map((s) => s.ticker).join(' and ')}, which reveals their always-up F1: ${vixRevealed
+  .map((s) => `${s.ticker} ${pct(alwaysUpF1(upShare(s)))} against the LSTM’s ${pct(s.lstm.f1)}`).join(', ')}.`;
 const thresholds = notCollapsed.map((s) => `${s.ticker} (${s.threshold.toFixed(2)})`).join(', ');
 const featureLabel = (name) => name.replace(/_/g, ' ');
 
@@ -38,23 +41,6 @@ function Heading({ n }) {
   );
 }
 
-// Figures carry their intrinsic size so the page does not jump as they load, and alt text that
-// states what the chart shows rather than repeating the caption.
-function Figure({ n, name, width, height, alt, caption }) {
-  return (
-    <figure className="figure" id={`figure-a${n}`} tabIndex={-1}>
-      {/* The link takes its name from the alt text, so a screen reader hears the finding. */}
-      <ExtLink href={img(name)}>
-        <img src={img(name)} width={width} height={height} alt={alt} loading="lazy" decoding="async" />
-      </ExtLink>
-      <figcaption>
-        <span className="caplabel">Figure A.{n}.</span> {caption}{' '}
-        <span className="scrollhint">Swipe sideways to see the whole chart.</span>
-      </figcaption>
-    </figure>
-  );
-}
-
 const ARef = (props) => <Ref route={APPENDIX} {...props} />;
 
 // Small multiples, one booktabs-style table per sector, all on one shared scale so a bar's length
@@ -72,6 +58,54 @@ function Bar({ share, tick, label, spoken }) {
       <span className="val">{label}</span>
       {spoken && <span className="visually-hidden">{spoken}</span>}
     </div>
+  );
+}
+
+// Figure A.1, redrawn from the printed bar labels of the notebook's chart: the average gap per
+// feature, with the 9 that unrelated rankings give as the reference. Bars share one 0–12 scale.
+const gapScale = 12;
+const unrelatedGap = 9;
+const gapPanels = [
+  { title: 'Largest gaps', rows: rankGap.slice(0, 14) },
+  { title: 'Smallest gaps', rows: rankGap.slice(14) },
+];
+
+function GapFigure() {
+  return (
+    <figure className="figure data-figure" id="figure-a1" tabIndex={-1}>
+      <div className="multiples pair">
+        {gapPanels.map(({ title, rows }) => (
+          <table key={title} className="bars">
+            <caption>{title} <span>(tick: unrelated rankings, 9)</span></caption>
+            <colgroup><col className="labels" /><col /></colgroup>
+            <thead className="visually-hidden">
+              <tr><th scope="col">Feature</th><th scope="col">Average rank gap</th></tr>
+            </thead>
+            <tbody>
+              {rows.map(([feature, value]) => (
+                <tr key={feature} className={feature === 'Bond_yield' ? 'mark' : undefined}>
+                  <th scope="row">{featureLabel(feature)}</th>
+                  <td>
+                    <Bar
+                      share={value / gapScale}
+                      tick={unrelatedGap / gapScale}
+                      label={value.toFixed(1)}
+                      spoken=", unrelated rankings give about 9"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ))}
+      </div>
+      <figcaption>
+        <span className="caplabel">Figure A.1.</span> Average gap between each feature’s correlation
+        and SHAP ranks over the {stockCount} stocks. The averages run from {rankGapRange}, around the 9 that
+        unrelated rankings give. Bond yield is in <strong>bold</strong>.{' '}
+        <a href={img('rank_disagreement_summary')} target="_blank" rel="noreferrer">Original chart, with the per-stock heatmap (opens in a new tab)</a>
+      </figcaption>
+    </figure>
   );
 }
 
@@ -116,27 +150,27 @@ function SectorFigure() {
 }
 
 // Figure A.3, redrawn from the notebook's numbers: the tuned LSTM per stock, with the reference
-// the argument needs, what always predicting "up" scores. That is only known for the stocks that
-// collapsed, where the tick lands on the end of the bar. 0.5 would flatter accuracy here: most of
-// the bars pass it only because more days went up than down.
+// the argument needs, what always predicting "up" scores. A collapsed run reveals that, so it is
+// known wherever the LSTM or the VIX run collapsed. 0.5 would flatter accuracy here: most of the
+// bars pass it only because more days went up than down.
 function StockFigure() {
   const panels = [
     {
       title: 'Accuracy',
       note: 'tick: always “up”',
       value: (s) => s.lstm.acc,
-      tick: (s) => (collapsed.includes(s) ? s.lstm.acc : null),
-      spoken: (s) => (collapsed.includes(s)
-        ? `, always “up” gives ${s.lstm.acc.toFixed(3)}`
+      tick: (s) => upShare(s),
+      spoken: (s) => (upShare(s) !== null
+        ? `, always “up” gives ${upShare(s).toFixed(3)}`
         : ', always “up” value not known'),
     },
     {
       title: 'F1',
       note: 'tick: always “up”',
       value: (s) => s.lstm.f1,
-      tick: (s) => (collapsed.includes(s) ? alwaysUpF1(s.lstm.acc) : null),
-      spoken: (s) => (collapsed.includes(s)
-        ? `, always “up” gives ${alwaysUpF1(s.lstm.acc).toFixed(3)}`
+      tick: (s) => (upShare(s) !== null ? alwaysUpF1(upShare(s)) : null),
+      spoken: (s) => (upShare(s) !== null
+        ? `, always “up” gives ${alwaysUpF1(upShare(s)).toFixed(3)}`
         : ', always “up” value not known'),
     },
   ];
@@ -167,8 +201,9 @@ function StockFigure() {
       </div>
       <figcaption>
         <span className="caplabel">Figure A.3.</span> Test-set accuracy and F1 of the tuned LSTM per
-        stock, on a 0–1 scale. A tick marks what always predicting “up” would score. It is known only
-        for the {collapsed.length} stocks that collapsed, and on those the bars end exactly on it.{' '}
+        stock, on a 0–1 scale. A tick marks what always predicting “up” would score, which the
+        notebook’s outputs reveal for {collapsed.length + vixRevealed.length} stocks. On the {collapsed.length} that
+        collapsed the bars end exactly on it.{' '}
         <a href={img('final_summary')} target="_blank" rel="noreferrer">Original chart, with the ensemble and VIX runs (opens in a new tab)</a>
       </figcaption>
     </figure>
@@ -200,7 +235,6 @@ export default function ProjectCS403() {
           <span className="role">{profile.name} and Tumrong Saechoen</span>
           <span>Senior project (CS403)</span> <span>Thammasat University</span>
         </p>
-        <Contacts className="contactline" />
       </header>
 
       <section className="abstract" aria-label="Abstract">
@@ -212,7 +246,7 @@ export default function ProjectCS403() {
           retraining on each method’s top features did not favour SHAP, so we can’t say it explains the
           model better. Set against a naive baseline, the model tied on {collapsed.length} of the{' '}
           {stockCount} stocks: it predicted “up” every day, so its F1 matched always predicting “up”
-          (<ARef to="table-a1">Table A.1</ARef>).
+          (<ARef to="table-a2">Table A.2</ARef>).
         </p>
       </section>
 
@@ -265,14 +299,7 @@ export default function ProjectCS403() {
           Both are close to chance, and this was one unseeded run with a shorter 20-day window, so it
           shows only that SHAP’s picks were no better here.
         </p>
-        <Figure
-          n={1}
-          name="rank_disagreement_summary"
-          width={1600}
-          height={791}
-          alt="Heatmap of the rank difference between correlation and SHAP for each feature and stock, with a bar chart of the average difference per feature. Rankings differ by roughly 5 to 12 positions on average, most for volume change, EMA26 and volume/MA ratio."
-          caption="Rank difference between correlation and SHAP for each feature and stock."
-        />
+        <GapFigure />
       </section>
 
       <section className="section">
@@ -281,9 +308,24 @@ export default function ProjectCS403() {
           Bond yield was in the model’s SHAP top 5 for {bondTop5Share} stocks, where about 2 would land
           by chance, and was the #1 feature for {bondFirstFor}. That fits financial intuition for JPM,
           since bank profits depend on interest rates, but not everywhere: GS, the other bank, ranks it{' '}
-          {bondRankOf('GS')}. Correlation only sometimes agrees. Where the notebook
-          prints both ranks, the two methods put it close together for {bondAgreeFor}, but they split
-          for {bondShapOnly}, and the other way for {bondCorrelationOnly}.
+          {bondRankOf('GS')}. Correlation only sometimes agrees: where both ranks are printed, the two
+          are close for {bondAgreeFor}, far apart for {bondSplitFor}, and reversed for {bondOppositeFor}{' '}
+          (<ARef to="table-a1">Table A.1</ARef>).
+        </p>
+        <NumberedTable
+          number="A.1"
+          caption="Bond yield’s rank among the 27 features for each stock, by SHAP and by correlation, strongest SHAP rank first."
+          note="The notebook prints a correlation rank only where bond yield is in a stock’s top 5 by correlation or among its largest rank gaps."
+          columns={['Stock', 'SHAP rank', 'Correlation rank']}
+          rows={bondRankRows}
+        />
+        <p>
+          If you open the notebook, note that its closing summary cell says top 5 for 8 of 10 stocks, #1
+          for both banks, and that SHAP gives richer insight than correlation. Those lines are typed text,
+          and the notebook’s own printed tables don’t support them. Every figure here comes from those
+          tables instead.
+        </p>
+        <p>
           Grouped by sector, the patterns differ too (<ARef to="figure-a2">Figure A.2</ARef>). Energy
           leans on the S&amp;P 500 trend, while Healthcare and Technology lean on MACD.
         </p>
@@ -295,17 +337,18 @@ export default function ProjectCS403() {
         <p>
           Our tuned model reported an average F1 of about {lstmF1About}, which looked good. Set against
           the simplest possible baseline, a model that always predicts “up”, the numbers
-          matched (<ARef to="table-a1">Table A.1</ARef>). With the decision threshold tuned down to 0.30,
+          matched (<ARef to="table-a2">Table A.2</ARef>). With the decision threshold tuned down to 0.30,
           the model predicted “up” on every test day for {collapsed.length} of the {stockCount} stocks.
           The notebook doesn’t print daily predictions, so that is inferred: on those stocks its accuracy
-          and F1 fit the always-up formula. The comparison isn’t in the notebook either; this
+          and F1 fit the always-up formula. The comparison isn’t in the{' '}
+          <ExtLink href={notebookUrl}>notebook</ExtLink> either; this
           site’s <ExtLink href={`${profile.source}/blob/main/scripts/check.mjs`}>build check</ExtLink> recomputes
           it from the notebook’s outputs.
         </p>
         <NumberedTable
-          number="A.1"
+          number="A.2"
           caption={`The ${collapsed.length} stocks tuned to a 0.30 threshold, where the model predicted “up” on every test day. Its accuracy is then the share of up days p, so its F1 must equal an always-up model’s, 2p / (1 + p), and it does on every row.`}
-          note={`${thresholds} used other thresholds and did not collapse to always-up, so the identity does not apply to them. Accuracy and F1 are the notebook’s test-set outputs.`}
+          note={`${thresholds} used other thresholds and did not collapse to always-up, so the identity does not apply to them. ${vixNote} Accuracy and F1 are the notebook’s test-set outputs.`}
           columns={['Stock', 'Accuracy', 'Our F1', 'F1 of “always up”']}
           rows={collapsed.map((s) => [s.ticker, pct(s.lstm.acc), pct(s.lstm.f1), pct(alwaysUpF1(s.lstm.acc))])}
         />

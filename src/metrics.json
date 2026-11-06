@@ -3,7 +3,7 @@
     "repo": "https://github.com/wachirawit-kaewdang/Project-CS403",
     "notebook": "stock_project.ipynb",
     "commit": "0c4ef04",
-    "note": "Per-stock test-set outputs copied by script from the notebook’s saved cell outputs (cells 5, 7, 9, 12, 20, 27 and 29) by scripts/extract-metrics.py. Sector SHAP values are the numbers printed on the bars of sector_shap.png."
+    "note": "Per-stock test-set outputs copied by script from the notebook’s saved cell outputs (cells 5, 7, 9, 12, 20, 27 and 29) by scripts/extract-metrics.py. Sector SHAP values and per-feature rank gaps are the numbers printed on the bars of sector_shap.png and rank_disagreement_summary.png."
   },
   "stocks": {
     "NVDA": {
@@ -12,6 +12,10 @@
       "lstm": {
         "acc": 0.5469,
         "f1": 0.6942
+      },
+      "vix": {
+        "acc": 0.5347,
+        "f1": 0.5649
       },
       "ensemble": {
         "acc": 0.4816,
@@ -47,6 +51,10 @@
       "sector": "Technology",
       "threshold": 0.3,
       "lstm": {
+        "acc": 0.502,
+        "f1": 0.6685
+      },
+      "vix": {
         "acc": 0.502,
         "f1": 0.6685
       },
@@ -87,6 +95,10 @@
         "acc": 0.5837,
         "f1": 0.7167
       },
+      "vix": {
+        "acc": 0.5306,
+        "f1": 0.6933
+      },
       "ensemble": {
         "acc": 0.5388,
         "f1": 0.6954,
@@ -121,6 +133,10 @@
       "sector": "Healthcare",
       "threshold": 0.3,
       "lstm": {
+        "acc": 0.6,
+        "f1": 0.75
+      },
+      "vix": {
         "acc": 0.6,
         "f1": 0.75
       },
@@ -161,6 +177,10 @@
         "acc": 0.5347,
         "f1": 0.6968
       },
+      "vix": {
+        "acc": 0.5347,
+        "f1": 0.6968
+      },
       "ensemble": {
         "acc": 0.5347,
         "f1": 0.6968,
@@ -195,6 +215,10 @@
       "sector": "Energy",
       "threshold": 0.3,
       "lstm": {
+        "acc": 0.5265,
+        "f1": 0.6898
+      },
+      "vix": {
         "acc": 0.5265,
         "f1": 0.6898
       },
@@ -235,6 +259,10 @@
         "acc": 0.6082,
         "f1": 0.7563
       },
+      "vix": {
+        "acc": 0.6082,
+        "f1": 0.7563
+      },
       "ensemble": {
         "acc": 0.6082,
         "f1": 0.7563,
@@ -269,6 +297,10 @@
       "sector": "Finance",
       "threshold": 0.3,
       "lstm": {
+        "acc": 0.5673,
+        "f1": 0.724
+      },
+      "vix": {
         "acc": 0.5673,
         "f1": 0.724
       },
@@ -309,6 +341,10 @@
         "acc": 0.4939,
         "f1": 0.6612
       },
+      "vix": {
+        "acc": 0.4939,
+        "f1": 0.6612
+      },
       "ensemble": {
         "acc": 0.4939,
         "f1": 0.6612,
@@ -345,6 +381,10 @@
       "lstm": {
         "acc": 0.6,
         "f1": 0.7421
+      },
+      "vix": {
+        "acc": 0.6,
+        "f1": 0.75
       },
       "ensemble": {
         "acc": 0.6041,
@@ -608,5 +648,115 @@
         ]
       ]
     }
+  ],
+  "rankGap": [
+    [
+      "Volume_change",
+      11.8
+    ],
+    [
+      "EMA26",
+      11.7
+    ],
+    [
+      "Volume_MA_ratio",
+      11.5
+    ],
+    [
+      "MACD",
+      10.6
+    ],
+    [
+      "MA50",
+      10.5
+    ],
+    [
+      "MACD_diff",
+      10.1
+    ],
+    [
+      "Volatility_20d",
+      10.0
+    ],
+    [
+      "EMA12",
+      9.8
+    ],
+    [
+      "SP500_vol",
+      9.7
+    ],
+    [
+      "Volume_MA20",
+      9.4
+    ],
+    [
+      "Return_1d",
+      9.3
+    ],
+    [
+      "Stoch_d",
+      9.2
+    ],
+    [
+      "Bond_yield",
+      8.9
+    ],
+    [
+      "RSI",
+      8.8
+    ],
+    [
+      "MA20",
+      8.7
+    ],
+    [
+      "Return_5d",
+      8.5
+    ],
+    [
+      "Volatility_5d",
+      8.5
+    ],
+    [
+      "MA5",
+      8.2
+    ],
+    [
+      "Relative_return",
+      8.2
+    ],
+    [
+      "Price_MA20_dist",
+      7.4
+    ],
+    [
+      "Return_10d",
+      7.3
+    ],
+    [
+      "Return_3d",
+      7.0
+    ],
+    [
+      "OBV",
+      6.5
+    ],
+    [
+      "Stoch_k",
+      6.4
+    ],
+    [
+      "MACD_signal",
+      5.9
+    ],
+    [
+      "SP500_return",
+      5.9
+    ],
+    [
+      "SP500_MA20",
+      5.4
+    ]
   ]
 }

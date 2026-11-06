@@ -8,15 +8,16 @@ Run:  python scripts/extract-metrics.py <path to Project-CS403 checkout> [commit
       Needs Python 3.10+. Then: npm run check
 
 Read from the notebook, located by the header each cell prints and by column name:
-  LSTM accuracy, F1 and threshold   "LSTM Acc  LSTM F1" table
+  LSTM and VIX accuracy, F1, threshold   "LSTM Acc  LSTM F1" table
   Ensemble accuracy, F1, ROC-AUC    "=== Ensemble Model Results ===" table
   Random Forest and LR metrics      per-ticker "Random Forest: Acc=... F1=... AUC=..." lines
   Bond-yield SHAP rank per stock    "=== Bond_yield SHAP Rank across all stocks ===" table
   Bond-yield correlation rank       each stock's "Top 5 Corr" list and rank-difference table;
                                     null where neither prints it (the notebook shows only those)
   Top-10 feature retrain            per-ticker "Corr top-10: ..." and "SHAP top-10: ..." lines
-sectorShap is kept from the current metrics.json: the notebook only saved it as a chart
-(sector_shap.png), so those values were read off the bar labels. Its bond-yield bars are
+sectorShap and rankGap are kept from the current metrics.json: the notebook only saved them as
+charts (sector_shap.png, rank_disagreement_summary.png), so those values were read off the bar
+labels, and scripts/check.mjs pins them by hash. Its bond-yield bars are
 checked against the per-stock table.
 """
 import json
@@ -137,6 +138,7 @@ def main():
             'sector': row['Sector'],
             'threshold': column(row, 'Thresh'),
             'lstm': {'acc': column(row, 'LSTM Acc'), 'f1': column(row, 'LSTM F1')},
+            'vix': {'acc': column(row, 'VIX Acc'), 'f1': column(row, 'VIX F1')},
             'ensemble': {key: column(ens, name) for key, name in
                          (('acc', 'Soft_Acc'), ('f1', 'Soft_F1'), ('auc', 'AUC'))},
             'rf': dict(zip(('acc', 'f1', 'auc'), map(float, rf.groups()))),
@@ -160,6 +162,7 @@ def main():
         'source': {**current['source'], 'commit': commit},
         'stocks': stocks,
         'sectorShap': current['sectorShap'],
+        'rankGap': current['rankGap'],
     }
     OUT.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
     print(f'Wrote {OUT} from {NOTEBOOK} @ {commit}: {len(stocks)} stocks')

@@ -1,7 +1,7 @@
 // All site content lives here, so updating the portfolio never means touching layout code.
 // The CS403 numbers come from metrics.js, which computes them from the notebook's outputs.
 import {
-  aucRange, bondAgreeFor, bondTop5Share, collapsed, sectorCount, source, stockCount, table1Rows,
+  aucRange, bondAgreeFor, bondTop5Share, collapsed, notebookUrl, sectorCount, source, stockCount, table1Rows,
 } from './metrics.js';
 
 const collapsedShare = `${collapsed.length} of ${stockCount}`;
@@ -9,7 +9,7 @@ const collapsedShare = `${collapsed.length} of ${stockCount}`;
 // Prose that points into Appendix A is written as a list of pieces: strings, and refs that the
 // page renders as cross-references, e.g. ['see ', appendix('A.2', 'appendix-a2')].
 const appendix = (label, to) => ({ label: `Appendix ${label}`, to });
-const tableA1 = { label: 'Table A.1', to: 'table-a1' };
+const tableA2 = { label: 'Table A.2', to: 'table-a2' };
 
 // Every GitHub and site URL is built from the username. A rename also has to reach the résumé and
 // share image, which are typed by hand; npm run check fails until they match.
@@ -29,7 +29,7 @@ export const profile = {
   resume: 'Wachirawit_Kaewdang_Resume.pdf',
   source: `${github}/${username}.github.io`,
   summary:
-    'Computer Science graduate (Software Engineering track) from Thammasat University. ' +
+    'Computer Science graduate (Software Engineering track, May 2026) from Thammasat University. ' +
     'I work across machine learning for time series — with a focus on model explainability ' +
     'rather than accuracy alone — and full-stack web development in React and Node.js.',
   status: 'Open to Machine Learning Engineer and Software Engineer roles in Bangkok or remote.',
@@ -46,7 +46,7 @@ export const projects = [
       'with results set against a naive baseline.',
     // Stated as the abstract's main result, ahead of any metric.
     finding: [
-      `we checked our senior-project model against a naive “always predict up” baseline and it tied on ${collapsedShare} stocks; `,
+      `We checked our senior-project model against a naive “always predict up” baseline and it tied on ${collapsedShare} stocks; `,
       appendix('A.4', 'appendix-a4'),
       ' shows the evidence',
     ],
@@ -55,15 +55,17 @@ export const projects = [
       caption: [
         `Every model with a recorded ROC-AUC is close to chance, at ${aucRange} where 0.50 is chance, and the tuned ` +
           `LSTM’s high F1 comes from predicting “up” on every test day for ${collapsedShare} stocks (`,
-        tableA1,
+        tableA2,
         ').',
       ],
-      note:
+      note: [
         `Averages over the ${stockCount} stocks, except rows marked ‡; test set is the last 20% of Jan 2020 – Apr 2025, split by ` +
-        'date. Thresholds were tuned on that test set, so these figures are if anything optimistic. ' +
-        `Computed from the notebook’s per-stock outputs (Project-CS403 @ ${source.commit}). ` +
-        '† Not recorded for the full-feature LSTM. ' +
-        `‡ Over the ${collapsed.length} stocks whose test-set up-day share is known; the LSTM’s F1 equals it on each.`,
+          'date. Thresholds were tuned on that test set, so these figures are if anything optimistic. ' +
+          'Computed from the notebook’s per-stock outputs (',
+        { label: `Project-CS403 @ ${source.commit}`, href: notebookUrl },
+        '). † Not recorded for the full-feature LSTM. ' +
+          `‡ Over the ${collapsed.length} stocks where the tuned LSTM collapsed, which reveals the test-set up-day share; its F1 equals the baseline on each.`,
+      ],
       columns: ['Model', 'F1', 'ROC-AUC'],
       rows: table1Rows,
     },
@@ -115,7 +117,7 @@ export const projects = [
       'The site you are reading: React + Vite, with the CS403 tables computed from the notebook’s ' +
       'saved outputs instead of typed by hand.',
     points: [
-      'On every push, CI rebuilds the per-stock CS403 metrics from the notebook at a frozen commit and stops the deploy if they differ.',
+      'On every push to main, CI rebuilds the per-stock CS403 metrics from the notebook at a frozen commit and stops the deploy if they differ.',
       'The same run checks the résumé PDF against its source and the site’s contact details, then opens both pages in headless Chrome.',
     ],
     tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions'],

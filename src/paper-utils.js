@@ -9,6 +9,10 @@ const prefersReducedMotion = () =>
 
 // Move to an element on the current page without changing the hash route: scroll, hand focus
 // to it for keyboard and screen reader users, and briefly tint it so the eye lands there.
+// The cross-references followed so far, each with the page it left, so Back can put focus back on
+// the link instead of leaving it on a target that has scrolled away.
+export const refTrail = [];
+
 export function jumpTo(id, { tint = true } = {}) {
   const target = document.getElementById(id);
   if (!target) return false;

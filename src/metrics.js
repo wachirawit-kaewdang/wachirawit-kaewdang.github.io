@@ -3,7 +3,10 @@
 import metrics from './metrics.json' with { type: 'json' };
 
 export const source = metrics.source;
+export const notebookUrl = `${source.repo}/blob/${source.commit}/${source.notebook}`;
 export const sectorShap = metrics.sectorShap;
+export const rankGap = metrics.rankGap;
+export const rankGapRange = `${Math.round(rankGap.at(-1)[1])} to ${Math.round(rankGap[0][1])}`;
 
 const stocks = Object.entries(metrics.stocks).map(([ticker, s]) => ({ ticker, ...s }));
 export const stockCount = stocks.length;
@@ -30,8 +33,8 @@ const modelRows = [
   ['Logistic Regression', avg((s) => s.lr.f1), avg((s) => s.lr.auc)],
   ['Random Forest', avg((s) => s.rf.f1), avg((s) => s.rf.auc)],
 ];
-// The baseline comes first. Its F1 needs each stock's test-set up-day share, which only the
-// collapsed stocks reveal (their accuracy is that share), so it covers those stocks and says so.
+// The baseline comes first. Its F1 needs each stock's test-set up-day share, and Table 1 uses the
+// stocks where the tuned LSTM itself collapsed (its accuracy is that share), and says so.
 export const alwaysUpAvgF1 = mean(collapsed.map((s) => alwaysUpF1(s.lstm.acc))).toFixed(3);
 // The LSTM over those same stocks sits beside it: 0.707 against 0.710 would otherwise read as a
 // small win, when the 0.710 only differs because it averages all the stocks.
@@ -42,6 +45,14 @@ export const table1Rows = [
   ...modelRows,
 ];
 export const ensembleAuc = avg((s) => s.ensemble.auc);
+
+// The VIX run collapsed on two stocks the LSTM didn't, so their up-day share is known too.
+const fitsAlwaysUp = ({ acc, f1 }) => Math.abs(f1 - alwaysUpF1(acc)) <= 0.0006;
+export const upShare = (s) => {
+  if (collapsed.includes(s)) return s.lstm.acc;
+  return fitsAlwaysUp(s.vix) ? s.vix.acc : null;
+};
+export const vixRevealed = notCollapsed.filter((s) => upShare(s) !== null);
 
 // The notebook's direct test: the LSTM retrained on each method's top 10 features (cell 9).
 export const retrainAuc = { corr: avg((s) => s.retrain.corr.auc), shap: avg((s) => s.retrain.shap.auc) };
@@ -73,6 +84,12 @@ export const bondAgreeFor = listed(bothRanks
 const shapHigher = bothRanks.filter((s) => s.bondCorrelationRank - s.bondYieldRank >= split);
 const corrHigher = bothRanks.filter((s) => s.bondYieldRank - s.bondCorrelationRank >= split);
 export const bondShapOnly = listed(shapHigher.map((s) => `${s.ticker} (${ordinal(s.bondYieldRank)} by SHAP, ${ordinal(s.bondCorrelationRank)} by correlation)`));
+export const bondSplitFor = listed(shapHigher.map((s) => s.ticker));
+export const bondOppositeFor = listed(corrHigher.map((s) => s.ticker));
+// Table A.1: every stock, strongest SHAP rank first. Correlation's rank is printed for only some.
+export const bondRankRows = [...stocks]
+  .sort((a, b) => a.bondYieldRank - b.bondYieldRank)
+  .map((s) => [s.ticker, ordinal(s.bondYieldRank), s.bondCorrelationRank ? ordinal(s.bondCorrelationRank) : 'not printed']);
 export const bondCorrelationOnly = listed(corrHigher.map((s) => `${s.ticker} (${ordinal(s.bondCorrelationRank)} by correlation, ${ordinal(s.bondYieldRank)} by SHAP)`));
 
 // Figure A.2's shared scale runs to the largest value in any panel.

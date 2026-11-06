@@ -1,6 +1,7 @@
 // Pieces of the preprint look shared by the home page and the case study.
 
-import { jumpTo, tableId } from './paper-utils.js';
+import { useEffect, useRef, useState } from 'react';
+import { jumpTo, refTrail, tableId } from './paper-utils.js';
 
 // A hyperref-style cross-reference ("Table 1", "§1.1") to something on the same page. Inside a
 // hash route (the appendix) the link keeps the route, as "#/cs403/table-a1", and the address bar
@@ -11,7 +12,11 @@ export function Ref({ to, route, children }) {
     if (!document.getElementById(to)) return;
     e.preventDefault();
     // A history entry per jump, added before scrolling, so Back returns to the reading position.
-    history.pushState(null, '', href);
+    // Following the same reference twice adds nothing, or Back would seem to do nothing.
+    if (window.location.hash !== href) {
+      refTrail.push({ from: window.location.href, link: e.currentTarget, top: window.scrollY });
+      history.pushState({ seen: true }, '', href);
+    }
     jumpTo(to);
   };
   return (
@@ -52,9 +57,25 @@ export function LinkLine({ className, children }) {
 // row label; the rest are figures, right-aligned in tabular numerals. An optional note sits
 // under the bottom rule for sources and the test setup.
 export function NumberedTable({ number, caption, note, columns, rows }) {
+  const frame = useRef(null);
+  const [scrolls, setScrolls] = useState(false);
+  useEffect(() => {
+    const element = frame.current;
+    const measure = () => setScrolls(element.scrollWidth > element.clientWidth);
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   return (
-    // tabIndex 0: on a narrow phone the table scrolls here, and the keyboard needs to reach it.
-    <div className="results" id={tableId(number)} tabIndex={0} role="group" aria-label={`Table ${number}`}>
+    // A tab stop only when the table scrolls here, on a narrow phone; -1 keeps it a jump target.
+    <div
+      ref={frame}
+      className="results"
+      id={tableId(number)}
+      tabIndex={scrolls ? 0 : -1}
+      role="group"
+      aria-label={`Table ${number}`}
+    >
       <table>
         <caption>
           <span className="caplabel">Table {number}.</span> {caption}

@@ -7,6 +7,10 @@ Everyday
 --------
 npm run dev       Dev server at http://localhost:5173 (the appendix is at #/cs403).
 npm run lint      oxlint over the source.
+npm run verify    Everything CI runs before deploying, in the same order. The notebook
+                  comparison needs ../Project-CS403 (or CS403_REPO), and says so if skipped.
+npm test          Tests the calculations in src/metrics.js.
+npm run test:extractor  Tests the extractor's parsing on made-up notebook output.
 npm run check     Checks a build cannot catch (see "What CI checks" below).
 npm run render-check  Opens the built site in headless Chrome; run npm run build first.
 npm run build     Production build to dist/. Fails if index.html keeps a %NAME% placeholder.
@@ -17,8 +21,8 @@ are frozen" below.
 
 Deploying
 ---------
-Push to main. GitHub Actions (.github/workflows/deploy.yml) runs npm ci, lint, check,
-build and render-check, then publishes dist/ to GitHub Pages. Pull requests, and manual runs on other branches,
+Push to main. GitHub Actions (.github/workflows/deploy.yml) runs npm ci, lint, both test
+suites, check, the notebook comparison, build and render-check, then publishes dist/ to GitHub Pages. Pull requests, and manual runs on other branches,
 run the same steps but never deploy.
 
 The CS403 results are frozen
@@ -59,7 +63,7 @@ With npm run dev running, capture http://localhost:5173/og/og-image.html at 1200
 headless Chrome screenshot and save it as public/og-image.png. Its words are typed into
 og/og-image.html, so update them when the name, role or summary in src/data.js changes.
 
-What CI checks (npm run check)
+What CI checks (npm run verify, plus the notebook comparison)
 ------------------------------
 - Every file the site links to exists in public/: resume, figures, favicon, og:image.
 - metrics.json is at the frozen commit, with 10 stocks, 5 sectors of 10 rows and every rate in
@@ -68,6 +72,9 @@ What CI checks (npm run check)
 - resume/resume.html quotes the computed CS403 numbers, and the PDF was built from it.
 - metrics.json is exactly what the extractor rebuilds from the notebook at its frozen commit.
   sectorShap's values came from a chart, so only its bond-yield bars are compared.
+- sectorShap, rankGap and the source block match a pinned hash, the charts and share image
+  match pinned file hashes, and Table 1's computed results match
+  fixed expected values in scripts/check.mjs. If the freeze ever moves, both must be updated.
 - The resume PDF is one page and uses only STIX Two Text.
 - The resume and og/og-image.html contain the contact details in src/data.js. If you change
   the site address, rebuild og-image.png too; the check reads only its HTML source.

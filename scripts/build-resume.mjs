@@ -6,10 +6,11 @@ import { execFileSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { findChrome } from './chrome.mjs';
+import { profile } from '../src/data.js';
 
 const root = resolve(import.meta.dirname, '..');
 const source = resolve(root, 'resume/resume.html');
-const out = resolve(root, 'public/Wachirawit_Kaewdang_Resume.pdf');
+const out = resolve(root, 'public', profile.resume);
 
 // Chrome silently falls back to another serif when a font file is missing, so the PDF would
 // look wrong without any error. Check every @font-face file before printing.
