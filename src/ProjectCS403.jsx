@@ -382,8 +382,8 @@ export default function ProjectCS403() {
       <section className="section">
         <Heading n={4} />
         <p>
-          Our tuned model reported an average F1 of about {lstmF1About}, which looked good. Set against
-          the simplest possible baseline, a model that always predicts “up”, the numbers
+          Our tuned model reported an average F1 of about {lstmF1About}, which looked good. When I checked it
+          against the simplest possible baseline, a model that always predicts “up”, the numbers
           matched (<ARef to="table-a2">Table A.2</ARef>). With the decision threshold tuned down to 0.30,
           the model predicted “up” on every test day for {collapsed.length} of the {stockCount} stocks.
           The notebook doesn’t print daily predictions, so that is inferred: on those stocks its accuracy
@@ -425,7 +425,7 @@ export default function ProjectCS403() {
         <p>
           I collected and prepared the training data, and designed the training
           approach and model architecture. My teammate Tumrong Saechoen designed the analysis
-          methodology and the VIX market-sentiment component. We ran the SHAP analysis together.
+          methodology and the VIX market-sentiment component. We ran the SHAP analysis together, and I did the baseline check in A.4.
         </p>
         <p className="meta">
           <em>Stack.</em> {project.tech.join(' · ')}

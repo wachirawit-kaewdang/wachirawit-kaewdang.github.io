@@ -59,10 +59,10 @@
 
     <h2>Summary</h2>
     <p>
-      Computer Science graduate (Software Engineering track) from Thammasat University. I work across
-      machine learning for time series, with a particular focus on model explainability rather than
-      accuracy alone, and full-stack web development in React and Node.js. Seeking Machine Learning
-      Engineer or Software Engineer roles.
+      Computer Science graduate (Software Engineering track) from Thammasat University, working across machine learning
+      and full-stack web development (React, Node.js). In my senior project I tested our model against a naive baseline
+      and showed its 0.71 F1 wasn’t real skill. I care about checking that results hold up, not just reporting them.
+      Seeking Machine Learning Engineer, Software Engineer or QA roles.
     </p>
 
     <h2>Education</h2>
@@ -80,14 +80,14 @@
         <li>Architecture: LSTM with self-attention (3 layers, hidden size 128) over a 60-day window, trained with Focal Loss and class weights, and compared with Random Forest, Logistic Regression, a soft-voting ensemble and a VIX feature set.</li>
         <li>Compared SHAP (KernelExplainer) with Pearson correlation: SHAP ranked bond yield top-5 for 6 of 10 stocks (#1 for JPM and AMZN); correlation agreed for JPM but split for others (TSLA: 2nd by SHAP, 15th by correlation). Overall rank gaps of 5–12 positions were close to the 9 expected by chance, which we documented.</li>
         <li>Evaluated results against a naive baseline: on 7 of 10 stocks the tuned model collapsed to always predicting “up”, so its F1 matched an always-up model; the ensemble’s threshold-free ROC-AUC averaged 0.568, showing short-term direction is close to random. Identified threshold and early-stopping leakage and documented fixes.</li>
-        <li>My contribution: data collection and preparation, training approach and model architecture, and joint SHAP analysis. Two-person project.</li>
+        <li>My contribution: data collection and preparation, training approach and model architecture, joint SHAP analysis, and the baseline check. Two-person project.</li>
       </ul>
       <p class="stack">Python · PyTorch · SHAP · scikit-learn · pandas · NumPy · Jupyter</p>
     </div>
     <div class="entry">
       <div class="head"><b>This Portfolio and Its Data Checks</b><span>Personal project, built with Claude Code</span></div>
       <ul>
-        <li>React + Vite site; CI rebuilds its CS403 metrics from the notebook and checks both pages in headless Chrome before deploying.</li>
+        <li>React + Vite site; CI rebuilds its metrics from the notebook and tests both pages in headless Chrome.</li>
       </ul>
     </div>
     <div class="entry">
@@ -100,7 +100,7 @@
       <div class="head"><b>Recipe Web Application – Full-Stack</b><span>CS369, group of 5</span></div>
       <ul>
         <li>React + Vite frontend with client-side routing, connected to a Node.js / Express REST API.</li>
-        <li>My contribution: the MyRecipe management feature, recipe deletion, and integration of the frontend with the backend API.</li>
+        <li>My contribution: the MyRecipe management feature, recipe deletion, and frontend–backend integration.</li>
       </ul>
       <p class="stack">React · Vite · JavaScript · Node.js · Express · REST APIs</p>
     </div>

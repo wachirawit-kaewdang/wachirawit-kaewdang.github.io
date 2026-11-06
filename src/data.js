@@ -20,7 +20,7 @@ const github = `https://github.com/${username}`;
 export const profile = {
   name: 'Wachirawit Kaewdang',
   nickname: 'Ohm',
-  role: 'Machine Learning & Software Engineer',
+  role: 'Machine Learning, Software & QA Engineer',
   location: 'Bangkok, Thailand',
   email: 'wachirawit.kaewdang@gmail.com',
   github,
@@ -30,10 +30,10 @@ export const profile = {
   resume: 'Wachirawit_Kaewdang_Resume.pdf',
   source: `${github}/${username}.github.io`,
   summary:
-    'Computer Science graduate (Software Engineering track, May 2026) from Thammasat University. ' +
-    'I work across machine learning for time series — with a focus on model explainability ' +
-    'rather than accuracy alone — and full-stack web development in React and Node.js.',
-  status: 'Open to Machine Learning Engineer and Software Engineer roles in Bangkok or remote.',
+    'Computer Science graduate (Software Engineering track, May 2026) from Thammasat University, ' +
+    'working across machine learning and full-stack web development (React, Node.js). I care about ' +
+    'checking that results hold up, not just reporting them.',
+  status: 'Open to Machine Learning Engineer, Software Engineer and QA roles in Bangkok or remote.',
 };
 
 export const projects = [
@@ -45,9 +45,9 @@ export const projects = [
       `An LSTM with self-attention that predicts 3-day price direction for ${stockCount} US stocks across ` +
       `${sectorCount} sectors, used to compare SHAP explanations with plain correlation, ` +
       'with results set against a naive baseline.',
-    // Stated as the abstract's main result, ahead of any metric.
+    // Opens the abstract, ahead of any metric.
     finding: [
-      `We checked our senior-project model against a naive “always predict up” baseline and found its ${lstmF1About} F1 wasn’t skill: on ${collapsedShare} stocks it only matched always predicting “up”. `,
+      `I checked our senior-project model against a naive “always predict up” baseline and found its ${lstmF1About} F1 wasn’t skill: on ${collapsedShare} stocks it only matched always predicting “up”. `,
       appendix('A.4', 'appendix-a4'),
       ' shows the evidence',
     ],
@@ -70,6 +70,8 @@ export const projects = [
       ],
       columns: ['Model', 'F1', 'ROC-AUC'],
       rows: table1Rows,
+      // The baseline and the LSTM on the same stocks: the tie the table exists to show.
+      emphasis: 2,
     },
     // The details (SHAP findings, the baseline check, what I'd change) live in Appendix A; here
     // only what a reader needs before choosing to go there.
@@ -83,7 +85,7 @@ export const projects = [
         appendix('A.3', 'appendix-a3'),
         '.',
       ],
-      'My part: data collection and preparation, the training approach and model architecture, and the SHAP analysis together with my teammate.',
+      'My part: data collection and preparation, the training approach and model architecture, the SHAP analysis together with my teammate, and the baseline check that exposed the collapse.',
     ],
     tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance', 'Git'],
     caseStudy: '#/cs403',

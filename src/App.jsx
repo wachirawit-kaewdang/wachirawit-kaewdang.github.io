@@ -155,15 +155,17 @@ function Abstract() {
   const featured = projects.findIndex((p) => p.results);
   return (
     <section className="abstract" aria-label="Abstract">
+      {/* Leads with the finding, the strongest evidence of how I work; the summary backs it up. */}
       <p>
-        <strong>Abstract.</strong> {profile.summary}
+        <strong>Abstract.</strong>{' '}
+        {featured >= 0 && (
+          <>
+            <Prose pieces={projects[featured].finding} />, with{' '}
+            <Ref to="table-1">Table 1</Ref> in <Ref to={projectId(featured)}>§{sectionNumber('projects')}.{featured + 1}</Ref>.
+          </>
+        )}
       </p>
-      {featured >= 0 && (
-        <p>
-          <strong>Main result.</strong> <Prose pieces={projects[featured].finding} />, with{' '}
-          <Ref to="table-1">Table 1</Ref> in <Ref to={projectId(featured)}>§{sectionNumber('projects')}.{featured + 1}</Ref>.
-        </p>
-      )}
+      <p>{profile.summary}</p>
       <p className="availability">
         <strong>Availability.</strong> {profile.status}
       </p>
@@ -319,9 +321,6 @@ export default function App() {
   const wasCaseStudy = useRef(false);
   const mounted = useRef(false);
   const [missing, setMissing] = useState(false);
-  // Where the reader was on each page when they followed a link, for Back between the two.
-  const spots = useRef({ home: null, appendix: null });
-  const pageName = () => (wasCaseStudy.current ? 'appendix' : 'home');
 
   // Back after a cross-reference: focus returns to the link that was followed.
   useEffect(() => {
@@ -337,7 +336,9 @@ export default function App() {
     };
     const onClick = (e) => {
       if (!e.target.closest?.('a[href^="#"]')) return;
-      spots.current[pageName()] = window.scrollY;
+      // Where the reader left this page, kept on its history entry for Back from the other page.
+      // The entry survives a reload, which anything held in memory would not.
+      history.replaceState({ ...history.state, seen: true, top: window.scrollY }, '');
       setMissing(false);
     };
     window.addEventListener('popstate', onPop);
@@ -369,8 +370,8 @@ export default function App() {
 
     document.title = isCaseStudy ? `Appendix A: Stock Direction Prediction · ${profile.name}` : homeTitle;
     // Back or Forward between the two pages: the browser can't restore a page that wasn't there.
-    const spot = returning ? spots.current[isCaseStudy ? 'appendix' : 'home'] : null;
-    if (spot !== null) {
+    const spot = returning ? history.state?.top : undefined;
+    if (spot != null) {
       window.scrollTo({ top: spot, behavior: 'instant' });
       focusNearby();
       setMissing(false);

@@ -19,7 +19,7 @@ const pct = (v) => v.toFixed(3);
 const pages = [
   {
     path: '/',
-    expected: ['Wachirawit Kaewdang', 'Main result', `${rankGapRange} positions apart`, 'did not favour SHAP', 'Contact'],
+    expected: ['Wachirawit Kaewdang', 'Abstract. I checked our senior-project model', `${rankGapRange} positions apart`, 'did not favour SHAP', 'Contact'],
     tables: { 'table-1': table1Rows },
   },
   {

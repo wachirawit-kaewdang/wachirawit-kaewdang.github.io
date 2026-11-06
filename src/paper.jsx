@@ -27,11 +27,14 @@ export function Ref({ to, route, children }) {
 }
 
 // An outbound link that opens in a new tab and says so to screen readers, so a reader is never
-// moved out of the page without warning.
+// moved out of the page without warning. Sighted readers get the small arrow.
 export function ExtLink({ children, ...props }) {
   return (
     <a {...props} target="_blank" rel="noreferrer">
       {children}
+      <svg className="ext" viewBox="0 0 10 10" aria-hidden="true">
+        <path d="M3 1.5h5.5V7M8.5 1.5l-7 7" fill="none" stroke="currentColor" strokeWidth="1.2" />
+      </svg>
       <span className="visually-hidden"> (opens in a new tab)</span>
     </a>
   );
@@ -56,7 +59,7 @@ export function LinkLine({ className, children }) {
 // A booktabs table with its numbered caption above, as in a paper. The first column is the
 // row label; the rest are figures, right-aligned in tabular numerals. An optional note sits
 // under the bottom rule for sources and the test setup.
-export function NumberedTable({ number, caption, note, columns, rows }) {
+export function NumberedTable({ number, caption, note, columns, rows, emphasis = 0 }) {
   const frame = useRef(null);
   const [scrolls, setScrolls] = useState(false);
   useEffect(() => {
@@ -88,8 +91,8 @@ export function NumberedTable({ number, caption, note, columns, rows }) {
           </tr>
         </thead>
         <tbody>
-          {rows.map(([label, ...values]) => (
-            <tr key={label}>
+          {rows.map(([label, ...values], i) => (
+            <tr key={label} className={i < emphasis ? 'emphasis' : undefined}>
               <th scope="row">{label}</th>
               {values.map((v, i) => (
                 <td key={i}>{v}</td>
