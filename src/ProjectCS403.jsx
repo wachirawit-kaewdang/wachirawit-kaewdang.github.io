@@ -195,51 +195,58 @@ function SectorFigure() {
   );
 }
 
-// Figure A.3, redrawn from the notebook's numbers: the tuned LSTM per stock, with the reference
-// the argument needs, what always predicting "up" scores. A collapsed run reveals that, so it is
-// known wherever the LSTM or the VIX run collapsed. 0.5 would flatter accuracy here: most of the
-// bars pass it only because more days went up than down.
+// Figure A.3: how far the tuned LSTM lands from what always predicting "up" would score, per stock.
+// On a 0–1 scale a tie and a near miss look the same, so the figure draws only the gap: a bar right
+// of the centre line is better than always-up, left is worse, and none means an exact tie. That
+// reference is known wherever the LSTM or the VIX run collapsed, so for 9 of the 10 stocks.
+const gapRange = 0.06;
+const tieWithin = 0.0006;
+const signed = (gap) => (Math.abs(gap) < tieWithin ? '0.000' : `${gap > 0 ? '+' : '−'}${Math.abs(gap).toFixed(3)}`);
+
+function Offset({ gap }) {
+  if (gap === null) return <div className="bar"><span className="track centred" aria-hidden="true" /><span className="val">not known</span></div>;
+  const tie = Math.abs(gap) < tieWithin;
+  const share = Math.min(Math.abs(gap), gapRange) / gapRange / 2;
+  return (
+    <div className="bar">
+      <span className="track centred" aria-hidden="true">
+        <span className="zero" />
+        {!tie && (
+          <span
+            className="fill"
+            style={{ left: `${gap > 0 ? 50 : 50 - share * 100}%`, width: `${share * 100}%`, transformOrigin: gap > 0 ? 'left' : 'right' }}
+          />
+        )}
+      </span>
+      <span className="val">{signed(gap)}</span>
+      <span className="visually-hidden">{tie ? ', a tie with always “up”' : gap > 0 ? ', better than always “up”' : ', worse than always “up”'}</span>
+    </div>
+  );
+}
+
 function StockFigure() {
   const panels = [
-    {
-      title: 'Accuracy',
-      note: 'tick: always “up”',
-      value: (s) => s.lstm.acc,
-      tick: (s) => upShare(s),
-      spoken: (s) => (upShare(s) !== null
-        ? `, always “up” gives ${upShare(s).toFixed(3)}`
-        : ', always “up” value not known'),
-    },
-    {
-      title: 'F1',
-      note: 'tick: always “up”',
-      value: (s) => s.lstm.f1,
-      tick: (s) => (upShare(s) !== null ? alwaysUpF1(upShare(s)) : null),
-      spoken: (s) => (upShare(s) !== null
-        ? `, always “up” gives ${alwaysUpF1(upShare(s)).toFixed(3)}`
-        : ', always “up” value not known'),
-    },
+    { title: 'Accuracy', gap: (s) => (upShare(s) === null ? null : s.lstm.acc - upShare(s)) },
+    { title: 'F1', gap: (s) => (upShare(s) === null ? null : s.lstm.f1 - alwaysUpF1(upShare(s))) },
   ];
   const figure = useDrawIn();
   return (
     <figure ref={figure} className="figure data-figure" id="figure-a3" tabIndex={-1}>
       <div className="multiples pair">
-        {panels.map(({ title, note, value, tick, spoken }) => (
+        {panels.map(({ title, gap }) => (
           <table key={title} className="bars tickers">
             <caption>
-              {title} <span>({note})</span>
+              {title} <span>(LSTM minus always “up”)</span>
             </caption>
             <colgroup><col className="labels" /><col /></colgroup>
             <thead className="visually-hidden">
-              <tr><th scope="col">Stock</th><th scope="col">{title}</th></tr>
+              <tr><th scope="col">Stock</th><th scope="col">{title}, LSTM minus always “up”</th></tr>
             </thead>
             <tbody>
               {stocks.map((s) => (
                 <tr key={s.ticker}>
                   <th scope="row">{s.ticker}</th>
-                  <td>
-                    <Bar share={value(s)} tick={tick(s)} label={value(s).toFixed(3)} spoken={spoken(s)} />
-                  </td>
+                  <td><Offset gap={gap(s)} /></td>
                 </tr>
               ))}
             </tbody>
@@ -247,10 +254,10 @@ function StockFigure() {
         ))}
       </div>
       <figcaption>
-        <span className="caplabel">Figure A.3.</span> Test-set accuracy and F1 of the tuned LSTM per
-        stock, on a 0–1 scale. A tick marks what always predicting “up” would score, which the
-        notebook’s outputs reveal for {collapsed.length + vixRevealed.length} stocks. On the {collapsed.length} that
-        collapsed the bars end exactly on it, and COST’s accuracy happens to match too.{' '}
+        <span className="caplabel">Figure A.3.</span> How far the tuned LSTM lands from always predicting
+        “up”, per stock, on a scale of ±{gapRange.toFixed(2)}. Right of the centre line is better, left is
+        worse, and no bar is an exact tie, as on the {collapsed.length} stocks that collapsed. JNJ beat
+        always “up” on both, COST tied on accuracy and fell short on F1, and NVDA’s reference isn’t known.{' '}
         <a href={img('final_summary')} target="_blank" rel="noreferrer">Original chart, with the ensemble and VIX runs<span className="newtab"> (opens in a new tab)</span></a>
       </figcaption>
     </figure>
@@ -367,16 +374,16 @@ export default function ProjectCS403() {
           rows={bondRankRows}
         />
         <p>
+          Grouped by sector, the patterns differ too (<ARef to="figure-a2">Figure A.2</ARef>). Energy
+          leans on the S&amp;P 500 trend, while Healthcare and Technology lean on MACD.
+        </p>
+        <SectorFigure />
+        <p className="aside">
           If you open the notebook, note that its closing summary cell says top 5 for 8 of 10 stocks, #1
           for both banks, and that SHAP gives richer insight than correlation. Those lines are typed text,
           and the notebook’s own printed tables don’t support them. The numbers here come from those
           tables, and Figures A.1 and A.2 from the values printed on its charts.
         </p>
-        <p>
-          Grouped by sector, the patterns differ too (<ARef to="figure-a2">Figure A.2</ARef>). Energy
-          leans on the S&amp;P 500 trend, while Healthcare and Technology lean on MACD.
-        </p>
-        <SectorFigure />
       </section>
 
       <section className="section">

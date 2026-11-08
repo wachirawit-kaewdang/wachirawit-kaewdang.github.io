@@ -13,6 +13,8 @@ npm test          Tests the calculations in src/metrics.js.
 npm run test:extractor  Tests the extractor's parsing on made-up notebook output.
 npm run check     Checks a build cannot catch (see "What CI checks" below).
 npm run render-check  Opens the built site in headless Chrome; run npm run build first.
+                  npm run build also pre-renders the home page into dist/index.html, so its
+                  text is in the HTML for tools that don't run JavaScript.
 npm run build     Production build to dist/. Fails if index.html keeps a %NAME% placeholder.
 
 Content lives in src/data.js. The CS403 tables and quoted counts are computed by src/metrics.js

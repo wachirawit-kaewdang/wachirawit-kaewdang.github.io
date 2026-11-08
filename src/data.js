@@ -1,7 +1,7 @@
 // All site content lives here, so updating the portfolio never means touching layout code.
 // The CS403 numbers come from metrics.js, which computes them from the notebook's outputs.
 import {
-  aucRange, bondAgreeFor, bondTop5Share, collapsed, lstmF1About, notebookUrl, rankGapRange, sectorCount, source,
+  aucRange, collapsed, lstmF1About, notebookUrl, rankGapRange, sectorCount, source,
   stockCount, table1Rows,
 } from './metrics.js';
 
@@ -76,9 +76,7 @@ export const projects = [
       'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
       [
         `SHAP and Pearson correlation ranked features ${rankGapRange} positions apart on average, about what ` +
-          'unrelated rankings would give (≈9), and retraining on each method’s top features did not favour SHAP. SHAP put ' +
-          `bond yield in the top 5 for ${bondTop5Share} stocks; correlation agreed for ${bondAgreeFor} ` +
-          'but split on the others where both ranks are printed; see ',
+          'unrelated rankings give, and retraining on each method’s top features did not favour SHAP; see ',
         appendix('A.3', 'appendix-a3'),
         '.',
       ],
@@ -92,8 +90,8 @@ export const projects = [
     title: 'This Portfolio and Its Data Checks',
     context: 'Personal project · I directed and reviewed; Claude Code wrote the code',
     summary:
-      'The site you are reading: React + Vite, with the CS403 tables computed from the notebook’s ' +
-      'saved outputs instead of typed by hand.',
+      'The site you are reading, and the automated tests that keep its claims true: the CS403 tables are ' +
+      'computed from the notebook’s saved outputs, and nothing deploys until every check passes.',
     points: [
       'On every push to main, CI rebuilds the per-stock CS403 metrics from the notebook at a frozen commit and stops the deploy if they differ.',
       'The same run checks the résumé PDF against its source and the site’s contact details, then opens both pages in headless Chrome.',
@@ -101,7 +99,7 @@ export const projects = [
         'approving them, reviewing every change before it shipped, and running repeated front-end (design and accessibility) ' +
         'and back-end (correctness, security, testing) critiques, then choosing which findings to fix.',
     ],
-    tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions'],
+    tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions', 'Node.js test runner', 'Headless Chrome'],
     link: `${github}/${username}.github.io`,
   },
   {
@@ -111,9 +109,10 @@ export const projects = [
       'A full-stack recipe app: a React + Vite frontend with client-side routing, backed by a ' +
       'Node.js / Express REST API.',
     points: [
-      'My part: the MyRecipe management feature, recipe deletion, and wiring the frontend to the backend API.',
+      'How it fits together: the React pages call an Express REST API, which stores users and recipes in MongoDB through Mongoose.',
+      'My part: the MyRecipe management feature, recipe deletion (the API endpoint and a confirm-before-delete step), and wiring the sign-up page and other pages to the backend API.',
     ],
-    tech: ['React', 'Vite', 'JavaScript', 'HTML/CSS', 'Node.js', 'Express', 'REST APIs'],
+    tech: ['React', 'Vite', 'JavaScript', 'HTML/CSS', 'Node.js', 'Express', 'REST APIs', 'MongoDB'],
     // The repository is a private GitHub Classroom repo, so there is nothing public to link.
     codeNote: 'In a private course repository (GitHub Classroom), so it cannot be linked.',
   },
@@ -123,7 +122,10 @@ export const projects = [
     summary:
       'An HTTP/1.0 server written directly on Python sockets — no frameworks — serving an ' +
       'HTML page and a GIF with the right content-type headers, and returning 404 for anything else.',
-    points: [],
+    points: [
+      'How it works: one loop accepts a connection, reads the request line, and answers with one of two known files and its content type, or a 404 page. It serves one client at a time.',
+      'The page is sent as encoded text and the image as raw bytes; sending both the same way would corrupt the GIF.',
+    ],
     tech: ['Python', 'Sockets', 'TCP/IP', 'HTTP'],
     codeNote: 'Course assignment; code not published.',
   },

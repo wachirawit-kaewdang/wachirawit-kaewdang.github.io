@@ -48,6 +48,16 @@ function savedReading() {
   }
 }
 
+// While Back or Forward swaps the page, the old page's scroll events would overwrite the new
+// entry's saved place, so saving pauses until the swap has settled.
+let settling = false;
+let lastSaved = 0;
+let saveLater;
+function savePlace() {
+  if (settling) return;
+  history.replaceState({ ...history.state, seen: true, top: window.scrollY }, '');
+}
+
 // Tiny hash router: "#/cs403" shows the case study, anything else shows the home page.
 // Hash URLs work on GitHub Pages without any server configuration.
 function useHash() {
@@ -364,6 +374,8 @@ export default function App() {
   // Back after a cross-reference: focus returns to the link that was followed.
   useEffect(() => {
     const onPop = () => {
+      settling = true;
+      setTimeout(() => { settling = false; }, 400);
       if (refTrail.at(-1)?.from !== window.location.href) return;
       const { link, top } = refTrail.pop();
       // After the browser's own handling: on the home page a hash names a real element, and the
@@ -374,22 +386,36 @@ export default function App() {
       }));
     };
     const onClick = (e) => {
-      if (!e.target.closest?.('a[href^="#"]')) return;
-      // Where the reader left this page, kept on its history entry for Back from the other page.
-      // The entry survives a reload, which anything held in memory would not.
-      history.replaceState({ ...history.state, seen: true, top: window.scrollY }, '');
+      const followed = e.target.closest?.('a[href^="#"]');
+      if (!followed) return;
+      // Where the reader left this page, and which link they followed, kept on its history entry
+      // for Back from the other page. The entry survives a reload, which memory would not.
+      const link = [...document.querySelectorAll('main a')].indexOf(followed);
+      history.replaceState({ ...history.state, seen: true, top: window.scrollY, link }, '');
       setMissing(false);
     };
     // A reload rebuilds the page after the browser has tried to restore the position, so that
     // restore fails on a real connection. The place is saved as the reader scrolls instead.
     const onLeave = () => saveReading();
+    // The place is also kept as the reader scrolls, so leaving with Back and returning with
+    // Forward finds it too. History updates are rate-limited by browsers, hence the throttle.
+    const onScroll = () => {
+      saveReading();
+      clearTimeout(saveLater);
+      if (Date.now() - lastSaved > 250) {
+        lastSaved = Date.now();
+        savePlace();
+      } else {
+        saveLater = setTimeout(savePlace, 250);
+      }
+    };
     window.addEventListener('popstate', onPop);
-    window.addEventListener('scroll', onLeave, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('pagehide', onLeave);
     document.addEventListener('click', onClick, true);
     return () => {
       window.removeEventListener('popstate', onPop);
-      window.removeEventListener('scroll', onLeave);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('pagehide', onLeave);
       document.removeEventListener('click', onClick, true);
     };
@@ -420,7 +446,11 @@ export default function App() {
     const spot = returning ? history.state?.top : undefined;
     if (spot != null) {
       window.scrollTo({ top: spot, behavior: 'instant' });
-      focusNearby();
+      // Focus goes back to the link the reader followed, if it's in view; else to what is.
+      const followed = document.querySelectorAll('main a')[history.state?.link ?? -1];
+      const rect = followed?.getBoundingClientRect();
+      if (rect && rect.bottom > 0 && rect.top < window.innerHeight) followed.focus({ preventScroll: true });
+      else focusNearby();
       // The notice depends on whether the page has the target, which only an effect can see.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setMissing(false);

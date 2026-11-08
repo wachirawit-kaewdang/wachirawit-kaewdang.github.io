@@ -217,6 +217,11 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .bars td { padding: 0.18rem 0; }
 .bars .bar { display: flex; align-items: center; gap: 0.45rem; }
 .bars .track { position: relative; flex: 1; height: 0.55rem; box-shadow: inset 1px 0 0 var(--ink-soft); }
+/* Figure A.3's gaps: bars grow either way from a centre line at zero. */
+.bars .track.centred { box-shadow: none; }
+.bars .track.centred .fill { position: absolute; top: 0; }
+.bars .zero { position: absolute; left: 50%; top: -0.15rem; bottom: -0.15rem; width: 2px; margin-left: -1px; background: var(--ink); }
+.aside { font-size: 0.95rem; color: var(--ink-soft); }
 .bars .tick { position: absolute; top: -0.15rem; bottom: -0.15rem; width: 2px; margin-left: -1px; background: var(--ink); }
 .bars .fill { display: block; height: 100%; background: color-mix(in srgb, var(--ink) 50%, transparent); transform-origin: left; }
 /* Transform rather than width, so nothing else on the page moves. */
@@ -230,7 +235,7 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .multiples .key { align-self: center; margin: 0; font-size: 0.9rem; color: var(--ink-soft); max-width: 24rem; }
 /* Bars are backgrounds, which forced-colours mode removes. */
 @media (forced-colors: active) {
-  .bars .fill, .bars .tick { forced-color-adjust: none; background: CanvasText; }
+  .bars .fill, .bars .tick, .bars .zero { forced-color-adjust: none; background: CanvasText; }
   .bars .tick { background: Highlight; }
 }
 @media (min-width: 72rem) { .multiples .key { order: 1; } .multiples.pair { grid-template-columns: 1fr 1fr; } }
@@ -282,8 +287,9 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
   .titleblock { padding-top: 0; }
   a { text-decoration: none; }
   /* Browsers drop backgrounds in print unless told not to, and the bars are the argument. */
-  .bars .fill, .bars .tick { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .bars .fill, .bars .tick, .bars .zero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .bars .track { box-shadow: none; border-left: 1px solid var(--ink-soft); }
+  .bars .track.centred { border-left: none; }
   .newtab, .ext { display: none; }
   .contactline a[href^='http']::after { content: ' (' attr(href) ')'; font-size: 0.85em; }
   .results, .figure { break-inside: avoid; }

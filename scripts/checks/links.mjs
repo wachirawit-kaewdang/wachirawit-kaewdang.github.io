@@ -17,6 +17,8 @@ function expect(path, from) {
 expect(profile.resume, 'src/data.js (profile.resume)');
 // GitHub Pages serves this for an address that doesn't exist, and its links must lead somewhere.
 expect('404.html', 'GitHub Pages');
+// Search engines and audit tools ask for this; without it they get the page HTML instead.
+expect('robots.txt', 'crawlers');
 for (const [, path] of read('public/404.html').matchAll(/href="\/([^"#]+)"/g)) expect(path, 'public/404.html');
 
 // Appendix figures: <Figure name="..."> props and img('...') calls map to public/cs403/<name>.webp.
