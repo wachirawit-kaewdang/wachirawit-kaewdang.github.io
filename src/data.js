@@ -31,8 +31,7 @@ export const profile = {
   source: `${github}/${username}.github.io`,
   summary:
     'Computer Science graduate (Software Engineering track, May 2026) from Thammasat University, ' +
-    'working across machine learning and full-stack web development (React, Node.js). I care about ' +
-    'checking that results hold up, not just reporting them.',
+    'working across machine learning and full-stack web development (React, Node.js).',
   status: 'Open to Machine Learning Engineer, Software Engineer and QA roles in Bangkok or remote.',
 };
 
@@ -47,9 +46,10 @@ export const projects = [
       'with results set against a naive baseline.',
     // Opens the abstract, ahead of any metric.
     finding: [
-      `I checked our senior-project model against a naive “always predict up” baseline and found its ${lstmF1About} F1 wasn’t skill: on ${collapsedShare} stocks it only matched always predicting “up”. `,
+      'I check whether results hold up. In my senior project, testing against a naive baseline showed ' +
+        `the model’s ${lstmF1About} F1 wasn’t real skill (`,
       appendix('A.4', 'appendix-a4'),
-      ' shows the evidence',
+      '); this site rebuilds and tests its own numbers on every deploy',
     ],
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
@@ -63,7 +63,7 @@ export const projects = [
         'Test set: the last 20% of Jan 2020 – Apr 2025. LSTM and ensemble thresholds were tuned on it, so those rows are ' +
           'if anything optimistic; Random Forest and Logistic Regression use the default 0.5. Source: ',
         { label: `Project-CS403 @ ${source.commit}`, href: notebookUrl },
-        `. † Not recorded. ‡ The ${collapsed.length} stocks where the LSTM collapsed; other rows average all ${stockCount}.`,
+        `. The first two rows cover the ${collapsed.length} stocks where the LSTM collapsed; the rest average all ${stockCount}.`,
       ],
       columns: ['Model', 'F1', 'ROC-AUC'],
       rows: table1Rows,
@@ -90,13 +90,16 @@ export const projects = [
   },
   {
     title: 'This Portfolio and Its Data Checks',
-    context: 'Personal project · built with Claude Code',
+    context: 'Personal project · I directed and reviewed; Claude Code wrote the code',
     summary:
       'The site you are reading: React + Vite, with the CS403 tables computed from the notebook’s ' +
       'saved outputs instead of typed by hand.',
     points: [
       'On every push to main, CI rebuilds the per-stock CS403 metrics from the notebook at a frozen commit and stops the deploy if they differ.',
       'The same run checks the résumé PDF against its source and the site’s contact details, then opens both pages in headless Chrome.',
+      'Built with Claude Code as the implementer. My part: setting the goals, choosing between proposed approaches and ' +
+        'approving them, reviewing every change before it shipped, and running repeated front-end (design and accessibility) ' +
+        'and back-end (correctness, security, testing) critiques, then choosing which findings to fix.',
     ],
     tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions'],
     link: `${github}/${username}.github.io`,

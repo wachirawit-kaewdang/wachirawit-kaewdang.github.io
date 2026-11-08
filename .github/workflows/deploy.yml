@@ -34,15 +34,9 @@ jobs:
       - run: python3 scripts/test_extract_metrics.py
       # Linked files, frozen results, résumé and share image (see scripts/check.mjs).
       - run: npm run check
-      # Rebuild metrics.json from the notebook at the frozen commit it records. Any difference
-      # means a number was edited or misread. Full history, as that commit isn't the branch tip.
-      - uses: actions/checkout@v4
-        with:
-          repository: wachirawit-kaewdang/Project-CS403
-          path: notebook
-          fetch-depth: 0
-          filter: blob:none
-      - run: python3 scripts/extract-metrics.py notebook
+      # Rebuild metrics.json from the frozen notebook kept in data/. Any difference means a number
+      # was edited or misread. The extractor also checks the copy's git hash against metrics.json.
+      - run: python3 scripts/extract-metrics.py data/notebook-0c4ef04.ipynb
       - run: git diff --exit-code src/metrics.json
       - run: npm run build
       # The built site must actually render in a browser (see scripts/render-check.mjs).

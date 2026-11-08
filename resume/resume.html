@@ -76,18 +76,18 @@
       <div class="head"><b>Stock Price Direction Prediction – LSTM + Self-Attention with Explainable AI</b><span>Senior project (CS403)</span></div>
       <p class="sub">github.com/wachirawit-kaewdang/Project-CS403</p>
       <ul>
-        <li>Built a deep learning pipeline predicting 3-day price direction for 10 US stocks across 5 sectors (2020–2025), from 27 engineered features: momentum and volatility, moving averages, RSI / MACD / Stochastic, volume and OBV, S&amp;P 500 market context and bond yield.</li>
+        <li>Built a deep learning pipeline predicting 3-day price direction for 10 US stocks across 5 sectors (2020–2025), from 27 engineered features (momentum, volatility, moving averages, RSI, MACD, volume, S&amp;P 500 context and bond yield).</li>
         <li>Architecture: LSTM with self-attention (3 layers, hidden size 128) over a 60-day window, trained with Focal Loss and class weights, and compared with Random Forest, Logistic Regression, a soft-voting ensemble and a VIX feature set.</li>
         <li>Compared SHAP (KernelExplainer) with Pearson correlation: SHAP ranked bond yield top-5 for 6 of 10 stocks (#1 for JPM and AMZN); correlation agreed for JPM but split for TSLA, COST and XOM (TSLA: 2nd by SHAP, 15th by correlation). Overall rank gaps of 5–12 positions were close to the 9 expected by chance, which we documented.</li>
-        <li>Evaluated results against a naive baseline: on 7 of 10 stocks the tuned model collapsed to always predicting “up”, so its F1 matched an always-up model; the ensemble’s threshold-free ROC-AUC averaged 0.568, showing short-term direction is close to random. Identified threshold and early-stopping leakage and documented fixes.</li>
+        <li>Evaluated results against a naive baseline: on 7 of 10 stocks the tuned model collapsed to always predicting “up”, so its F1 matched an always-up model; the ensemble’s threshold-free ROC-AUC averaged 0.568, close to random. Identified threshold and early-stopping leakage and documented fixes.</li>
         <li>My contribution: data collection and preparation, training approach and model architecture, joint SHAP analysis, and the baseline check. Two-person project.</li>
       </ul>
       <p class="stack">Python · PyTorch · SHAP · scikit-learn · pandas · NumPy · Jupyter</p>
     </div>
     <div class="entry">
-      <div class="head"><b>This Portfolio and Its Data Checks</b><span>Personal project, built with Claude Code</span></div>
+      <div class="head"><b>This Portfolio and Its Data Checks</b><span>Personal project</span></div>
       <ul>
-        <li>React + Vite site; CI rebuilds its metrics from the notebook and tests both pages in headless Chrome.</li>
+        <li>React + Vite site whose CI rebuilds its metrics and tests both pages in headless Chrome. I set the goals, chose between proposed approaches and approved them, reviewed every change, and ran regular design and code critiques; Claude Code wrote most of the code.</li>
       </ul>
     </div>
     <div class="entry">

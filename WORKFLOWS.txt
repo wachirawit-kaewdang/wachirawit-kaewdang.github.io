@@ -44,7 +44,7 @@ frozenAt in scripts/checks/metrics.mjs:
 - Replace the charts in public/cs403/ and re-read sectorShap from sector_shap.png and
   rankGap from rank_disagreement_summary.png. The extractor keeps both, and their hash alone
   won't tell you they're out of date.
-- Re-read the typed claims in src/data.js, src/ProjectCS403.jsx and resume/resume.html:
+- Re-read the typed claims in src/data.js, src/ProjectCS403.jsx, resume/resume.html and og/og-image.html:
   "5 to 12 positions", the features that moved most, 27 features, "close to chance",
   "close to a coin flip", which sector leans on what, the bond-yield reading, and the model
   setup (layers, window, dates).
@@ -78,8 +78,10 @@ What CI checks (npm run verify, plus the notebook comparison)
   match pinned file hashes, and Table 1's computed results match
   fixed expected values in scripts/checks/metrics.mjs. If the freeze ever moves, both must be updated.
 - The resume PDF is one page and uses only STIX Two Text.
-- The resume, site and share image contain nothing shaped like a phone number. The private
-  resume is kept outside this repo.
+- No text source of the site, resume or share image, and neither rendered page, contains a Thai
+  phone number in any common format. The private resume is kept outside this repo.
+- The frozen notebook is kept in data/ and checked by its git hash, so deploys don't depend on
+  the Project-CS403 branch. verify also compares it with a Project-CS403 checkout when present.
 - The resume and og/og-image.html contain the contact details in src/data.js. If you change
   the site address, rebuild og-image.png too; the check reads only its HTML source.
 - After the build, both pages render in headless Chrome with no literal NaN or undefined.

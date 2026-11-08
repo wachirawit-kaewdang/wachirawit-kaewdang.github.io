@@ -14,7 +14,7 @@
     "resume": "node scripts/build-resume.mjs",
     "check": "node scripts/check.mjs",
     "render-check": "node scripts/render-check.mjs",
-    "test": "node --test scripts/metrics.test.mjs",
+    "test": "node --test scripts/metrics.test.mjs scripts/phone.test.mjs",
     "test:extractor": "python3 scripts/test_extract_metrics.py || python scripts/test_extract_metrics.py",
     "verify:notebook": "node scripts/verify-notebook.mjs",
     "verify": "npm run lint && npm test && npm run test:extractor && npm run check && npm run verify:notebook && npm run build && npm run render-check",

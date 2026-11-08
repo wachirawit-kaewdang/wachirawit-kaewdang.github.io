@@ -168,6 +168,32 @@ function Prose({ pieces }) {
     ));
 }
 
+// The 10-second version for a recruiter: who, the two projects to look at, and how to get in touch.
+function AtAGlance() {
+  const featured = projects.findIndex((p) => p.results);
+  return (
+    <dl className="glance" aria-label="At a glance">
+      <div>
+        <dt>Looking for</dt>
+        <dd>{profile.status.replace(/^Open to /, '').replace(/\.$/, '')}</dd>
+      </div>
+      <div>
+        <dt>Look at</dt>
+        <dd>
+          <Ref to={projectId(featured)}>{projects[featured].title}</Ref>, and{' '}
+          <Ref to={projectId(1)}>{projects[1].title.toLowerCase()}</Ref>
+        </dd>
+      </div>
+      <div>
+        <dt>Contact</dt>
+        <dd>
+          <a href={`mailto:${profile.email}`}>{profile.email}</a> · <ExtLink href={asset(profile.resume)}>Résumé (PDF)</ExtLink>
+        </dd>
+      </div>
+    </dl>
+  );
+}
+
 function Abstract() {
   const featured = projects.findIndex((p) => p.results);
   return (
@@ -177,15 +203,11 @@ function Abstract() {
         <strong>Abstract.</strong>{' '}
         {featured >= 0 && (
           <>
-            <Prose pieces={projects[featured].finding} />, with{' '}
-            <Ref to="table-1">Table 1</Ref> in <Ref to={projectId(featured)}>§{sectionNumber('projects')}.{featured + 1}</Ref>.
+            <Prose pieces={projects[featured].finding} /> (<Ref to={projectId(1)}>§{sectionNumber('projects')}.2</Ref>).
           </>
         )}
       </p>
       <p>{profile.summary}</p>
-      <p className="availability">
-        <strong>Availability.</strong> {profile.status}
-      </p>
     </section>
   );
 }
@@ -455,6 +477,7 @@ export default function App() {
       ) : (
         <main id="main" className="page" tabIndex={-1}>
           <TitleBlock />
+          <AtAGlance />
           <Abstract />
           <Projects />
           <Skills />

@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { preview } from 'vite';
 import { findChrome } from './chrome.mjs';
+import { findPhones } from './checks/phone.mjs';
 import {
   alwaysUpF1, bondRankRows, collapsed, ensembleAuc, rankGapRange, retrainAuc, retrainCorrWins, table1Rows,
 } from '../src/metrics.js';
@@ -19,7 +20,7 @@ const pct = (v) => v.toFixed(3);
 const pages = [
   {
     path: '/',
-    expected: ['Wachirawit Kaewdang', 'Abstract. I checked our senior-project model', `${rankGapRange} positions apart`, 'did not favour SHAP', 'Contact'],
+    expected: ['Wachirawit Kaewdang', 'Abstract. I check whether results hold up.', 'Looking for', `${rankGapRange} positions apart`, 'did not favour SHAP', 'Contact'],
     tables: { 'table-1': table1Rows },
     headers: { 'table-1': ['Model', 'F1', 'ROC-AUC'] },
   },
@@ -81,6 +82,7 @@ async function read({ path, expected, tables = {}, headers = {}, ticks = {} }) {
   for (const phrase of expected) {
     if (!text.includes(phrase)) failures.push(`${path} did not render “${phrase}”`);
   }
+  if (findPhones(text).length) failures.push(`${path} shows a phone number`);
   for (const [word] of text.matchAll(/\bNaN\b|\bundefined\b|\bnull(?:th)?\b/g)) failures.push(`${path} shows the literal text “${word}”`);
   for (const [id, rows] of Object.entries(tables)) {
     const shown = rowsOf(dom, id);

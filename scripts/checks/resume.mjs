@@ -1,12 +1,13 @@
 // The résumé and share image are typed by hand, so they are compared with the site: its CS403
 // numbers, facts, skills and contact details, and the PDF's page count, fonts and source.
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { education, profile, projects, skills } from '../../src/data.js';
 import {
   bondCorrelationRankOf, bondFirstFor, bondOppositeFor, bondRankOf, bondSplitFor, bondTop5Share, collapsed, ensembleAuc,
   lstmF1About, rankGapRange, sectorCount, stockCount,
 } from '../../src/metrics.js';
+import { findPhones } from './phone.mjs';
 import { pub, read, root, sha256 } from './shared.mjs';
 
 export const failures = [];
@@ -55,10 +56,16 @@ for (const skill of skills.flatMap((group) => group.items)) {
 }
 
 // The public résumé and site must never carry a phone number; the private résumé is kept outside
-// this repo. The PDF's hash ties it to this HTML, so checking the source covers it too.
-const phoneShape = /(?:\+66|\b0)\d{1,2}[\s-]?\d{3}[\s-]?\d{4}\b/;
-for (const file of ['resume/resume.html', 'src/data.js', 'index.html', 'public/404.html', 'og/og-image.html']) {
-  if (phoneShape.test(read(file))) failures.push(`${file} contains something shaped like a phone number`);
+// this repo. Every text source the site or résumé is built from is scanned, in any number format.
+// The PDF's hash ties it to resume.html, so checking the source covers it too.
+const textFiles = (dir) => readdirSync(resolve(root, dir), { withFileTypes: true }).flatMap((entry) => {
+  const path = `${dir}/${entry.name}`;
+  if (entry.isDirectory()) return textFiles(path);
+  return /\.(html|jsx?|mjs|json|css|txt)$/.test(entry.name) ? [path] : [];
+});
+for (const file of ['index.html', 'WORKFLOWS.txt', ...['src', 'resume', 'og', 'public'].flatMap(textFiles)]) {
+  const found = findPhones(read(file));
+  if (found.length) failures.push(`${file} contains a phone number (${found.length})`);
 }
 
 // The PDF is built from resume.html by hand (npm run resume), which records both files' hashes.
@@ -95,7 +102,7 @@ for (const detail of [bare(profile.site), profile.name, profile.role.replace('&'
   if (!shareSource.includes(detail)) failures.push(`og/og-image.html should include ${detail} (from src/data.js)`);
 }
 // The share image is captured from this file by hand, so an edit here means the PNG is out of date.
-const shareSourceHash = 'edd4a6b0faf437418e42812003909e27278b7323e422bf44e80d63d0a78edc98';
+const shareSourceHash = '60908746c14395ec8b67374c65c45f73e4253ce1579b1fda2a5db81260d4b5b9';
 if (sha256(shareSource.replaceAll('\r\n', '\n')) !== shareSourceHash) {
   failures.push('og/og-image.html changed: rebuild public/og-image.png, then update both hashes (scripts/checks/)');
 }

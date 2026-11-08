@@ -56,7 +56,7 @@ for (const s of shape) failures.push(`metrics.json: ${s}`);
 // The extractor proves the per-stock numbers. These cover what it can't: sectorShap and the source
 // block, which it copies rather than rebuilds, and the calculations in metrics.js. The results are
 // frozen, so any change here is a mistake unless the freeze itself is being moved.
-const pinned = '0c34c8839b6f093b0550ec0f2bc8e2078b47fba96500a1fc6b0ab723ddf1cdb3';
+const pinned = '5cf5882e5d841c6217bb378a365222734322934253612a6ea3bbecc7b8218058';
 const copied = sha256(JSON.stringify({ source: metrics.source, sectorShap: metrics.sectorShap, rankGap: metrics.rankGap }));
 if (copied !== pinned) failures.push(`metrics.json: sectorShap, rankGap or source changed; their hash is now ${copied}`);
 if (metrics.rankGap?.length !== 27) failures.push('metrics.json: rankGap should have all 27 features');
@@ -78,19 +78,19 @@ const computed = {
 const expectedOutputs = {
   "table1Rows": [
     [
-      "Always predict “up” (baseline)",
-      "0.707‡",
+      "Always predict “up” (baseline), 7 stocks",
+      "0.707",
       "0.500"
     ],
     [
       "LSTM, same 7 stocks",
-      "0.707‡",
-      "n/r†"
+      "0.707",
+      "not recorded"
     ],
     [
       "LSTM + self-attention",
       "0.710",
-      "n/r†"
+      "not recorded"
     ],
     [
       "Ensemble (LSTM + RF + LR, soft vote)",

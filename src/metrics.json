@@ -3,7 +3,8 @@
     "repo": "https://github.com/wachirawit-kaewdang/Project-CS403",
     "notebook": "stock_project.ipynb",
     "commit": "0c4ef04",
-    "note": "Per-stock test-set outputs copied by script from the notebook’s saved cell outputs (cells 5, 7, 9, 12, 20, 27 and 29) by scripts/extract-metrics.py. Sector SHAP values and per-feature rank gaps are the numbers printed on the bars of sector_shap.png and rank_disagreement_summary.png."
+    "note": "Per-stock test-set outputs copied by script from the notebook’s saved cell outputs (cells 5, 7, 9, 12, 20, 27 and 29) by scripts/extract-metrics.py. Sector SHAP values and per-feature rank gaps are the numbers printed on the bars of sector_shap.png and rank_disagreement_summary.png.",
+    "notebookBlob": "8c2d448a6f2398ce7c8d160637b9a7789db4055e"
   },
   "stocks": {
     "NVDA": {

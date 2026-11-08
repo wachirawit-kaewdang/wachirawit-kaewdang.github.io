@@ -4,7 +4,8 @@ numbers still match it. Nothing is re-executed: it reads the text the notebook p
 The results are frozen at the commit recorded in metrics.json (see WORKFLOWS.txt), so running
 this should change nothing.
 
-Run:  python scripts/extract-metrics.py <path to Project-CS403 checkout> [commit]
+Run:  python scripts/extract-metrics.py data/notebook-0c4ef04.ipynb   (the frozen copy in this repo)
+      python scripts/extract-metrics.py <path to Project-CS403 checkout> [commit]
       Needs Python 3.10+. Then: npm run check
 
 Read from the notebook, located by the header each cell prints and by column name:
@@ -20,6 +21,7 @@ charts (sector_shap.png, rank_disagreement_summary.png), so those values were re
 labels, and scripts/checks/metrics.mjs pins them by hash. Its bond-yield bars are
 checked against the per-stock table.
 """
+import hashlib
 import json
 import re
 import subprocess
@@ -98,12 +100,22 @@ def bond_correlation_ranks(top5_text, diff_text):
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
-    repo = Path(sys.argv[1])
+    target = Path(sys.argv[1])
     current = json.loads(OUT.read_text(encoding='utf-8'))
-    # Resolved, so a branch name can never be recorded as the commit.
-    commit = git(repo, 'rev-parse', '--short=7',
-                 f'{sys.argv[2] if len(sys.argv) > 2 else current["source"]["commit"]}^{{commit}}').decode().strip()
-    raw = git(repo, 'show', f'{commit}:{NOTEBOOK}')
+    if target.is_file():
+        # The frozen copy kept in this repo, so deploys don't depend on the notebook's branch.
+        commit = current['source']['commit']
+        raw = target.read_bytes()
+    else:
+        # Resolved, so a branch name can never be recorded as the commit.
+        commit = git(target, 'rev-parse', '--short=7',
+                     f'{sys.argv[2] if len(sys.argv) > 2 else current["source"]["commit"]}^{{commit}}').decode().strip()
+        raw = git(target, 'show', f'{commit}:{NOTEBOOK}')
+    # Git's own hash of the file, so the copy and the commit can be compared with no checkout.
+    blob = hashlib.sha1(b'blob %d\0' % len(raw) + raw).hexdigest()
+    pinned = current['source'].get('notebookBlob')
+    if pinned and blob != pinned and commit == current['source']['commit']:
+        sys.exit(f'The notebook read has git hash {blob}, but the frozen one is {pinned}')
     texts = list(outputs(json.loads(raw.decode('utf-8'))))
 
     lstm_text = find(texts, 'LSTM Acc  LSTM F1')
@@ -159,7 +171,7 @@ def main():
             sys.exit(f'sectorShap {sector["sector"]}: bond yield {drawn} does not match the notebook\'s {values}')
 
     data = {
-        'source': {**current['source'], 'commit': commit},
+        'source': {**current['source'], 'commit': commit, 'notebookBlob': blob},
         'stocks': stocks,
         'sectorShap': current['sectorShap'],
         'rankGap': current['rankGap'],

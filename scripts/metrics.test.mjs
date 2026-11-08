@@ -28,6 +28,7 @@ test('ranks read as ordinals, including the teens', () => {
 
 test('Table 1 leads with the baseline, then the LSTM on the same stocks', () => {
   assert.match(table1Rows[0][0], /baseline/);
+  assert.doesNotMatch(table1Rows.flat().join(' '), /[†‡]/);
   assert.match(table1Rows[1][0], new RegExp(`same ${collapsed.length} stocks`));
   assert.equal(table1Rows[0][1], table1Rows[1][1]);
 });

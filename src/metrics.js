@@ -26,9 +26,9 @@ export const collapsed = stocks
 export const notCollapsed = stocks.filter((s) => s.threshold !== 0.3);
 
 // Table 1: averages over every stock. The notebook never records ROC-AUC for the full-feature
-// LSTM, so that cell is "n/r" (not recorded) and the table note says why.
+// LSTM, so that cell says so.
 const modelRows = [
-  ['LSTM + self-attention', avg((s) => s.lstm.f1), 'n/r†'],
+  ['LSTM + self-attention', avg((s) => s.lstm.f1), 'not recorded'],
   ['Ensemble (LSTM + RF + LR, soft vote)', avg((s) => s.ensemble.f1), avg((s) => s.ensemble.auc)],
   ['Logistic Regression', avg((s) => s.lr.f1), avg((s) => s.lr.auc)],
   ['Random Forest', avg((s) => s.rf.f1), avg((s) => s.rf.auc)],
@@ -40,8 +40,8 @@ export const alwaysUpAvgF1 = mean(collapsed.map((s) => alwaysUpF1(s.lstm.acc))).
 // small win, when the 0.710 only differs because it averages all the stocks.
 const lstmSameStocksF1 = mean(collapsed.map((s) => s.lstm.f1)).toFixed(3);
 export const table1Rows = [
-  ['Always predict “up” (baseline)', `${alwaysUpAvgF1}‡`, '0.500'],
-  [`LSTM, same ${collapsed.length} stocks`, `${lstmSameStocksF1}‡`, 'n/r†'],
+  [`Always predict “up” (baseline), ${collapsed.length} stocks`, alwaysUpAvgF1, '0.500'],
+  [`LSTM, same ${collapsed.length} stocks`, lstmSameStocksF1, 'not recorded'],
   ...modelRows,
 ];
 export const ensembleAuc = avg((s) => s.ensemble.auc);

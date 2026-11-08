@@ -5,3 +5,5 @@
 *.pdf binary
 *.png binary
 *.webp binary
+# The frozen notebook is checked by its git hash, so it must stay byte for byte as committed
+*.ipynb binary
