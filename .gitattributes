@@ -7,3 +7,5 @@
 *.webp binary
 # The frozen notebook is checked by its git hash, so it must stay byte for byte as committed
 *.ipynb binary
+# Hook scripts run under sh, which reads a CR as part of the command, so they keep LF endings.
+.githooks/* text eol=lf
