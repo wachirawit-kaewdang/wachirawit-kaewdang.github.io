@@ -34,6 +34,8 @@ test('leaves the site\'s own numbers alone', () => {
     '0c34c8839b6f093b0550ec0f2bc8e2078b47fba96500a1fc6b0ab723ddf1cdb3',
     '"acc": 0.5469, "f1": 0.6942',
     '3 layers, hidden size 128, over a 60-day window',
+    '0.6000       0.4327',
+    '0.50    0.5469   0',
   ];
   for (const text of ordinary) assert.deepEqual(findPhones(text), [], text);
 });
