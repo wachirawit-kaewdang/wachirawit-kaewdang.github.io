@@ -78,6 +78,8 @@ og/og-image.html, so update them when the name, role or summary in src/data.js c
 What CI checks (npm run verify)
 -------------------------------
 - Every file the site links to exists in public/: resume, figures, favicon, og:image.
+- src/data.js has the expected number of projects (4, in scripts/checks/content.mjs), each
+  with a title, context, summary and stack, and every language is { name, level }.
 - metrics.json is at the frozen commit, with 10 stocks, 5 sectors of 10 rows and every rate in
   [0, 1].
 - The 0.30-threshold stocks have F1 equal to always-up, 2p / (1 + p); the others do not.

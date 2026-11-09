@@ -107,24 +107,6 @@ export const projects = [
     tech: ['Python', 'Sockets', 'TCP/IP', 'HTTP'],
     codeNote: 'Course assignment; code not published.',
   },
-];
-
-export const skills = [
-  { group: 'Languages', items: ['Python', 'JavaScript', 'Java', 'C', 'C++', 'SQL'] },
-  { group: 'ML & Data', items: ['PyTorch', 'scikit-learn', 'SHAP', 'pandas', 'NumPy', 'Jupyter'] },
-  { group: 'Web', items: ['React', 'Vite', 'Node.js', 'Express', 'Django', 'REST APIs', 'HTML/CSS'] },
-  { group: 'Data & Tools', items: ['MySQL', 'MongoDB', 'Git', 'Docker', 'Testing (TDD)', 'Robot Framework'] },
-];
-
-export const education = {
-  school: 'Thammasat University',
-  degree: 'BSc Computer Science (Computer and Information Science major) — Software Engineering track',
-  period: '2022 – May 2026',
-};
-
-export const languages = [
-  { name: 'Thai', level: 'Native' },
-  { name: 'English', level: 'Conversational' },
   {
     title: 'Recipe Web Application',
     context: 'CS369 · 5-person team',
@@ -157,4 +139,22 @@ export const languages = [
     tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions', 'Node.js test runner', 'Headless Chrome'],
     link: `${github}/${username}.github.io`,
   },
+];
+
+export const skills = [
+  { group: 'Languages', items: ['Python', 'JavaScript', 'Java', 'C', 'C++', 'SQL'] },
+  { group: 'ML & Data', items: ['PyTorch', 'scikit-learn', 'SHAP', 'pandas', 'NumPy', 'Jupyter'] },
+  { group: 'Web', items: ['React', 'Vite', 'Node.js', 'Express', 'Django', 'REST APIs', 'HTML/CSS'] },
+  { group: 'Data & Tools', items: ['MySQL', 'MongoDB', 'Git', 'Docker', 'Testing (TDD)', 'Robot Framework'] },
+];
+
+export const education = {
+  school: 'Thammasat University',
+  degree: 'BSc Computer Science (Computer and Information Science major) — Software Engineering track',
+  period: '2022 – May 2026',
+};
+
+export const languages = [
+  { name: 'Thai', level: 'Native' },
+  { name: 'English', level: 'Conversational' },
 ];
