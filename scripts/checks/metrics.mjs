@@ -3,7 +3,7 @@
 import metrics from '../../src/metrics.json' with { type: 'json' };
 import {
   alwaysUpF1, aucRange, bondAgreeFor, bondCorrelationOnly, bondRankRows, bondShapOnly, collapsed, ensembleAuc, lstmF1About,
-  notCollapsed, rankGapRange, retrainAuc, retrainCorrWins, table1Rows, vixRevealed,
+  notCollapsed, rankGapRange, retrainAuc, retrainCorrWins, modelRows, table1Rows, vixRevealed,
 } from '../../src/metrics.js';
 import { sha256 } from './shared.mjs';
 
@@ -62,6 +62,7 @@ if (copied !== pinned) failures.push(`metrics.json: sectorShap, rankGap or sourc
 if (metrics.rankGap?.length !== 27) failures.push('metrics.json: rankGap should have all 27 features');
 const computed = {
   table1Rows,
+  modelRows,
   aucRange,
   ensembleAuc,
   retrainAuc,
@@ -77,36 +78,14 @@ const computed = {
 };
 const expectedOutputs = {
   "table1Rows": [
-    [
-      "Always predict “up” (baseline)",
-      "0.707",
-      "0.500"
-    ],
-    [
-      "LSTM + self-attention",
-      "0.707",
-      "not recorded"
-    ],
-    [
-      "LSTM + self-attention",
-      "0.710",
-      "not recorded"
-    ],
-    [
-      "Ensemble (LSTM + RF + LR, soft vote)",
-      "0.663",
-      "0.568"
-    ],
-    [
-      "Logistic Regression",
-      "0.525",
-      "0.555"
-    ],
-    [
-      "Random Forest",
-      "0.374",
-      "0.546"
-    ]
+    ["Always predict “up” (baseline)", "0.707"],
+    ["LSTM + self-attention", "0.707"]
+  ],
+  "modelRows": [
+    ["LSTM + self-attention", "0.710", "not recorded"],
+    ["Ensemble (LSTM + RF + LR, soft vote)", "0.663", "0.568"],
+    ["Logistic Regression", "0.525", "0.555"],
+    ["Random Forest", "0.374", "0.546"]
   ],
   "aucRange": "0.55–0.57",
   "ensembleAuc": "0.568",

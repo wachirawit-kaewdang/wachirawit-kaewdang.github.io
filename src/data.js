@@ -9,8 +9,11 @@ const collapsedShare = `${collapsed.length} of ${stockCount}`;
 
 // Prose that points into Appendix A is written as a list of pieces: strings, and refs that the
 // page renders as cross-references, e.g. ['see ', appendix('A.2', 'appendix-a2')].
-const appendix = (label, to) => ({ label: `Appendix ${label}`, to });
-const tableA2 = { label: 'Table A.2', to: 'table-a2' };
+// A cross-reference into Appendix A. `about` names what is there, for a screen reader's list of
+// links and for anyone who doesn't read "A.4" as a place.
+const appendix = (label, to, about) => ({ label: `Appendix ${label}`, to, about });
+const tableA2 = { label: 'Table A.2', to: 'table-a2', about: 'the always-up check, stock by stock' };
+const tableA3 = { label: 'Table A.3', to: 'table-a3', about: 'every model’s averages' };
 
 // Every GitHub and site URL is built from the username. A rename also has to reach the résumé and
 // share image, which are typed by hand; npm run check fails until they match.
@@ -46,32 +49,31 @@ export const projects = [
       'with results set against a naive baseline.',
     // Opens the abstract, ahead of any metric.
     finding: [
-      'I check whether results hold up. In my senior project I built an LSTM to predict stock direction, ' +
-        'then tested it against a simple baseline that always predicts “up”. That check caught that its ' +
-        `${lstmF1About} F1 (a 0–1 score for spotting “up” days) wasn’t real skill (`,
-      appendix('A.4', 'appendix-a4'),
-      '); this site rebuilds and tests its own numbers on every deploy',
+      'I check whether results hold up. In my senior project I caught that my LSTM’s ' +
+        `${lstmF1About} F1 (a 0–1 score for spotting “up” days) came from predicting “up” on every ` +
+        `test day for ${collapsedShare} stocks, which scores the same as never looking at the data, ` +
+        'so I report it as no real skill (',
+      appendix('A.4', 'appendix-a4', 'the baseline check'),
+      ')',
     ],
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption: [
-        `Every model here with a recorded ROC-AUC is close to chance, at ${aucRange} where 0.50 is chance, and the tuned ` +
-          `LSTM’s high F1 comes from predicting “up” on every test day for ${collapsedShare} stocks (`,
+        `On the ${collapsedShare} stocks where the tuned LSTM predicted “up” on every test day, its F1 is exactly ` +
+          'what always predicting “up” scores (',
         tableA2,
+        `). Across all ${stockCount} stocks it averages ${lstmF1About}, and every model with a recorded ROC-AUC is ` +
+          `close to chance, at ${aucRange} where 0.50 is chance (`,
+        tableA3,
         ').',
       ],
       note: [
-        'Test set: the last 20% of Jan 2020 – Apr 2025. LSTM and ensemble thresholds were tuned on it, so those rows are ' +
-          'if anything optimistic; Random Forest and Logistic Regression use the default 0.5. Source: ',
+        'Average F1 over those stocks, on the test set: the last 20% of Jan 2020 – Apr 2025. The LSTM’s threshold ' +
+          'was tuned on it, so its row is if anything optimistic. Source: ',
         { label: `Project-CS403 @ ${source.commit}`, href: notebookUrl },
         '.',
       ],
-      // The baseline and the collapsed LSTM cover fewer stocks than the rest, so the rows are grouped.
-      groups: [
-        { at: 0, label: `The ${collapsed.length} stocks where the LSTM collapsed` },
-        { at: 2, label: `All ${stockCount} stocks` },
-      ],
-      columns: ['Model', 'F1', 'ROC-AUC'],
+      columns: ['Model', 'F1'],
       rows: table1Rows,
       // The baseline and the LSTM on the same stocks: the tie the table exists to show.
       emphasis: 2,
@@ -83,7 +85,7 @@ export const projects = [
       [
         `SHAP and Pearson correlation ranked features ${rankGapRange} positions apart on average, about what ` +
           'unrelated rankings give, and retraining on each method’s top features did not favour SHAP; see ',
-        appendix('A.3', 'appendix-a3'),
+        appendix('A.3', 'appendix-a3', 'SHAP against correlation'),
         '.',
       ],
       'My part: data collection and preparation, the training approach and model architecture, the SHAP analysis together with my teammate, and the baseline check that exposed the collapse.',
@@ -91,38 +93,6 @@ export const projects = [
     tech: ['Python', 'PyTorch', 'SHAP', 'scikit-learn', 'pandas', 'NumPy', 'Jupyter', 'yfinance', 'Git'],
     caseStudy: '#/cs403',
     link: `${github}/Project-CS403`,
-  },
-  {
-    title: 'This Portfolio and Its Data Checks',
-    context: 'Personal project · I directed and reviewed; Claude Code wrote the code',
-    summary:
-      'The site you are reading, and the automated tests that keep its claims true: the CS403 tables are ' +
-      'computed from the notebook’s saved outputs, and nothing deploys until every check passes.',
-    points: [
-      'On every push to main, CI rebuilds the per-stock CS403 metrics from the notebook at a frozen commit and stops the deploy if they differ.',
-      'The same run checks the résumé PDF against its source and the site’s contact details, then opens both pages in headless Chrome.',
-      'In QA terms, each check is a test case for a claim on the site, a failing one stops the deploy, and gaps found in ' +
-        'reviews became new checks, such as the phone-number scan and the Back and Forward test.',
-      'Built with Claude Code as the implementer. My part: setting the goals, choosing between proposed approaches and ' +
-        'approving them, reviewing every change before it shipped, and running repeated front-end (design and accessibility) ' +
-        'and back-end (correctness, security, testing) critiques, then choosing which findings to fix.',
-    ],
-    tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions', 'Node.js test runner', 'Headless Chrome'],
-    link: `${github}/${username}.github.io`,
-  },
-  {
-    title: 'Recipe Web Application',
-    context: 'CS369 · 5-person team',
-    summary:
-      'A full-stack recipe app: a React + Vite frontend with client-side routing, backed by a ' +
-      'Node.js / Express REST API.',
-    points: [
-      'How it fits together: the React pages call an Express REST API, which stores users and recipes in MongoDB through Mongoose.',
-      'My part: the MyRecipe management feature, recipe deletion (the API endpoint and a confirm-before-delete step), and wiring the sign-up page and other pages to the backend API.',
-    ],
-    tech: ['React', 'Vite', 'JavaScript', 'HTML/CSS', 'Node.js', 'Express', 'REST APIs', 'MongoDB'],
-    // The repository is a private GitHub Classroom repo, so there is nothing public to link.
-    codeNote: 'In a private course repository (GitHub Classroom), so it cannot be linked.',
   },
   {
     title: 'HTTP Web Server from Scratch',
@@ -155,4 +125,36 @@ export const education = {
 export const languages = [
   { name: 'Thai', level: 'Native' },
   { name: 'English', level: 'Conversational' },
+  {
+    title: 'Recipe Web Application',
+    context: 'CS369 · 5-person team',
+    summary:
+      'A full-stack recipe app: a React + Vite frontend with client-side routing, backed by a ' +
+      'Node.js / Express REST API.',
+    points: [
+      'How it fits together: the React pages call an Express REST API, which stores users and recipes in MongoDB through Mongoose.',
+      'My part: the MyRecipe management feature, recipe deletion (the API endpoint and a confirm-before-delete step), and wiring the sign-up page and other pages to the backend API.',
+    ],
+    tech: ['React', 'Vite', 'JavaScript', 'HTML/CSS', 'Node.js', 'Express', 'REST APIs', 'MongoDB'],
+    // The repository is a private GitHub Classroom repo, so there is nothing public to link.
+    codeNote: 'In a private course repository (GitHub Classroom), so it cannot be linked.',
+  },
+  {
+    title: 'This Portfolio and Its Data Checks',
+    context: 'Personal project · I directed and reviewed; Claude Code wrote the code',
+    summary:
+      'The site you are reading, and the automated tests that keep its claims true: the CS403 tables are ' +
+      'computed from the notebook’s saved outputs, and nothing deploys until every check passes.',
+    points: [
+      'On every push to main, CI rebuilds the per-stock CS403 metrics from the notebook at a frozen commit and stops the deploy if they differ.',
+      'The same run checks the résumé PDF against its source and the site’s contact details, then opens both pages in headless Chrome.',
+      'In QA terms, each check is a test case for a claim on the site, a failing one stops the deploy, and gaps found in ' +
+        'reviews became new checks, such as the phone-number scan and the Back and Forward test.',
+      'Built with Claude Code as the implementer. My part: setting the goals, choosing between proposed approaches and ' +
+        'approving them, reviewing every change before it shipped, and running repeated front-end (design and accessibility) ' +
+        'and back-end (correctness, security, testing) critiques, then choosing which findings to fix.',
+    ],
+    tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions', 'Node.js test runner', 'Headless Chrome'],
+    link: `${github}/${username}.github.io`,
+  },
 ];

@@ -3,9 +3,10 @@
 // Project-CS403 checkout is present (../Project-CS403, or CS403_REPO), it also confirms that copy
 // is byte for byte the notebook at the frozen commit. Python 3.10+.
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { python } from './python.mjs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { hasPython, noPython, python } from './python.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const file = resolve(root, 'src/metrics.json');
@@ -25,13 +26,22 @@ function firstDifference(a, b, path = '') {
   return null;
 }
 
+if (!hasPython) {
+  console.error(noPython);
+  process.exit(1);
+}
+// The extractor writes to a temp file, so the real one is never changed, even if this is stopped.
+const scratch = mkdtempSync(join(tmpdir(), 'verify-notebook-'));
 let after;
 try {
-  execFileSync(python, [resolve(root, 'scripts/extract-metrics.py'), copy], { stdio: ['ignore', 'ignore', 'inherit'] });
-  after = readFileSync(file);
+  const out = join(scratch, 'metrics.json');
+  execFileSync(python, [resolve(root, 'scripts/extract-metrics.py'), copy], {
+    stdio: ['ignore', 'ignore', 'inherit'],
+    env: { ...process.env, METRICS_OUT: out },
+  });
+  after = readFileSync(out);
 } finally {
-  // Only a comparison: the file goes back exactly as it was, line endings included.
-  writeFileSync(file, before);
+  rmSync(scratch, { recursive: true, force: true });
 }
 const difference = firstDifference(JSON.parse(before.toString('utf8')), JSON.parse(after.toString('utf8')));
 if (difference) {

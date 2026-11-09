@@ -1,12 +1,13 @@
 // Pieces of the preprint look shared by the home page and the case study.
 
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { jumpTo, refTrail, tableId } from './paper-utils.js';
 
 // A hyperref-style cross-reference ("Table 1", "§1.1") to something on the same page. Inside a
 // hash route (the appendix) the link keeps the route, as "#/cs403/table-a1", and the address bar
 // is kept up to date too, so the reference can be copied and still opens the right page.
-export function Ref({ to, route, children }) {
+// `name`, when given, is the link's full accessible name, such as "Appendix A.4, the baseline check".
+export function Ref({ to, route, name, children }) {
   const href = route ? `${route}/${to}` : `#${to}`;
   const follow = (e) => {
     if (!document.getElementById(to)) return;
@@ -20,7 +21,7 @@ export function Ref({ to, route, children }) {
     jumpTo(to);
   };
   return (
-    <a className="ref" href={href} onClick={follow}>
+    <a className="ref" href={href} onClick={follow} aria-label={name}>
       {children}
     </a>
   );
@@ -59,8 +60,7 @@ export function LinkLine({ className, children }) {
 // A booktabs table with its numbered caption above, as in a paper. The first column is the
 // row label; the rest are figures, right-aligned in tabular numerals. An optional note sits
 // under the bottom rule for sources and the test setup.
-// `groups` labels runs of rows, as { at: first row's index, label }.
-export function NumberedTable({ number, caption, note, columns, rows, emphasis = 0, groups = [] }) {
+export function NumberedTable({ number, caption, note, columns, rows, emphasis = 0 }) {
   const frame = useRef(null);
   const [scrolls, setScrolls] = useState(false);
   useEffect(() => {
@@ -92,24 +92,14 @@ export function NumberedTable({ number, caption, note, columns, rows, emphasis =
           </tr>
         </thead>
         <tbody>
-          {rows.map(([label, ...values], i) => {
-            const group = groups.find(({ at }) => at === i);
-            return (
-              <Fragment key={i}>
-                {group && (
-                  <tr className="group">
-                    <th scope="colgroup" colSpan={columns.length}>{group.label}</th>
-                  </tr>
-                )}
-                <tr className={i < emphasis ? 'emphasis' : undefined}>
-                  <th scope="row">{label}</th>
-                  {values.map((v, j) => (
-                    <td key={j}>{v}</td>
-                  ))}
-                </tr>
-              </Fragment>
-            );
-          })}
+          {rows.map(([label, ...values], i) => (
+            <tr key={label} className={i < emphasis ? 'emphasis' : undefined}>
+              <th scope="row">{label}</th>
+              {values.map((v, j) => (
+                <td key={j}>{v}</td>
+              ))}
+            </tr>
+          ))}
         </tbody>
       </table>
       {note && <p className="tablenote">{note}</p>}

@@ -14,8 +14,10 @@ npm test          Tests the calculations in src/metrics.js and the phone-number 
 npm run test:extractor  Tests the extractor's parsing on made-up notebook output.
 npm run check     Checks a build cannot catch (see "What CI checks" below).
 npm run check:phone  Scans every tracked file for a phone number. npm install switches on
-                  git hooks (.githooks) that run the same scan on each commit's files and
-                  message, so a number is stopped before it is ever pushed.
+                  git hooks (.githooks) that scan each commit's files and message, each
+                  merge, and every commit in a push (which also catches --no-verify commits).
+                  They don't run for edits made on GitHub's website, and npm run check warns
+                  when they are off in this copy.
 npm run render-check  Opens the built site in headless Chrome; run npm run build first.
                   npm run build also pre-renders the home page into dist/index.html, so its
                   text is in the HTML for tools that don't run JavaScript.

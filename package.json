@@ -14,7 +14,7 @@
     "resume": "node scripts/build-resume.mjs",
     "check": "node scripts/check.mjs",
     "check:phone": "node scripts/check-phone.mjs",
-    "prepare": "node -e \"try { require('child_process').execFileSync('git', ['config', 'core.hooksPath', '.githooks']) } catch {}\"",
+    "prepare": "node -e \"try { require('child_process').execFileSync('git', ['config', 'core.hooksPath', '.githooks']) } catch { console.warn('! Could not switch on the git hooks. Run: git config core.hooksPath .githooks') }\"",
     "render-check": "node scripts/render-check.mjs",
     "history-check": "node scripts/history-check.mjs",
     "test": "node --test scripts/metrics.test.mjs scripts/phone.test.mjs",

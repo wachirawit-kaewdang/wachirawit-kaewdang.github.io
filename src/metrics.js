@@ -25,24 +25,23 @@ export const collapsed = stocks
   .sort((a, b) => b.lstm.acc - a.lstm.acc);
 export const notCollapsed = stocks.filter((s) => s.threshold !== 0.3);
 
-// Table 1: averages over every stock. The notebook never records ROC-AUC for the full-feature
+// Table A.3: averages over every stock. The notebook never records ROC-AUC for the full-feature
 // LSTM, so that cell says so.
-const modelRows = [
+export const modelRows = [
   ['LSTM + self-attention', avg((s) => s.lstm.f1), 'not recorded'],
   ['Ensemble (LSTM + RF + LR, soft vote)', avg((s) => s.ensemble.f1), avg((s) => s.ensemble.auc)],
   ['Logistic Regression', avg((s) => s.lr.f1), avg((s) => s.lr.auc)],
   ['Random Forest', avg((s) => s.rf.f1), avg((s) => s.rf.auc)],
 ];
-// The baseline comes first. Its F1 needs each stock's test-set up-day share, and Table 1 uses the
-// stocks where the tuned LSTM itself collapsed (its accuracy is that share), and says so.
+// Table 1: the baseline and the LSTM on the stocks where the tuned LSTM collapsed (its accuracy is
+// then the up-day share, which the baseline's F1 needs).
 export const alwaysUpAvgF1 = mean(collapsed.map((s) => alwaysUpF1(s.lstm.acc))).toFixed(3);
 // The LSTM over those same stocks sits beside it: 0.707 against 0.710 would otherwise read as a
 // small win, when the 0.710 only differs because it averages all the stocks.
 const lstmSameStocksF1 = mean(collapsed.map((s) => s.lstm.f1)).toFixed(3);
 export const table1Rows = [
-  ['Always predict “up” (baseline)', alwaysUpAvgF1, '0.500'],
-  [modelRows[0][0], lstmSameStocksF1, 'not recorded'],
-  ...modelRows,
+  ['Always predict “up” (baseline)', alwaysUpAvgF1],
+  [modelRows[0][0], lstmSameStocksF1],
 ];
 export const ensembleAuc = avg((s) => s.ensemble.auc);
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   alwaysUpF1, bondCorrelationRankOf, bondRankOf, collapsed, notCollapsed, rankGap, rankGapRange, retrainCorrWins,
-  stockCount, table1Rows,
+  modelRows, stockCount, table1Rows,
 } from '../src/metrics.js';
 import { projects } from '../src/data.js';
 
@@ -30,12 +30,12 @@ test('ranks read as ordinals, including the teens', () => {
 test('Table 1 leads with the baseline, then the LSTM on the same stocks', () => {
   assert.match(table1Rows[0][0], /baseline/);
   assert.doesNotMatch(table1Rows.flat().join(' '), /[†‡]/);
-  // Row 2 is the same LSTM as row 3, on fewer stocks; the row groups say which stocks each covers.
-  assert.equal(table1Rows[1][0], table1Rows[2][0]);
+  // Only the tie: the baseline and the same LSTM on the stocks where it collapsed. Every model's
+  // averages are in Table A.3.
+  assert.equal(table1Rows.length, 2);
+  assert.equal(table1Rows[1][0], modelRows[0][0]);
   assert.equal(table1Rows[0][1], table1Rows[1][1]);
-  const { groups } = projects.find((p) => p.results).results;
-  assert.deepEqual(groups.map(({ at }) => at), [0, 2]);
-  assert.match(groups[0].label, new RegExp(`${collapsed.length} stocks`));
+  assert.match(projects.find((p) => p.results).results.caption[0], new RegExp(`${collapsed.length} of`));
 });
 
 test('the rank gaps run from largest to smallest', () => {

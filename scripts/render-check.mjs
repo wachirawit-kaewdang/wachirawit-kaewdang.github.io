@@ -5,7 +5,7 @@
 import { dumpDom, withSite } from './chrome.mjs';
 import { findPhones } from './checks/phone.mjs';
 import {
-  alwaysUpF1, bondRankRows, collapsed, ensembleAuc, rankGapRange, retrainAuc, retrainCorrWins, table1Rows,
+  alwaysUpF1, bondRankRows, collapsed, ensembleAuc, rankGapRange, retrainAuc, retrainCorrWins, modelRows, table1Rows,
 } from '../src/metrics.js';
 
 const port = 4179;
@@ -15,7 +15,7 @@ const pages = [
     path: '/',
     expected: ['Wachirawit Kaewdang', 'Abstract. I check whether results hold up.', 'Looking for', `${rankGapRange} positions apart`, 'did not favour SHAP', 'Contact'],
     tables: { 'table-1': table1Rows },
-    headers: { 'table-1': ['Model', 'F1', 'ROC-AUC'] },
+    headers: { 'table-1': ['Model', 'F1'] },
   },
   {
     path: '/#/cs403',
@@ -26,10 +26,12 @@ const pages = [
     tables: {
       'table-a1': bondRankRows,
       'table-a2': collapsed.map((s) => [s.ticker, pct(s.lstm.acc), pct(s.lstm.f1), pct(alwaysUpF1(s.lstm.acc))]),
+      'table-a3': modelRows,
     },
     headers: {
       'table-a1': ['Stock', 'SHAP rank', 'Correlation rank'],
       'table-a2': ['Stock', 'Accuracy', 'Our F1', 'Always-up F1'],
+      'table-a3': ['Model', 'F1', 'ROC-AUC'],
     },
     // Figure A.1's tick marks 9 on a 0–12 scale, on every one of its 27 rows.
     ticks: { 'figure-a1': { left: '75%', count: 27 } },
@@ -45,8 +47,7 @@ function rowsOf(dom, id) {
   const start = dom.indexOf(`id="${id}"`);
   if (start < 0) return null;
   const body = dom.slice(dom.indexOf('<tbody', start), dom.indexOf('</tbody>', start));
-  // Group label rows (Table 1's) aren't data, so they are left out.
-  return [...body.matchAll(/<tr(?![^>]*class="group")[\s\S]*?<\/tr>/g)].map(([row]) =>
+  return [...body.matchAll(/<tr[\s\S]*?<\/tr>/g)].map(([row]) =>
     [...row.matchAll(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/g)].map(([, cell]) => plain(cell)));
 }
 

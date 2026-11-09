@@ -156,12 +156,14 @@ function TitleBlock() {
         <span>{education.school}</span> <span>{profile.location}</span>
       </p>
       <LinkLine className="contactline">
-        <ExtLink className="primary" href={asset(profile.resume)}>
+        {/* data-print: a paper copy shows where the résumé lives, not a relative path. */}
+        <ExtLink className="primary" href={asset(profile.resume)} data-print={`${profile.site}${profile.resume}`}>
           Résumé (PDF)
         </ExtLink>
         <ExtLink href={profile.github}>GitHub</ExtLink>
         <ExtLink href={profile.linkedin}>LinkedIn</ExtLink>
-        <a href={`mailto:${profile.email}`}>Email</a>
+        {/* The address itself, so it can be copied where no mail app opens a mailto link. */}
+        <a href={`mailto:${profile.email}`}>{profile.email}</a>
       </LinkLine>
     </header>
   );
@@ -174,7 +176,7 @@ function Prose({ pieces }) {
     typeof piece === 'string' ? piece : piece.href ? (
       <ExtLink key={i} href={piece.href}>{piece.label}</ExtLink>
     ) : (
-      <Ref key={i} route={APPENDIX} to={piece.to}>{piece.label}</Ref>
+      <Ref key={i} route={APPENDIX} to={piece.to} name={piece.about && `${piece.label}, ${piece.about}`}>{piece.label}</Ref>
     ));
 }
 
@@ -210,7 +212,7 @@ function Abstract() {
         <strong>Abstract.</strong>{' '}
         {featured >= 0 && (
           <>
-            <Prose pieces={projects[featured].finding} /> (<Ref to={projectId(1)}>§{sectionNumber('projects')}.2</Ref>).
+            <Prose pieces={projects[featured].finding} />.
           </>
         )}
       </p>
@@ -348,7 +350,7 @@ function Contact() {
   return (
     <section id="contact" className="section" tabIndex={-1} aria-labelledby="contact-title">
       <SectionHeading id="contact" />
-      <p>Happy to talk through any of this. Email or LinkedIn is quickest.</p>
+      <p>Happy to talk through any of this. Email is quickest, or LinkedIn.</p>
       <LinkLine className="contactline left">
         <a className="primary" href={`mailto:${profile.email}`}>{profile.email}</a>
         <ExtLink href={profile.linkedin}>LinkedIn</ExtLink>

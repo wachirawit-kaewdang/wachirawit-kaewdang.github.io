@@ -6,7 +6,7 @@ import { APPENDIX, asset } from './paper-utils.js';
 import { profile, projects } from './data.js';
 import {
   alwaysUpF1, bondAgreeFor, bondFirstFor, bondTop5Share, collapsed, ensembleAuc,
-  lstmF1About, notCollapsed, sectorCount, sectorShap,
+  lstmF1About, modelRows, notCollapsed, sectorCount, sectorShap,
   bondOppositeFor, bondRankOf, bondRankRows, bondSplitFor, notebookUrl, rankGap, rankGapRange, retrainAuc, retrainCorrWins, shapPeak, stockCount, stocks, upShare, vixRevealed,
 } from './metrics.js';
 
@@ -423,6 +423,13 @@ export default function ProjectCS403() {
           shows any skill (<ARef to="figure-a3">Figure A.3</ARef>). SHAP still gives a rough view of what
           the model relied on, within the limits in A.2.
         </p>
+        <NumberedTable
+          number="A.3"
+          caption={`Every model’s average over all ${stockCount} stocks. Each one with a recorded ROC-AUC is close to chance (0.50).`}
+          note="LSTM and ensemble thresholds were tuned on the test set, so those rows are if anything optimistic; Random Forest and Logistic Regression use the default 0.5. The notebook never records ROC-AUC for the full-feature LSTM."
+          columns={['Model', 'F1', 'ROC-AUC']}
+          rows={modelRows}
+        />
         <StockFigure />
       </section>
 

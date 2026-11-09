@@ -44,9 +44,26 @@ async function check({ chrome: path, profile, url }) {
       const message = JSON.parse(data);
       if (pending.has(message.id)) { pending.get(message.id)(message); pending.delete(message.id); }
     };
+    // If Chrome stops answering or the connection drops, every waiting call fails instead of
+    // hanging until CI's 10-minute limit.
+    const dropAll = (why) => {
+      for (const settle of pending.values()) settle({ error: { message: why } });
+      pending.clear();
+    };
+    socket.onclose = () => dropAll(`Chrome closed the connection${chromeSaid ? `: ${chromeSaid.trim().split('\n').at(-1)}` : ''}`);
+    socket.onerror = () => dropAll('the connection to Chrome failed');
     const send = (method, params = {}) => new Promise((done, fail) => {
-      pending.set(++id, (m) => (m.error ? fail(new Error(`${method}: ${m.error.message}`)) : done(m.result)));
-      socket.send(JSON.stringify({ id, method, params }));
+      const callId = ++id;
+      const timer = setTimeout(() => {
+        pending.delete(callId);
+        fail(new Error(`${method}: Chrome did not answer within 10 s`));
+      }, 10_000);
+      pending.set(callId, (m) => {
+        clearTimeout(timer);
+        if (m.error) fail(new Error(`${method}: ${m.error.message}`));
+        else done(m.result);
+      });
+      socket.send(JSON.stringify({ id: callId, method, params }));
     });
     const evaluate = async (expression) =>
       (await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true })).result.value;

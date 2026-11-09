@@ -25,10 +25,13 @@ import hashlib
 import json
 import re
 import subprocess
+import os
 import sys
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parent.parent / 'src' / 'metrics.json'
+SRC = Path(__file__).resolve().parent.parent / 'src' / 'metrics.json'
+# METRICS_OUT sends the result elsewhere, so a comparison never touches the real file.
+OUT = Path(os.environ['METRICS_OUT']) if os.environ.get('METRICS_OUT') else SRC
 NOTEBOOK = 'stock_project.ipynb'
 
 
@@ -101,7 +104,7 @@ def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     target = Path(sys.argv[1])
-    current = json.loads(OUT.read_text(encoding='utf-8'))
+    current = json.loads(SRC.read_text(encoding='utf-8'))
     if target.is_file():
         # The frozen copy kept in this repo, so deploys don't depend on the notebook's branch.
         commit = current['source']['commit']

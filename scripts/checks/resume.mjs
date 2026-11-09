@@ -1,6 +1,5 @@
 // The résumé and share image are typed by hand, so they are compared with the site: its CS403
 // numbers, facts, skills and contact details, and the PDF's page count, fonts and source.
-import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { education, profile, projects, skills } from '../../src/data.js';
@@ -8,7 +7,6 @@ import {
   bondCorrelationRankOf, bondFirstFor, bondOppositeFor, bondRankOf, bondSplitFor, bondTop5Share, collapsed, ensembleAuc,
   lstmF1About, rankGapRange, sectorCount, stockCount,
 } from '../../src/metrics.js';
-import { phonesIn } from './phone.mjs';
 import { pub, read, root, sha256 } from './shared.mjs';
 
 export const failures = [];
@@ -56,16 +54,8 @@ for (const skill of skills.flatMap((group) => group.items)) {
   if (!resumeSkills.includes(resumeWording[skill] ?? skill)) failures.push(`resume/resume.html should list the skill ${skill}`);
 }
 
-// The public résumé and site must never carry a phone number; the private résumé is kept outside
-// this repo. Every text source the site or résumé is built from is scanned, in any number format.
-// The PDF's hash ties it to resume.html, so checking the source covers it too.
-// Every tracked file is scanned, not chosen folders: a number in a code comment is just as public.
-// The git hooks run the same scan on each commit, before anything is pushed (scripts/check-phone.mjs).
-const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: root, encoding: 'utf8' }).split('\0').filter(Boolean);
-for (const file of tracked) {
-  const found = phonesIn(readFileSync(resolve(root, file)));
-  if (found.length) failures.push(`${file} contains a phone number (${found.length})`);
-}
+// The résumé's sources are among the tracked files scanned for a phone number (checks/phones.mjs);
+// the PDF's hash ties it to resume.html, so checking the source covers it too.
 
 // The PDF is built from resume.html by hand (npm run resume), which records both files' hashes.
 // If either has changed since, the live PDF is not the one this source builds.

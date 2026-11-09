@@ -1,0 +1,3 @@
+#!/bin/sh
+# Stops a push that carries a phone number in any of its commits (see scripts/check-phone.mjs).
+exec node scripts/check-phone.mjs --push

@@ -133,10 +133,6 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .contactline .primary { font-weight: 600; }
 .contactline.left { text-align: left; }
 .noscript { max-width: var(--measure); margin: 0 auto; padding: 0.75rem 16px; border-bottom: 1px solid var(--ink-soft); }
-/* Table 1's two row groups: a label row, and a rule above the second group. */
-.results tr.group th { padding-top: 0.6rem; text-align: left; font-style: italic; font-weight: 400; color: var(--ink-soft); }
-.results tr.group + tr th, .results tr.group + tr td { padding-top: 0.25rem; }
-.results tbody tr.group:not(:first-child) th { border-top: 1px solid var(--ink-soft); }
 /* On a phone the links wrap as whole items with a gap, so no line ends on a stray "·". */
 @media (max-width: 600px) {
   .contactline { display: flex; flex-wrap: wrap; justify-content: center; column-gap: 1.1em; }
@@ -304,6 +300,7 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
   .bars .track.centred { border-left: none; }
   .newtab, .ext { display: none; }
   .contactline a[href^='http']::after { content: ' (' attr(href) ')'; font-size: 0.85em; }
+  .contactline a[data-print]::after { content: ' (' attr(data-print) ')'; }
   .results, .figure { break-inside: avoid; }
   h2, h3, h4 { break-after: avoid; }
 }
