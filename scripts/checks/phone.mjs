@@ -24,3 +24,10 @@ export function findPhones(text) {
     return /^0[689]\d{8}$/.test(digits) || /^0[2-7]\d{7}$/.test(digits);
   });
 }
+
+// The phone numbers in a file's bytes, apart from the made-up ones. A file with a NUL byte is
+// binary (an image, a PDF) and is skipped.
+export function phonesIn(bytes) {
+  if (bytes.includes(0)) return [];
+  return findPhones(bytes.toString('utf8')).filter((run) => !madeUp.has(phoneDigits(run)));
+}

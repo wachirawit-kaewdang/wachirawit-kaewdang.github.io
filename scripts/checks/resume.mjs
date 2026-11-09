@@ -8,7 +8,7 @@ import {
   bondCorrelationRankOf, bondFirstFor, bondOppositeFor, bondRankOf, bondSplitFor, bondTop5Share, collapsed, ensembleAuc,
   lstmF1About, rankGapRange, sectorCount, stockCount,
 } from '../../src/metrics.js';
-import { findPhones, madeUp, phoneDigits } from './phone.mjs';
+import { phonesIn } from './phone.mjs';
 import { pub, read, root, sha256 } from './shared.mjs';
 
 export const failures = [];
@@ -60,12 +60,10 @@ for (const skill of skills.flatMap((group) => group.items)) {
 // this repo. Every text source the site or résumé is built from is scanned, in any number format.
 // The PDF's hash ties it to resume.html, so checking the source covers it too.
 // Every tracked file is scanned, not chosen folders: a number in a code comment is just as public.
-// Binary files (with a NUL byte) are skipped; the only numbers allowed are the made-up test ones.
+// The git hooks run the same scan on each commit, before anything is pushed (scripts/check-phone.mjs).
 const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: root, encoding: 'utf8' }).split('\0').filter(Boolean);
 for (const file of tracked) {
-  const bytes = readFileSync(resolve(root, file));
-  if (bytes.includes(0)) continue;
-  const found = findPhones(bytes.toString('utf8')).filter((run) => !madeUp.has(phoneDigits(run)));
+  const found = phonesIn(readFileSync(resolve(root, file)));
   if (found.length) failures.push(`${file} contains a phone number (${found.length})`);
 }
 

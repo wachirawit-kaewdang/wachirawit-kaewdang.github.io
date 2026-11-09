@@ -1,6 +1,6 @@
 // Pieces of the preprint look shared by the home page and the case study.
 
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { jumpTo, refTrail, tableId } from './paper-utils.js';
 
 // A hyperref-style cross-reference ("Table 1", "§1.1") to something on the same page. Inside a
@@ -59,7 +59,8 @@ export function LinkLine({ className, children }) {
 // A booktabs table with its numbered caption above, as in a paper. The first column is the
 // row label; the rest are figures, right-aligned in tabular numerals. An optional note sits
 // under the bottom rule for sources and the test setup.
-export function NumberedTable({ number, caption, note, columns, rows, emphasis = 0 }) {
+// `groups` labels runs of rows, as { at: first row's index, label }.
+export function NumberedTable({ number, caption, note, columns, rows, emphasis = 0, groups = [] }) {
   const frame = useRef(null);
   const [scrolls, setScrolls] = useState(false);
   useEffect(() => {
@@ -91,14 +92,24 @@ export function NumberedTable({ number, caption, note, columns, rows, emphasis =
           </tr>
         </thead>
         <tbody>
-          {rows.map(([label, ...values], i) => (
-            <tr key={label} className={i < emphasis ? 'emphasis' : undefined}>
-              <th scope="row">{label}</th>
-              {values.map((v, i) => (
-                <td key={i}>{v}</td>
-              ))}
-            </tr>
-          ))}
+          {rows.map(([label, ...values], i) => {
+            const group = groups.find(({ at }) => at === i);
+            return (
+              <Fragment key={i}>
+                {group && (
+                  <tr className="group">
+                    <th scope="colgroup" colSpan={columns.length}>{group.label}</th>
+                  </tr>
+                )}
+                <tr className={i < emphasis ? 'emphasis' : undefined}>
+                  <th scope="row">{label}</th>
+                  {values.map((v, j) => (
+                    <td key={j}>{v}</td>
+                  ))}
+                </tr>
+              </Fragment>
+            );
+          })}
         </tbody>
       </table>
       {note && <p className="tablenote">{note}</p>}

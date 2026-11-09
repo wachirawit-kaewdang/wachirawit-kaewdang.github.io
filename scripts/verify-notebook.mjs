@@ -2,16 +2,16 @@
 // kept in data/ and fails if anything changed, naming the first value that differs. If a
 // Project-CS403 checkout is present (../Project-CS403, or CS403_REPO), it also confirms that copy
 // is byte for byte the notebook at the frozen commit. Python 3.10+.
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { python } from './python.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const file = resolve(root, 'src/metrics.json');
 const before = readFileSync(file);
 const { source } = JSON.parse(before.toString('utf8'));
 const copy = resolve(root, `data/notebook-${source.commit}.ipynb`);
-const python = spawnSync('python3', ['--version']).status === 0 ? 'python3' : 'python';
 
 // The path of the first value that differs, such as stocks.JPM.lstm.f1.
 function firstDifference(a, b, path = '') {

@@ -28,6 +28,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - run: npm ci
       # The same list a local `npm run verify` runs, so the two can't drift apart: lint, tests,
       # the checks, metrics.json rebuilt from the frozen notebook in data/, the build with its

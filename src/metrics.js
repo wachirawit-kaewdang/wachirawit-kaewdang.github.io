@@ -40,8 +40,8 @@ export const alwaysUpAvgF1 = mean(collapsed.map((s) => alwaysUpF1(s.lstm.acc))).
 // small win, when the 0.710 only differs because it averages all the stocks.
 const lstmSameStocksF1 = mean(collapsed.map((s) => s.lstm.f1)).toFixed(3);
 export const table1Rows = [
-  [`Always predict “up” (baseline), ${collapsed.length} stocks`, alwaysUpAvgF1, '0.500'],
-  [`LSTM, same ${collapsed.length} stocks`, lstmSameStocksF1, 'not recorded'],
+  ['Always predict “up” (baseline)', alwaysUpAvgF1, '0.500'],
+  [modelRows[0][0], lstmSameStocksF1, 'not recorded'],
   ...modelRows,
 ];
 export const ensembleAuc = avg((s) => s.ensemble.auc);

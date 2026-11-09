@@ -46,9 +46,9 @@ export const projects = [
       'with results set against a naive baseline.',
     // Opens the abstract, ahead of any metric.
     finding: [
-      'I check whether results hold up. In my senior project I built an LSTM to predict stock direction ' +
-        `and tested it against a simple baseline, always predicting “up”; that showed its ${lstmF1About} F1 ` +
-        'wasn’t real skill (',
+      'I check whether results hold up. In my senior project I built an LSTM to predict stock direction, ' +
+        'then tested it against a simple baseline that always predicts “up”. That check caught that its ' +
+        `${lstmF1About} F1 (a 0–1 score for spotting “up” days) wasn’t real skill (`,
       appendix('A.4', 'appendix-a4'),
       '); this site rebuilds and tests its own numbers on every deploy',
     ],
@@ -64,7 +64,12 @@ export const projects = [
         'Test set: the last 20% of Jan 2020 – Apr 2025. LSTM and ensemble thresholds were tuned on it, so those rows are ' +
           'if anything optimistic; Random Forest and Logistic Regression use the default 0.5. Source: ',
         { label: `Project-CS403 @ ${source.commit}`, href: notebookUrl },
-        `. The first two rows cover the ${collapsed.length} stocks where the LSTM collapsed; the rest average all ${stockCount}.`,
+        '.',
+      ],
+      // The baseline and the collapsed LSTM cover fewer stocks than the rest, so the rows are grouped.
+      groups: [
+        { at: 0, label: `The ${collapsed.length} stocks where the LSTM collapsed` },
+        { at: 2, label: `All ${stockCount} stocks` },
       ],
       columns: ['Model', 'F1', 'ROC-AUC'],
       rows: table1Rows,
@@ -96,6 +101,8 @@ export const projects = [
     points: [
       'On every push to main, CI rebuilds the per-stock CS403 metrics from the notebook at a frozen commit and stops the deploy if they differ.',
       'The same run checks the résumé PDF against its source and the site’s contact details, then opens both pages in headless Chrome.',
+      'In QA terms, each check is a test case for a claim on the site, a failing one stops the deploy, and gaps found in ' +
+        'reviews became new checks, such as the phone-number scan and the Back and Forward test.',
       'Built with Claude Code as the implementer. My part: setting the goals, choosing between proposed approaches and ' +
         'approving them, reviewing every change before it shipped, and running repeated front-end (design and accessibility) ' +
         'and back-end (correctness, security, testing) critiques, then choosing which findings to fix.',

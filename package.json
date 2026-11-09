@@ -13,10 +13,12 @@
     "preview": "vite preview",
     "resume": "node scripts/build-resume.mjs",
     "check": "node scripts/check.mjs",
+    "check:phone": "node scripts/check-phone.mjs",
+    "prepare": "node -e \"try { require('child_process').execFileSync('git', ['config', 'core.hooksPath', '.githooks']) } catch {}\"",
     "render-check": "node scripts/render-check.mjs",
     "history-check": "node scripts/history-check.mjs",
     "test": "node --test scripts/metrics.test.mjs scripts/phone.test.mjs",
-    "test:extractor": "python3 scripts/test_extract_metrics.py || python scripts/test_extract_metrics.py",
+    "test:extractor": "node scripts/python.mjs scripts/test_extract_metrics.py",
     "verify:notebook": "node scripts/verify-notebook.mjs",
     "verify": "npm run lint && npm test && npm run test:extractor && npm run check && npm run verify:notebook && npm run build && npm run render-check && npm run history-check",
     "help": "node -e \"process.stdout.write(require('fs').readFileSync('WORKFLOWS.txt','utf8'))\""

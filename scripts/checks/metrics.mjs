@@ -78,12 +78,12 @@ const computed = {
 const expectedOutputs = {
   "table1Rows": [
     [
-      "Always predict “up” (baseline), 7 stocks",
+      "Always predict “up” (baseline)",
       "0.707",
       "0.500"
     ],
     [
-      "LSTM, same 7 stocks",
+      "LSTM + self-attention",
       "0.707",
       "not recorded"
     ],

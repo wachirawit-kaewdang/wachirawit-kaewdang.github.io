@@ -8,11 +8,14 @@ Everyday
 npm run dev       Dev server at http://localhost:5173 (the appendix is at #/cs403).
 npm run lint      oxlint over the source.
 npm run verify    Everything CI runs before deploying; CI runs this same command. Needs
-                  Python 3.10+ and Chrome or Edge (or CHROME=path). With ../Project-CS403
+                  Python 3.10+ (CI uses 3.12) and Chrome or Edge (or CHROME=path). With ../Project-CS403
                   (or CS403_REPO) present, it also compares the notebook copy with it.
-npm test          Tests the calculations in src/metrics.js.
+npm test          Tests the calculations in src/metrics.js and the phone-number finder.
 npm run test:extractor  Tests the extractor's parsing on made-up notebook output.
 npm run check     Checks a build cannot catch (see "What CI checks" below).
+npm run check:phone  Scans every tracked file for a phone number. npm install switches on
+                  git hooks (.githooks) that run the same scan on each commit's files and
+                  message, so a number is stopped before it is ever pushed.
 npm run render-check  Opens the built site in headless Chrome; run npm run build first.
                   npm run build also pre-renders the home page into dist/index.html, so its
                   text is in the HTML for tools that don't run JavaScript.

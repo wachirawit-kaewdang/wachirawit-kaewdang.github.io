@@ -5,6 +5,7 @@ import {
   alwaysUpF1, bondCorrelationRankOf, bondRankOf, collapsed, notCollapsed, rankGap, rankGapRange, retrainCorrWins,
   stockCount, table1Rows,
 } from '../src/metrics.js';
+import { projects } from '../src/data.js';
 
 test('alwaysUpF1 is 2p / (1 + p)', () => {
   assert.equal(alwaysUpF1(0), 0);
@@ -29,8 +30,12 @@ test('ranks read as ordinals, including the teens', () => {
 test('Table 1 leads with the baseline, then the LSTM on the same stocks', () => {
   assert.match(table1Rows[0][0], /baseline/);
   assert.doesNotMatch(table1Rows.flat().join(' '), /[†‡]/);
-  assert.match(table1Rows[1][0], new RegExp(`same ${collapsed.length} stocks`));
+  // Row 2 is the same LSTM as row 3, on fewer stocks; the row groups say which stocks each covers.
+  assert.equal(table1Rows[1][0], table1Rows[2][0]);
   assert.equal(table1Rows[0][1], table1Rows[1][1]);
+  const { groups } = projects.find((p) => p.results).results;
+  assert.deepEqual(groups.map(({ at }) => at), [0, 2]);
+  assert.match(groups[0].label, new RegExp(`${collapsed.length} stocks`));
 });
 
 test('the rank gaps run from largest to smallest', () => {
