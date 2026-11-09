@@ -108,7 +108,8 @@ try {
   }
 } finally {
   await new Promise((done) => server.httpServer.close(done));
-  rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  // A locked temp folder must not hide the checks' own result.
+  try { rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* left for the OS */ }
 }
 
 if (failures.length) {

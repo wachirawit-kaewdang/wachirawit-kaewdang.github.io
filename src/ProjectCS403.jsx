@@ -154,6 +154,14 @@ function GapFigure() {
   );
 }
 
+// Each panel shows its top 5 of the notebook's 10, which halves the figure on a phone. Bond yield,
+// the feature the text follows, ranks 3rd or higher wherever it appears, so it is always shown.
+const shownFeatures = 5;
+if (sectorShap.some(({ rows }) => rows.findIndex(([f]) => f === 'Bond_yield') >= shownFeatures)) {
+  throw new Error(`Figure A.2 would hide bond yield: it ranks below ${shownFeatures} in a sector`);
+}
+const bondSectors = sectorShap.filter(({ rows }) => rows.some(([f]) => f === 'Bond_yield')).length;
+
 function SectorFigure() {
   const figure = useDrawIn();
   return (
@@ -174,7 +182,7 @@ function SectorFigure() {
                 <tr><th scope="col">Feature</th><th scope="col">Mean |SHAP|</th></tr>
               </thead>
               <tbody>
-                {rows.map(([feature, value]) => (
+                {rows.slice(0, shownFeatures).map(([feature, value]) => (
                   <tr key={feature} className={feature === 'Bond_yield' ? 'mark' : undefined}>
                     <th scope="row">{featureLabel(feature)}</th>
                     <td>
@@ -188,8 +196,10 @@ function SectorFigure() {
         })}
       </div>
       <figcaption>
-        <span className="caplabel">Figure A.2.</span> Mean |SHAP| of the top 10 features in each
-        sector. <a href={img('sector_shap')} target="_blank" rel="noreferrer">Original chart<span className="newtab"> (opens in a new tab)</span></a>
+        <span className="caplabel">Figure A.2.</span> Mean |SHAP| of the top {shownFeatures} features in
+        each sector. Bond yield makes the notebook’s top 10 in {bondSectors} sectors, and the top{' '}
+        {shownFeatures} in each of them.{' '}
+        <a href={img('sector_shap')} target="_blank" rel="noreferrer">Original chart, with the top 10<span className="newtab"> (opens in a new tab)</span></a>
       </figcaption>
     </figure>
   );

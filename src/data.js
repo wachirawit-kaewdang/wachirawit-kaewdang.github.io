@@ -46,8 +46,9 @@ export const projects = [
       'with results set against a naive baseline.',
     // Opens the abstract, ahead of any metric.
     finding: [
-      'I check whether results hold up. In my senior project, testing against a naive baseline showed ' +
-        `the model’s ${lstmF1About} F1 wasn’t real skill (`,
+      'I check whether results hold up. In my senior project I built an LSTM to predict stock direction ' +
+        `and tested it against a simple baseline, always predicting “up”; that showed its ${lstmF1About} F1 ` +
+        'wasn’t real skill (',
       appendix('A.4', 'appendix-a4'),
       '); this site rebuilds and tests its own numbers on every deploy',
     ],

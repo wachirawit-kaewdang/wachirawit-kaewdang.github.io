@@ -114,11 +114,11 @@ function RunningHead({ appendix }) {
               <a href={`#${projectId(0)}`} aria-label={`Back to the portfolio, section ${sectionNumber('projects')}.1`}>
                 ← Portfolio
               </a>
-              {/* Doubles as the reader's position in a long page; on a phone the number alone fits. */}
+              {/* Doubles as the reader's position in a long page. A phone has room for one word, and
+                  "Contents" says where the link goes; the section number stays in the link's name. */}
               <Ref route={APPENDIX} to="appendix-contents">
-                {current?.startsWith('appendix-a') ? (
-                  <><span className="wide">Contents, </span>{current.replace('appendix-a', 'A.')}</>
-                ) : 'Contents'}
+                Contents
+                {current?.startsWith('appendix-a') && <span className="wide">, {current.replace('appendix-a', 'A.')}</span>}
               </Ref>
               {featured?.link && <ExtLink href={featured.link}>Code</ExtLink>}
               <a href={`mailto:${profile.email}`}>Email</a>
@@ -178,7 +178,8 @@ function Prose({ pieces }) {
     ));
 }
 
-// The 10-second version for a recruiter: who, the two projects to look at, and how to get in touch.
+// The 10-second version for a recruiter: the roles wanted and the two projects to start with.
+// Contact links sit once, in the title block above.
 function AtAGlance() {
   const featured = projects.findIndex((p) => p.results);
   return (
@@ -188,16 +189,10 @@ function AtAGlance() {
         <dd>{profile.status.replace(/^Open to /, '').replace(/\.$/, '')}</dd>
       </div>
       <div>
-        <dt>Look at</dt>
+        <dt>Start with</dt>
         <dd>
           <Ref to={projectId(featured)}>{projects[featured].title}</Ref>, and{' '}
           <Ref to={projectId(1)}>{projects[1].title.toLowerCase()}</Ref>
-        </dd>
-      </div>
-      <div>
-        <dt>Contact</dt>
-        <dd>
-          <a href={`mailto:${profile.email}`}>{profile.email}</a> · <ExtLink href={asset(profile.resume)}>Résumé (PDF)</ExtLink>
         </dd>
       </div>
     </dl>

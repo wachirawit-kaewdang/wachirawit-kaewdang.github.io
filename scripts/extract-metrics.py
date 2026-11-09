@@ -167,6 +167,8 @@ def main():
     for sector in current['sectorShap']:
         drawn = dict(sector['rows']).get('Bond_yield')
         values = [column(bond[t], 'SHAP Value') for t, s in stocks.items() if s['sector'] == sector['sector']]
+        if not values:
+            sys.exit(f'sectorShap {sector["sector"]}: no stock in the table belongs to this sector')
         if drawn is not None and abs(drawn - sum(values) / len(values)) > 0.00011:
             sys.exit(f'sectorShap {sector["sector"]}: bond yield {drawn} does not match the notebook\'s {values}')
 
@@ -176,7 +178,7 @@ def main():
         'sectorShap': current['sectorShap'],
         'rankGap': current['rankGap'],
     }
-    OUT.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
+    OUT.write_text(json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + '\n', encoding='utf-8', newline='\n')
     print(f'Wrote {OUT} from {NOTEBOOK} @ {commit}: {len(stocks)} stocks')
 
 

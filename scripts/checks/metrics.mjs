@@ -187,7 +187,12 @@ const expectedOutputs = {
   "rankGapRange": "5 to 12"
 };
 if (JSON.stringify(computed) !== JSON.stringify(expectedOutputs)) {
-  failures.push(`src/metrics.js: computed results changed: ${JSON.stringify(computed)}`);
+  // Name each changed result, so the message says what moved instead of dumping everything.
+  const changed = Object.keys({ ...expectedOutputs, ...computed })
+    .filter((key) => JSON.stringify(computed[key]) !== JSON.stringify(expectedOutputs[key]));
+  for (const key of changed) {
+    failures.push(`src/metrics.js: ${key} changed from ${JSON.stringify(expectedOutputs[key])} to ${JSON.stringify(computed[key])}`);
+  }
 }
 
 // Appendix A claims the 0.30-threshold stocks collapsed to always-up, so their F1 must equal

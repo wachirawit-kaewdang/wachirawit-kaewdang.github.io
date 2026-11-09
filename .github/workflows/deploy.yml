@@ -29,18 +29,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm test
-      - run: python3 scripts/test_extract_metrics.py
-      # Linked files, frozen results, résumé and share image (see scripts/check.mjs).
-      - run: npm run check
-      # Rebuild metrics.json from the frozen notebook kept in data/. Any difference means a number
-      # was edited or misread. The extractor also checks the copy's git hash against metrics.json.
-      - run: python3 scripts/extract-metrics.py data/notebook-0c4ef04.ipynb
-      - run: git diff --exit-code src/metrics.json
-      - run: npm run build
-      # The built site must actually render in a browser (see scripts/render-check.mjs).
-      - run: npm run render-check
+      # The same list a local `npm run verify` runs, so the two can't drift apart: lint, tests,
+      # the checks, metrics.json rebuilt from the frozen notebook in data/, the build with its
+      # pre-render, the rendered tables, and Back and Forward in a browser.
+      - run: npm run verify
       - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:

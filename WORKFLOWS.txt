@@ -7,14 +7,17 @@ Everyday
 --------
 npm run dev       Dev server at http://localhost:5173 (the appendix is at #/cs403).
 npm run lint      oxlint over the source.
-npm run verify    Everything CI runs before deploying, in the same order. The notebook
-                  comparison needs ../Project-CS403 (or CS403_REPO), and says so if skipped.
+npm run verify    Everything CI runs before deploying; CI runs this same command. Needs
+                  Python 3.10+ and Chrome or Edge (or CHROME=path). With ../Project-CS403
+                  (or CS403_REPO) present, it also compares the notebook copy with it.
 npm test          Tests the calculations in src/metrics.js.
 npm run test:extractor  Tests the extractor's parsing on made-up notebook output.
 npm run check     Checks a build cannot catch (see "What CI checks" below).
 npm run render-check  Opens the built site in headless Chrome; run npm run build first.
                   npm run build also pre-renders the home page into dist/index.html, so its
                   text is in the HTML for tools that don't run JavaScript.
+npm run history-check  Clicks into the appendix, then checks Back and Forward in headless
+                  Chrome return to the reading place and the link followed; build first.
 npm run build     Production build to dist/. Fails if index.html keeps a %NAME% placeholder.
 
 Content lives in src/data.js. The CS403 tables and quoted counts are computed by src/metrics.js
@@ -23,9 +26,9 @@ are frozen" below.
 
 Deploying
 ---------
-Push to main. GitHub Actions (.github/workflows/deploy.yml) runs npm ci, lint, both test
-suites, check, the notebook comparison, build and render-check, then publishes dist/ to GitHub Pages. Pull requests, and manual runs on other branches,
-run the same steps but never deploy.
+Push to main. GitHub Actions (.github/workflows/deploy.yml) runs npm ci and npm run verify,
+then publishes dist/ to GitHub Pages. Pull requests, and manual runs on other branches, run
+the same steps but never deploy.
 
 The CS403 results are frozen
 ----------------------------
@@ -67,8 +70,8 @@ With npm run dev running, capture http://localhost:5173/og/og-image.html at 1200
 headless Chrome screenshot and save it as public/og-image.png. Its words are typed into
 og/og-image.html, so update them when the name, role or summary in src/data.js changes.
 
-What CI checks (npm run verify, plus the notebook comparison)
-------------------------------
+What CI checks (npm run verify)
+-------------------------------
 - Every file the site links to exists in public/: resume, figures, favicon, og:image.
 - metrics.json is at the frozen commit, with 10 stocks, 5 sectors of 10 rows and every rate in
   [0, 1].
@@ -80,11 +83,14 @@ What CI checks (npm run verify, plus the notebook comparison)
   match pinned file hashes, and Table 1's computed results match
   fixed expected values in scripts/checks/metrics.mjs. If the freeze ever moves, both must be updated.
 - The resume PDF is one page and uses only STIX Two Text.
-- No text source of the site, resume or share image, and neither rendered page, contains a Thai
-  phone number in any common format. The private resume is kept outside this repo.
+- No tracked text file, and neither rendered page, contains a Thai phone number in any common
+  format, code comments included. Only the made-up test numbers in scripts/checks/phone.mjs
+  are allowed. The private resume is kept outside this repo.
 - The frozen notebook is kept in data/ and checked by its git hash, so deploys don't depend on
   the Project-CS403 branch. verify also compares it with a Project-CS403 checkout when present.
 - The resume and og/og-image.html contain the contact details in src/data.js. If you change
   the site address, rebuild og-image.png too; the check reads only its HTML source.
 - After the build, both pages render in headless Chrome with no literal NaN or undefined.
+- The pre-render cuts the home page at <!--root-end--> in index.html; keep it right after the root.
+- Back and Forward between the home page and the appendix restore the place and the focus.
 Warning only: files in public/ nothing links to.

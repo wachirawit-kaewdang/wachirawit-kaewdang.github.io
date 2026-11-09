@@ -80,7 +80,7 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
   background: var(--paper); padding: 0.5rem 0.75rem;
 }
 .skip:focus { top: 0.5rem; }
-/* Hidden from view on phones, where only the number fits, but still part of the link's name. */
+/* Hidden from view on phones, where only one word fits, but still part of the link's name. */
 @media (max-width: 600px) {
   .runhead .ext { display: none; }
   .wide { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -132,6 +132,13 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .sep { margin: 0 0.6em; color: var(--ink-soft); }
 .contactline .primary { font-weight: 600; }
 .contactline.left { text-align: left; }
+/* On a phone the links wrap as whole items with a gap, so no line ends on a stray "·". */
+@media (max-width: 600px) {
+  .contactline { display: flex; flex-wrap: wrap; justify-content: center; column-gap: 1.1em; }
+  .contactline.left { justify-content: flex-start; }
+  .contactline .sep { display: none; }
+  .contactline .linkitem + .linkitem::before { content: none; }
+}
 /* Inline links are text-height; vertical padding widens their hit area without moving text. */
 .contactline a, .meta a, .seealso a, .back a, .footer a { padding-block: 0.6rem; }
 /* The way into Appendix A, the site's main onward path, so it reads as text rather than a note. */
