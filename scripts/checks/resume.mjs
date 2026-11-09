@@ -7,6 +7,7 @@ import {
   bondCorrelationRankOf, bondFirstFor, bondOppositeFor, bondRankOf, bondSplitFor, bondTop5Share, collapsed, ensembleAuc,
   lstmF1About, rankGapRange, sectorCount, stockCount,
 } from '../../src/metrics.js';
+import { shareSourceHash } from './pins.mjs';
 import { pub, read, root, sha256 } from './shared.mjs';
 
 export const failures = [];
@@ -54,8 +55,8 @@ for (const skill of skills.flatMap((group) => group.items)) {
   if (!resumeSkills.includes(resumeWording[skill] ?? skill)) failures.push(`resume/resume.html should list the skill ${skill}`);
 }
 
-// The résumé's sources are among the tracked files scanned for a phone number (checks/phones.mjs);
-// the PDF's hash ties it to resume.html, so checking the source covers it too.
+// The PDF can't be scanned for a phone number, so its hash ties it to resume.html, which is. The
+// git hooks compare the same hashes before each commit and push (scripts/phone-sources.mjs).
 
 // The PDF is built from resume.html by hand (npm run resume), which records both files' hashes.
 // If either has changed since, the live PDF is not the one this source builds.
@@ -91,7 +92,6 @@ for (const detail of [bare(profile.site), profile.name, profile.role.replace('&'
   if (!shareSource.includes(detail)) failures.push(`og/og-image.html should include ${detail} (from src/data.js)`);
 }
 // The share image is captured from this file by hand, so an edit here means the PNG is out of date.
-const shareSourceHash = '60908746c14395ec8b67374c65c45f73e4253ce1579b1fda2a5db81260d4b5b9';
 if (sha256(shareSource.replaceAll('\r\n', '\n')) !== shareSourceHash) {
   failures.push('og/og-image.html changed: rebuild public/og-image.png, then update both hashes (scripts/checks/)');
 }

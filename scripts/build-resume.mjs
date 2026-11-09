@@ -1,11 +1,12 @@
 // Prints resume/resume.html to public/Wachirawit_Kaewdang_Resume.pdf with headless Chrome, so the
 // résumé is rebuilt from a committed source instead of edited by hand. Run: npm run resume
-import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { dirname, resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { findChrome } from './chrome.mjs';
+import { chromeFlags, findChrome } from './chrome.mjs';
+import { sha256 } from './checks/shared.mjs';
 import { profile } from '../src/data.js';
 
 const root = resolve(import.meta.dirname, '..');
@@ -25,9 +26,11 @@ if (missingFonts.length) {
 
 const chrome = findChrome();
 const before = existsSync(out) ? statSync(out).mtimeMs : 0;
+// A throwaway profile, so an open Chrome window can't lock the run.
+const chromeProfile = mkdtempSync(join(tmpdir(), 'build-resume-'));
+try {
 execFileSync(chrome, [
-  '--headless=new',
-  '--disable-gpu',
+  ...chromeFlags(chromeProfile),
   '--no-pdf-header-footer',
   // Fonts load from node_modules next to the source, so file:// access must be allowed.
   '--allow-file-access-from-files',
@@ -35,6 +38,9 @@ execFileSync(chrome, [
   pathToFileURL(source).href,
   // A Chrome that hangs (a profile lock, a first-run dialog) should fail the script, not stall it.
 ], { stdio: 'inherit', timeout: 60_000 });
+} finally {
+  try { rmSync(chromeProfile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* left for the OS */ }
+}
 
 // Chrome can exit 0 without writing anything, so confirm a fresh PDF actually came out.
 const written = existsSync(out) && statSync(out);
@@ -43,7 +49,6 @@ if (!written || written.mtimeMs <= before || !readFileSync(out).subarray(0, 5).e
   process.exit(1);
 }
 // The check compares these with the committed files, so a forgotten rebuild fails CI.
-const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 writeFileSync(resolve(root, 'resume/resume.sha256'),
   `${sha256(html.replaceAll('\r\n', '\n'))}\n${sha256(readFileSync(out))}\n`);
 console.log(`Wrote ${out} (${Math.round(written.size / 1024)} KB)`);

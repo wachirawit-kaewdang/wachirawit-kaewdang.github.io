@@ -1,21 +1,36 @@
-// What the phone-number scans read, as [name, bytes] pairs. No side effects, so the git hooks
-// (scripts/check-phone.mjs) and npm run check (scripts/checks/phones.mjs) can both import it.
+// What the phone-number scans read, as [name, bytes] pairs, and the hash ties that cover the
+// binary files they can't read. No side effects, so the git hooks (scripts/check-phone.mjs) and
+// npm run check (scripts/checks/phones.mjs) can both import it. Git runs hooks from the top of the
+// repository, so paths are relative to the current folder.
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { phonesIn } from './checks/phone.mjs';
+import { pinnedFiles, shareSourceHash } from './checks/pins.mjs';
+import { profile } from '../src/data.js';
 
-const root = resolve(import.meta.dirname, '..');
-export const git = (args) => execFileSync('git', args, { cwd: root, maxBuffer: 256 * 1024 * 1024, stdio: ['pipe', 'pipe', 'ignore'] });
+// A failed git command throws with git's own message, not only "Command failed".
+export function git(args) {
+  try {
+    return execFileSync('git', args, { maxBuffer: 256 * 1024 * 1024, stdio: ['pipe', 'pipe', 'pipe'] });
+  } catch (error) {
+    throw new Error(`git ${args[0]} failed: ${error.stderr?.toString().trim() || error.message}`, { cause: error });
+  }
+}
 const names = (output) => output.toString().split('\0').filter(Boolean);
+const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
+const lf = (bytes) => bytes.toString('utf8').replaceAll('\r\n', '\n');
 
-// The names, from [name, bytes] pairs, whose bytes hold a phone number.
-export const withPhones = (sources) => sources.filter(([, bytes]) => phonesIn(bytes).length).map(([name]) => name);
+// The names, from [name, bytes] pairs, whose bytes hold a phone number. Names may carry a suffix
+// (" in abc1234"), so the file type is read from the path before it.
+export const withPhones = (sources) =>
+  sources.filter(([name, bytes]) => phonesIn(bytes, name.split(' ')[0]).length).map(([name]) => name);
 
 // Tracked files as they are on disk; one deleted but not yet committed has nothing to scan.
 export const trackedFiles = () => names(git(['ls-files', '-z']))
-  .filter((name) => existsSync(resolve(root, name)))
-  .map((name) => [name, readFileSync(resolve(root, name))]);
+  .filter((name) => existsSync(resolve(name)))
+  .map((name) => [name, readFileSync(resolve(name))]);
 // What a commit would record: the staged copy, which can differ from the file on disk.
 export const stagedFiles = () =>
   names(git(['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z'])).map((name) => [name, git(['show', `:${name}`])]);
@@ -25,3 +40,30 @@ export const commitContents = (commit) => [
     .map((name) => [`${name} in ${commit.slice(0, 7)}`, git(['show', `${commit}:${name}`])]),
   [`the message of ${commit.slice(0, 7)}`, git(['log', '-1', '--format=%B', commit])],
 ];
+
+// A file's bytes in a snapshot (":" for the staged index, or a commit), or null if it isn't there.
+export const reader = (snapshot) => (path) => {
+  try { return git(['show', `${snapshot}${snapshot === ':' ? '' : ':'}${path}`]); } catch { return null; }
+};
+
+// The binary files can't be scanned, so each must match the hash that ties it to a scanned source:
+// the résumé PDF to resume/resume.html through resume/resume.sha256, the share image to
+// og/og-image.html, and the charts to their pinned hashes. Returns what doesn't match.
+export function brokenTies(read, where = '') {
+  const problems = [];
+  const pdf = read(`public/${profile.resume}`);
+  const html = read('resume/resume.html');
+  const recorded = read('resume/resume.sha256')?.toString().split(/\s+/) ?? [];
+  if (pdf && (!html || recorded[0] !== sha256(lf(html)) || recorded[1] !== sha256(pdf))) {
+    problems.push(`the résumé PDF${where} was not built from resume/resume.html as it stands; run npm run resume`);
+  }
+  for (const [file, hash] of Object.entries(pinnedFiles)) {
+    const bytes = read(`public/${file}`);
+    if (bytes && sha256(bytes) !== hash) problems.push(`public/${file}${where} doesn't match its pinned hash`);
+  }
+  const share = read('og/og-image.html');
+  if (share && sha256(lf(share)) !== shareSourceHash) {
+    problems.push(`og/og-image.html${where} doesn't match the hash the share image was built from`);
+  }
+  return problems;
+}

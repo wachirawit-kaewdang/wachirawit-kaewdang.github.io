@@ -3,6 +3,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 import { profile } from '../../src/data.js';
+import { pinnedFiles } from './pins.mjs';
 import { pub, read, sha256 } from './shared.mjs';
 
 export const failures = [];
@@ -37,15 +38,9 @@ for (const [, path] of html.matchAll(/property="og:image" content="(?:%SITE_URL%
 }
 
 // Charts and the share image are copied in by hand, so a swapped or re-encoded file shows up here.
-const pinnedFiles = {
-  "cs403/rank_disagreement_summary.webp": "2b215d8a06e9c1579707f17e7de5ee9d60447213934a47c5474b13f3c505040d",
-  "cs403/sector_shap.webp": "503a30afb4b6f4ef2d944ecc809e18e94f037af1be2b34fc51ec4680aacd78dd",
-  "cs403/final_summary.webp": "ce5bbc984ad03bc040fcf34f5138945b0d506689885bc179e6f2124846304340",
-  "og-image.png": "9cbc7ef5942807498ca17fcadbe43848546052a3fbc08edda0005ac43483082f"
-};
 for (const [file, hash] of Object.entries(pinnedFiles)) {
   if (!existsSync(pub(file)) || sha256(readFileSync(pub(file))) !== hash) {
-    failures.push(`public/${file} changed; if that was meant, update its hash in scripts/checks/links.mjs`);
+    failures.push(`public/${file} changed; if that was meant, update its hash in scripts/checks/pins.mjs`);
   }
 }
 

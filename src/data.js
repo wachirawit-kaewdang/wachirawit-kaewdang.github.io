@@ -49,18 +49,16 @@ export const projects = [
       'with results set against a naive baseline.',
     // Opens the abstract, ahead of any metric.
     finding: [
-      'I check whether results hold up. In my senior project I caught that my LSTM’s ' +
-        `${lstmF1About} F1 (a 0–1 score for spotting “up” days) came from predicting “up” on every ` +
-        `test day for ${collapsedShare} stocks, which scores the same as never looking at the data, ` +
-        'so I report it as no real skill (',
+      'I check whether results hold up. In my senior project I caught my own LSTM doing no better than ' +
+        `always predicting “up” on ${collapsedShare} stocks, and reported that instead of its ${lstmF1About} F1 (`,
       appendix('A.4', 'appendix-a4', 'the baseline check'),
       ')',
     ],
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption: [
-        `On the ${collapsedShare} stocks where the tuned LSTM predicted “up” on every test day, its F1 is exactly ` +
-          'what always predicting “up” scores (',
+        `On the ${collapsedShare} stocks where the tuned LSTM predicted “up” on every test day, its F1 (a 0–1 ` +
+          'score for spotting “up” days) is exactly what always predicting “up” scores (',
         tableA2,
         `). Across all ${stockCount} stocks it averages ${lstmF1About}, and every model with a recorded ROC-AUC is ` +
           `close to chance, at ${aucRange} where 0.50 is chance (`,

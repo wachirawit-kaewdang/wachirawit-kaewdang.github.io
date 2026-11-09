@@ -31,3 +31,5 @@ dist-ssr
 
 # Claude Code local settings (permissions), never committed
 .claude/
+
+__pycache__/

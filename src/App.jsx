@@ -176,7 +176,9 @@ function Prose({ pieces }) {
     typeof piece === 'string' ? piece : piece.href ? (
       <ExtLink key={i} href={piece.href}>{piece.label}</ExtLink>
     ) : (
-      <Ref key={i} route={APPENDIX} to={piece.to} name={piece.about && `${piece.label}, ${piece.about}`}>{piece.label}</Ref>
+      <Ref key={i} route={APPENDIX} to={piece.to} name={piece.about && `${piece.label}, ${piece.about}`} print={`${profile.site}${APPENDIX}/${piece.to}`}>
+        {piece.label}
+      </Ref>
     ));
 }
 
@@ -354,7 +356,7 @@ function Contact() {
       <LinkLine className="contactline left">
         <a className="primary" href={`mailto:${profile.email}`}>{profile.email}</a>
         <ExtLink href={profile.linkedin}>LinkedIn</ExtLink>
-        <ExtLink href={asset(profile.resume)}>Résumé (PDF)</ExtLink>
+        <ExtLink href={asset(profile.resume)} data-print={`${profile.site}${profile.resume}`}>Résumé (PDF)</ExtLink>
       </LinkLine>
     </section>
   );

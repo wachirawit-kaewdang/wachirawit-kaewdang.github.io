@@ -1,5 +1,5 @@
 // Appendix A of the portfolio: the CS403 senior project write-up, shown at #/cs403. Set like the
-// home page, with its own A-numbering: sections A.1–A.6, Tables A.1–A.2 and Figures A.1–A.3.
+// home page, with its own A-numbering: sections A.1–A.6, Tables A.1–A.3 and Figures A.1–A.3.
 import { useEffect, useRef } from 'react';
 import { ExtLink, Ref, LinkLine, NumberedTable } from './paper.jsx';
 import { APPENDIX, asset } from './paper-utils.js';
@@ -234,6 +234,9 @@ function Offset({ gap }) {
   );
 }
 
+// The stock whose reference isn't known goes last, so the figure doesn't open on a gap.
+const byKnown = [...stocks].sort((a, b) => (upShare(a) === null) - (upShare(b) === null));
+
 function StockFigure() {
   const panels = [
     { title: 'Accuracy', gap: (s) => (upShare(s) === null ? null : s.lstm.acc - upShare(s)) },
@@ -253,7 +256,7 @@ function StockFigure() {
               <tr><th scope="col">Stock</th><th scope="col">{title}, LSTM minus always “up”</th></tr>
             </thead>
             <tbody>
-              {stocks.map((s) => (
+              {byKnown.map((s) => (
                 <tr key={s.ticker}>
                   <th scope="row">{s.ticker}</th>
                   <td><Offset gap={gap(s)} /></td>

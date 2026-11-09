@@ -8,6 +8,10 @@ const candidate = /(?<!\w|\d\.)\+?\(?\d[\d\s().-]{7,18}\d(?!\w)/g;
 // The made-up numbers the tests use, as digits. They are the only numbers allowed in the repo.
 export const madeUp = new Set(['0812345678', '021234567']);
 
+// Images, PDFs and fonts hold no readable text to scan. Each one in this repo is tied by hash to a
+// text source that is scanned (scripts/checks/pins.mjs, resume/resume.sha256).
+export const binaryFile = /\.(pdf|png|webp|jpe?g|gif|ico|woff2?|ttf|otf)$/i;
+
 // A number's digits in the local 0… form, so every way of writing it compares equal.
 export function phoneDigits(run) {
   let digits = run.replace(/\D/g, '');
@@ -28,9 +32,30 @@ export function findPhones(text) {
   });
 }
 
-// The phone numbers in a file's bytes, apart from the made-up ones. A file with a NUL byte is
-// binary (an image, a PDF) and is skipped.
-export function phonesIn(bytes) {
-  if (bytes.includes(0)) return [];
-  return findPhones(bytes.toString('utf8')).filter((run) => !madeUp.has(phoneDigits(run)));
+// Text in any encoding a Windows tool might write. PowerShell 5.1's Out-File writes UTF-16, where
+// every ASCII character carries a zero byte, so a zero byte alone never means "not text".
+export function decodeText(bytes) {
+  const utf16 = (le) => {
+    const even = Buffer.from(bytes.subarray(0, bytes.length - (bytes.length % 2)));
+    const text = (le ? even : even.swap16()).toString('utf16le');
+    return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text; // drop the byte-order mark
+  };
+  if (bytes[0] === 0xff && bytes[1] === 0xfe) return utf16(true);
+  if (bytes[0] === 0xfe && bytes[1] === 0xff) return utf16(false);
+  let oddZeros = 0;
+  let evenZeros = 0;
+  for (let i = 0; i < bytes.length; i++) {
+    if (bytes[i] === 0 && i % 2) oddZeros++;
+    else if (bytes[i] === 0) evenZeros++;
+  }
+  // Mostly-ASCII UTF-16 without a byte-order mark: zeros fill one half of the bytes.
+  if (oddZeros > bytes.length / 4) return utf16(true);
+  if (evenZeros > bytes.length / 4) return utf16(false);
+  return bytes.toString('utf8').replaceAll('\0', '');
+}
+
+// The phone numbers in a file, apart from the made-up ones. Only the binary types above are skipped.
+export function phonesIn(bytes, name = '') {
+  if (binaryFile.test(name)) return [];
+  return findPhones(decodeText(bytes)).filter((run) => !madeUp.has(phoneDigits(run)));
 }

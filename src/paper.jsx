@@ -7,7 +7,8 @@ import { jumpTo, refTrail, tableId } from './paper-utils.js';
 // hash route (the appendix) the link keeps the route, as "#/cs403/table-a1", and the address bar
 // is kept up to date too, so the reference can be copied and still opens the right page.
 // `name`, when given, is the link's full accessible name, such as "Appendix A.4, the baseline check".
-export function Ref({ to, route, name, children }) {
+// `print` is the full address a paper copy shows after the link, for references to the other page.
+export function Ref({ to, route, name, print, children }) {
   const href = route ? `${route}/${to}` : `#${to}`;
   const follow = (e) => {
     if (!document.getElementById(to)) return;
@@ -21,7 +22,7 @@ export function Ref({ to, route, name, children }) {
     jumpTo(to);
   };
   return (
-    <a className="ref" href={href} onClick={follow} aria-label={name}>
+    <a className="ref" href={href} onClick={follow} aria-label={name} data-print={print}>
       {children}
     </a>
   );
