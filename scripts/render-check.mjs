@@ -19,7 +19,7 @@ const pct = (v) => v.toFixed(3);
 const pages = [
   {
     path: '/',
-    expected: ['Wachirawit Kaewdang', `Abstract. ${opening}.`, 'Looking for', `${rankGapRange} positions apart`, 'did not favour SHAP', 'Contact'],
+    expected: ['Wachirawit Kaewdang', `Abstract. ${opening}.`, 'Looking for', projects.find((p) => p.sample).sample.lines[0], `${rankGapRange} positions apart`, 'did not favour SHAP', 'Contact'],
     tables: { 'table-1': table1Rows },
     headers: { 'table-1': ['Model', 'F1'] },
   },

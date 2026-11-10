@@ -98,6 +98,24 @@ export const projects = [
       'How it works: one loop accepts a connection, reads the request line, and answers with one of two known files and its content type, or a 404 page. It serves one client at a time.',
       'The page is sent as encoded text and the image as raw bytes; sending both the same way would corrupt the GIF.',
     ],
+    // Output from running the server, shown in place of code that can't be published. Only the
+    // headers are shown; each line below was printed by the server's responses to curl.
+    sample: {
+      lines: [
+        '$ curl -i http://localhost:5013/mypage.htm',
+        'HTTP/1.0 200 OK',
+        'Content-Type: text/html',
+        '',
+        '$ curl -i http://localhost:5013/myimage.gif',
+        'HTTP/1.0 200 OK',
+        'Content-Type: image/gif',
+        '',
+        '$ curl -i http://localhost:5013/other',
+        'HTTP/1.0 404 Not Found',
+        'Content-Type: text/html',
+      ],
+      caption: 'The headers the server sent for the page, the image and an unknown path, captured with curl. The page and image bodies are left out.',
+    },
     tech: ['Python', 'Sockets', 'TCP/IP', 'HTTP'],
     codeNote: 'Course assignment; code not published.',
   },
@@ -122,13 +140,10 @@ export const projects = [
       'The site you are reading, and the automated tests that keep its claims true: the CS403 tables are ' +
       'computed from the notebook’s saved outputs, and nothing deploys until every check passes.',
     points: [
-      'On every push to main, CI rebuilds the per-stock CS403 metrics from the notebook at a frozen commit and stops the deploy if they differ.',
-      'The same run checks the résumé PDF against its source and the site’s contact details, then opens both pages in headless Chrome.',
-      'In QA terms, each check is a test case for a claim on the site, a failing one stops the deploy, and gaps found in ' +
-        'reviews became new checks, such as the phone-number scan and the Back and Forward test.',
-      'Built with Claude Code as the implementer. My part: setting the goals, choosing between proposed approaches and ' +
-        'approving them, reviewing every change before it shipped, and running repeated front-end (design and accessibility) ' +
-        'and back-end (correctness, security, testing) critiques, then choosing which findings to fix.',
+      'On every push, CI rebuilds the CS403 numbers from the notebook, checks the résumé against its source and opens ' +
+        'both pages in headless Chrome; any mismatch stops the deploy. In QA terms, each check is a test case for a claim on the site.',
+      'My part: setting the goals, choosing between approaches, reviewing every change before it shipped, and running ' +
+        'repeated design and code reviews whose findings became new checks.',
     ],
     tech: ['React', 'Vite', 'JavaScript', 'Python', 'GitHub Actions', 'Node.js test runner', 'Headless Chrome'],
     link: `${github}/${username}.github.io`,

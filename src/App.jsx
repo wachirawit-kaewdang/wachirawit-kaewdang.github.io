@@ -268,6 +268,14 @@ function Project({ project, index }) {
         </ul>
       )}
 
+      {project.sample && (
+        <figure className="sample">
+          {/* tabIndex: a long line scrolls sideways, and a keyboard reader must be able to reach it. */}
+          <pre tabIndex={0} aria-label="Terminal output from the server">{project.sample.lines.join('\n')}</pre>
+          <figcaption>{project.sample.caption}</figcaption>
+        </figure>
+      )}
+
       <p className="meta">
         <em>Stack.</em> {project.tech.join(' · ')}
       </p>

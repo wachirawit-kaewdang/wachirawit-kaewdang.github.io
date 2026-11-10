@@ -28,7 +28,9 @@ npm run check:phone  Scans every tracked file for a phone number. npm install sw
                   resume/resume.sha256). Any other file the scan can't read (a new image, a
                   .docx) fails until it is tied there on purpose.
                   The push hook is the last gate: CI runs after the push, when the commit is
-                  already public. The hooks don't run for edits made on GitHub's website, and
+                  already public. CI still scans every commit in the push, so a number pushed
+                  without the hooks (even one removed again in a later commit) fails the build
+                  instead of passing quietly. The hooks don't run for edits made on GitHub's website, and
                   npm run check warns when they are off in this copy.
 npm run render-check  Opens the built site in headless Chrome; run npm run build first.
                   npm run build also pre-renders the home page into dist/index.html, so its

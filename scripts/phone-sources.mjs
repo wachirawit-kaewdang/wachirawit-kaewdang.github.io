@@ -22,17 +22,21 @@ const names = (output) => output.toString().split('\0').filter(Boolean);
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const lf = (bytes) => bytes.toString('utf8').replaceAll('\r\n', '\n');
 
+// A source's file path: its name without the commit it came from (" in abc1234"). A path may
+// itself hold spaces (my cv.html), so only that exact suffix is removed.
+const pathOf = (name) => name.replace(/ in [0-9a-f]{7}$/, '');
+
 // The names, from [name, bytes] pairs, whose bytes hold a phone number. Names may carry a suffix
 // (" in abc1234"), so the file type is read from the path before it.
 export const withPhones = (sources) =>
-  sources.filter(([name, bytes]) => phonesIn(bytes, name.split(' ')[0]).length).map(([name]) => name);
+  sources.filter(([name, bytes]) => phonesIn(bytes, pathOf(name)).length).map(([name]) => name);
 
 // The files the scan can't read (images, PDFs, fonts, .docx, anything not text) that aren't tied by
 // hash to a scanned source. A new one has to be tied in scripts/checks/pins.mjs on purpose, so a
 // screenshot or a Word copy of the private résumé can't slip through unread.
 const tied = new Set([`public/${profile.resume}`, ...Object.keys(pinnedFiles).map((file) => `public/${file}`)]);
 export const untiedBinaries = (sources) => sources
-  .filter(([name, bytes]) => !tied.has(name.split(' ')[0]) && unreadable(bytes, name.split(' ')[0]))
+  .filter(([name, bytes]) => !tied.has(pathOf(name)) && unreadable(bytes, pathOf(name)))
   .map(([name]) => `${name} can't be scanned for a phone number. Tie it by hash in scripts/checks/pins.mjs, or keep it out of the repo`);
 
 // Tracked files as they are on disk; one deleted but not yet committed has nothing to scan.
@@ -58,6 +62,15 @@ export const reader = (snapshot) => (path) => {
 // The binary files can't be scanned, so each must match the hash that ties it to a scanned source:
 // the résumé PDF to resume/resume.html through resume/resume.sha256, the share image to
 // og/og-image.html, and the charts to their pinned hashes. Returns what doesn't match.
+// The pinned hashes in a snapshot's scripts/checks/pins.mjs, read as text (it can't be imported
+// from a commit). On disk, or in a snapshot without the file, the current pins apply.
+function pinsIn(read) {
+  const text = read('scripts/checks/pins.mjs')?.toString();
+  if (!text) return { files: pinnedFiles, share: shareSourceHash };
+  const files = Object.fromEntries([...text.matchAll(/"([^"]+)":\s*"([0-9a-f]{64})"/g)].map(([, file, hash]) => [file, hash]));
+  return { files, share: text.match(/shareSourceHash = '([0-9a-f]{64})'/)?.[1] };
+}
+
 export function brokenTies(read, where = '') {
   const problems = [];
   const pdf = read(`public/${profile.resume}`);
@@ -66,12 +79,15 @@ export function brokenTies(read, where = '') {
   if (pdf && (!html || recorded[0] !== sha256(lf(html)) || recorded[1] !== sha256(pdf))) {
     problems.push(`the résumé PDF${where} was not built from resume/resume.html as it stands; run npm run resume`);
   }
-  for (const [file, hash] of Object.entries(pinnedFiles)) {
+  // The hashes as that snapshot recorded them: an older commit in a push still has the older
+  // image and the older hash together, so it is compared with its own pins, not today's.
+  const pins = pinsIn(read);
+  for (const [file, hash] of Object.entries(pins.files)) {
     const bytes = read(`public/${file}`);
     if (bytes && sha256(bytes) !== hash) problems.push(`public/${file}${where} doesn't match its pinned hash`);
   }
   const share = read('og/og-image.html');
-  if (share && sha256(lf(share)) !== shareSourceHash) {
+  if (share && pins.share && sha256(lf(share)) !== pins.share) {
     problems.push(`og/og-image.html${where} doesn't match the hash the share image was built from`);
   }
   return problems;

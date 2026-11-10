@@ -311,7 +311,10 @@ export default function ProjectCS403() {
           it with SHAP, and compared those explanations with Pearson correlation. The two disagreed by{' '}
           {rankGapRange} rank positions on average, about what two unrelated rankings would show, and
           retraining on each method’s top features did not favour SHAP, so we can’t say it explains the
-          model better. Set against a naive baseline, the model tied on {collapsed.length} of the{' '}
+          model better.
+        </p>
+        <p>
+          Set against a naive baseline, the model tied on {collapsed.length} of the{' '}
           {stockCount} stocks: it predicted “up” every day, so its F1 matched always predicting “up”
           (<ARef to="table-a2">Table A.2</ARef>).
         </p>

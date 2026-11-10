@@ -3,7 +3,8 @@
 // Run: npm test
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { after, before, test } from 'node:test';
@@ -104,6 +105,32 @@ test('a new branch is compared only with the remote it goes to, not with any rem
   assert.equal(result.status, 1);
   assert.match(result.stderr, /backup\.txt/);
   git('update-ref', '-d', 'refs/remotes/backup/main');
+  git('reset', '-q', '--hard', base);
+});
+
+test('each commit in a push is checked against its own pinned hashes', () => {
+  const base = git('rev-parse', 'HEAD');
+  const pin = (bytes) => {
+    const hash = createHash('sha256').update(bytes).digest('hex');
+    mkdirSync(join(repo, 'scripts/checks'), { recursive: true });
+    mkdirSync(join(repo, 'public'), { recursive: true });
+    writeFileSync(join(repo, 'public/og-image.png'), bytes);
+    writeFileSync(join(repo, 'scripts/checks/pins.mjs'), `export const pinnedFiles = {\n  "og-image.png": "${hash}"\n};\n`);
+    git('add', 'public/og-image.png', 'scripts/checks/pins.mjs');
+    git('commit', '-q', '--no-verify', '-m', 'image');
+  };
+  pin(Buffer.from([0x89, 0x50, 0x4e, 0x47, 1]));
+  pin(Buffer.from([0x89, 0x50, 0x4e, 0x47, 2]));
+  const head = git('rev-parse', 'HEAD');
+  assert.equal(scan(['--push'], `refs/heads/main ${head} refs/heads/main ${base}\n`).status, 0);
+  // An image that no longer matches the hash its own commit pinned is still stopped.
+  writeFileSync(join(repo, 'public/og-image.png'), Buffer.from([0x89, 0x50, 0x4e, 0x47, 3]));
+  git('add', 'public/og-image.png');
+  git('commit', '-q', '--no-verify', '-m', 'swapped image');
+  const swapped = git('rev-parse', 'HEAD');
+  const result = scan(['--push'], `refs/heads/main ${swapped} refs/heads/main ${base}\n`);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, new RegExp(`og-image\\.png in ${swapped.slice(0, 7)} doesn't match`));
   git('reset', '-q', '--hard', base);
 });
 

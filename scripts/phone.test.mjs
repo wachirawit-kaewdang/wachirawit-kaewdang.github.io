@@ -36,6 +36,22 @@ test('finds a phone number in every common format', () => {
   }
 });
 
+// Other digits right before a number used to join it into one long run that was then skipped.
+test('finds a number that follows other digits, a list marker or a web-address code', () => {
+  const stuck = [
+    'Bangkok 10200, 081-234-5678',
+    'Bangkok 10200 081 234 5678',
+    '1. 081-234-5678',
+    '2) 081 234 5678',
+    '25, 0812345678',
+    'Updated 2026 081 234 5678',
+    'Call%20081-234-5678',
+    'tel:%2B66812345678',
+    '081  234  5678',
+  ];
+  for (const text of stuck) assert.equal(findPhones(text).length, 1, text);
+});
+
 test('leaves the site\'s own numbers alone', () => {
   const ordinary = [
     '2022 – May 2026',
@@ -49,6 +65,8 @@ test('leaves the site\'s own numbers alone', () => {
     '0.6000       0.4327',
     '0.50    0.5469   0',
     'built 2025/11/09',
+    'JPM 0.608 0.756 0.756 UNH 0.600 0.750 0.750 GS 0.567',
+    'Bangkok 10200, Thailand',
     'sha f0812345678',
   ];
   for (const text of ordinary) assert.deepEqual(findPhones(text), [], text);
@@ -74,4 +92,10 @@ test('a number split by tags or spaced out in markup is found as the browser sho
   for (const html of cases) assert.equal(phonesIn(Buffer.from(html), 'resume.html').length, 1, html);
   // Plain text keeps its table-column rule: a run of spaces there is columns, not one number.
   assert.equal(phonesIn(Buffer.from('0.6000       0.4327'), 'notes.txt').length, 0);
+});
+
+test('a path with a space keeps its file type, with or without a commit suffix', async () => {
+  const { withPhones } = await import('./phone-sources.mjs');
+  const split = Buffer.from(`<b>${['089', '765', '4321'].join('</b>-<b>')}</b>`);
+  assert.deepEqual(withPhones([['my cv.html', split], ['my cv.html in abc1234', split]]), ['my cv.html', 'my cv.html in abc1234']);
 });

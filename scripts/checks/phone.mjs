@@ -3,10 +3,11 @@
 // &nbsp;, or in Thai digits. Formats differ, so it compares digits only. A phone number must never
 // reach the public repo, site or résumé; the private résumé is kept outside this repo. Use only the
 // made-up numbers in `madeUp` as examples, here or anywhere.
-// A number may follow a label and a dot (Tel.081…, โทร.081…); only a decimal like 0.5469 may not.
-// A letter may come right before it (Tel081-…) only when the run has separators; a hash or an ID
-// that ends in digits has none. An underscore may sit on either side (tel_081…_home).
-const candidate = /(?<!\d|\d\.)\+?\(?\d[\d\s(),./-]{7,18}\d(?![0-9A-Za-z])/g;
+// A run is any stretch of digit groups and the separators between them. A number can sit inside
+// a longer run (Bangkok 10200, 081-234-5678 or 1. 081-…), so every stretch of up to five
+// neighbouring groups is tested on its own, not only the whole run.
+// A number may follow a label and a dot (Tel.081…, โทร.081…); a decimal's fraction (0.0812…) may not.
+const candidate = /\d[\d\s(),./+-]*\d|\d/g;
 
 // Markup, where tags can split a number that the browser shows whole: <b>081</b>-234-5678.
 const markup = /\.(html?|jsx|tsx|svg|xml|md)$/i;
@@ -34,6 +35,8 @@ export function phoneDigits(run) {
 const entities = { nbsp: ' ', ensp: ' ', emsp: ' ', thinsp: ' ', ndash: '-', mdash: '-', minus: '-', hyphen: '-', dash: '-' };
 export function plainText(text) {
   return text
+    // Web-address codes for a space, plus, minus, dot and brackets (Call%20081…, tel:%2B66…).
+    .replace(/%(20|2B|2D|2E|28|29)/gi, (whole, hex) => String.fromCharCode(parseInt(hex, 16)))
     .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (whole, code) => {
       if (code[0] !== '#') return entities[code.toLowerCase()] ?? whole;
       const point = code[1].toLowerCase() === 'x' ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
@@ -49,16 +52,37 @@ export function plainText(text) {
 export function findPhones(text) {
   // A number wrapped across indented lines (081-234- then 5678 on the next line) reads as one.
   const joined = plainText(text).replace(/[ \t]*\r?\n[ \t]*/g, ' ');
-  return [...joined.matchAll(candidate)].filter(({ 0: run, index }) => {
-    // Straight after a letter, only a run with separators is a number (Tel081-234-5678).
-    if (/[a-z]/i.test(joined[index - 1] ?? '') && /^\+?\d+$/.test(run)) return false;
-    // A run of spaces is a table's columns (0.6000     0.4327), never one number.
-    if (/\s{2,}/.test(run)) return false;
-    const digits = phoneDigits(run);
-    // Mobile numbers are 10 digits from 06, 08 or 09; landlines 9 digits from 02 to 07.
-    return /^0[689]\d{8}$/.test(digits) || /^0[2-7]\d{7}$/.test(digits);
-  }).map(({ 0: run }) => run);
+  const found = [];
+  for (const { 0: run, index } of joined.matchAll(candidate)) {
+    const before = joined[index - 1] ?? '';
+    const after = joined[index + run.length] ?? '';
+    // Odd places hold the digit groups, even places the separators around them.
+    const parts = run.split(/(\d+)/);
+    for (let i = 1; i < parts.length; i += 2) {
+      // A group right after a digit and a dot is a decimal's fraction, not the start of a number.
+      const lead = i === 1 ? before : parts[i - 1];
+      if (lead === '.' && (i > 1 || /\d/.test(joined[index - 2] ?? ''))) continue;
+      let digits = '';
+      for (let j = i; j < parts.length && j <= i + 8; j += 2) {
+        digits += parts[j];
+        if (digits.length > 12) break;
+        const stretch = parts.slice(i, j + 1).join('');
+        // One unbroken string of digits against a letter is part of a hash or an ID.
+        const touching = /[A-Za-z]/.test(i === 1 ? before : '') || /[A-Za-z]/.test(j === parts.length - 2 ? after : '');
+        if (i === j && touching) continue;
+        // A number written with dots uses only dots (081.234.5678). A dot beside other separators
+        // is a decimal in a list or table (0.608 0.756 0.756, 0.6000     0.4327).
+        if (stretch.includes('.') && /[^\d.]/.test(stretch)) continue;
+        // A match is reported once; the search goes on after its last group.
+        if (isPhone(phoneDigits(stretch))) { found.push(stretch); i = j; break; }
+      }
+    }
+  }
+  return found;
 }
+
+// Mobile numbers are 10 digits from 06, 08 or 09; landlines 9 digits from 02 to 07.
+const isPhone = (digits) => /^0[689]\d{8}$/.test(digits) || /^0[2-7]\d{7}$/.test(digits);
 
 // Text in any encoding a Windows tool might write. PowerShell 5.1's Out-File writes UTF-16, where
 // every ASCII character carries a zero byte, so a zero byte alone never means "not text".
@@ -102,5 +126,7 @@ export function phonesIn(bytes, name = '') {
   const text = decodeText(bytes);
   // Markup is read twice: as typed, and as a browser shows it.
   const runs = markup.test(name) ? [...findPhones(text), ...findPhones(shownText(text))] : findPhones(text);
-  return [...new Set(runs)].filter((run) => !madeUp.has(phoneDigits(run)));
+  // The same number read both ways counts once.
+  const numbers = new Map(runs.map((run) => [phoneDigits(run), run]));
+  return [...numbers].filter(([digits]) => !madeUp.has(digits)).map(([, run]) => run);
 }
