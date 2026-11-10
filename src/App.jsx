@@ -268,6 +268,13 @@ function Project({ project, index }) {
         </ul>
       )}
 
+      {project.shot && (
+        <figure className="shot">
+          <img src={asset(project.shot.src)} width={project.shot.width} height={project.shot.height} alt={project.shot.alt} loading="lazy" decoding="async" />
+          <figcaption>{project.shot.caption}</figcaption>
+        </figure>
+      )}
+
       {project.sample && (
         <figure className="sample">
           {/* tabIndex: a long line scrolls sideways, and a keyboard reader must be able to reach it. */}

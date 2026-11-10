@@ -2,7 +2,7 @@
 // and the files copied in by hand are the ones that were checked.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
-import { profile } from '../../src/data.js';
+import { profile, projects } from '../../src/data.js';
 import { pinnedFiles } from './pins.mjs';
 import { pub, read, sha256 } from './shared.mjs';
 
@@ -16,6 +16,8 @@ function expect(path, from) {
 
 // Résumé, linked through asset(profile.resume) on both pages.
 expect(profile.resume, 'src/data.js (profile.resume)');
+// A project's screenshot, shown on the home page through asset(project.shot.src).
+for (const p of projects) if (p.shot) expect(p.shot.src, `src/data.js (${p.title} shot)`);
 // GitHub Pages serves this for an address that doesn't exist, and its links must lead somewhere.
 expect('404.html', 'GitHub Pages');
 // Search engines and audit tools ask for this; without it they get the page HTML instead.

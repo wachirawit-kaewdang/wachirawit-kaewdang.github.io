@@ -183,7 +183,9 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 /* Output from running a project whose code can't be shown: a quiet monospace block. */
 .sample { margin: 1rem 0; }
 .sample pre { margin: 0; padding: 0.6rem 0.8rem; overflow-x: auto; font: 0.85rem/1.45 ui-monospace, 'Cascadia Mono', Consolas, Menlo, monospace; border: 1px solid var(--hair); border-radius: 2px; }
-.sample figcaption { max-width: 34rem; margin-top: 0.5rem; font-size: 0.9rem; line-height: 1.45; color: var(--ink-soft); }
+.shot { margin: 1rem 0; }
+.shot img { display: block; max-width: 100%; height: auto; border: 1px solid var(--hair); border-radius: 2px; background: #fff; }
+.shot figcaption, .sample figcaption { max-width: 34rem; margin-top: 0.5rem; font-size: 0.9rem; line-height: 1.45; color: var(--ink-soft); }
 .tablenote { width: 0; min-width: 100%; margin: 0.5rem 0 0; font-size: 0.9rem; line-height: 1.45; color: var(--ink-soft); }
 .results table { border-top: 1.5px solid var(--rule); border-bottom: 1.5px solid var(--rule); }
 .results thead th { border-bottom: 0.75px solid var(--rule); font-weight: 600; }

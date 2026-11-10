@@ -129,6 +129,15 @@ export const projects = [
       'How it fits together: the React pages call an Express REST API, which stores users and recipes in MongoDB through Mongoose.',
       'My part: the MyRecipe management feature, recipe deletion (the API endpoint and a confirm-before-delete step), and wiring the sign-up page and other pages to the backend API.',
     ],
+    // The app's own front end, run for this screenshot with made-up recipes from a stand-in server,
+    // so no real user or team data is shown.
+    shot: {
+      src: 'recipe/myrecipe.png',
+      width: 768,
+      height: 665,
+      alt: 'The My Recipe page: two recipe cards, Garlic Pepper Pork and Mango Sticky Rice, each with Edit and Delete buttons.',
+      caption: 'The MyRecipe page I built, running with two made-up recipes from a stand-in server, not the team’s database.',
+    },
     tech: ['React', 'Vite', 'JavaScript', 'HTML/CSS', 'Node.js', 'Express', 'REST APIs', 'MongoDB'],
     // The repository is a private GitHub Classroom repo, so there is nothing public to link.
     codeNote: 'In a private course repository (GitHub Classroom), so it cannot be linked.',
