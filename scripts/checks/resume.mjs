@@ -37,11 +37,11 @@ const resumeClaims = [
   education.degree.split(' — ')[0],
   education.period,
 ];
-// The site's "Machine Learning, Software & QA Engineer" is listed as separate roles on the résumé.
-for (const role of profile.role.replace(' Engineer', '').split(/, | & /)) {
-  if (!resumeText.includes(`${role} Engineer`) && !resumeText.includes(`${role} roles`)) {
-    failures.push(`resume/resume.html should list the role ${role}`);
-  }
+// The roles in the site's "Looking for" line ("Open to Machine Learning Engineer, Software
+// Engineer and QA roles …") must each be on the résumé too.
+const wanted = profile.status.replace(/^Open to /, '').replace(/ roles\b.*$/, '').split(/, | and /);
+for (const role of wanted) {
+  if (!resumeText.includes(role)) failures.push(`resume/resume.html should list the role ${role}`);
 }
 for (const claim of resumeClaims) {
   if (!resumeText.includes(claim)) failures.push(`resume/resume.html should say “${claim}”`);

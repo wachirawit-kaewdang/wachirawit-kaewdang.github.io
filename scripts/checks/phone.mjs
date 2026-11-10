@@ -5,8 +5,13 @@
 // made-up numbers in `madeUp` as examples, here or anywhere.
 // A number may follow a label and a dot (Tel.081…, โทร.081…); only a decimal like 0.5469 may not.
 // A letter may come right before it (Tel081-…) only when the run has separators; a hash or an ID
-// that ends in digits has none.
-const candidate = /(?<!\d|\d\.)\+?\(?\d[\d\s()./-]{7,18}\d(?!\w)/g;
+// that ends in digits has none. An underscore may sit on either side (tel_081…_home).
+const candidate = /(?<!\d|\d\.)\+?\(?\d[\d\s(),./-]{7,18}\d(?![0-9A-Za-z])/g;
+
+// Markup, where tags can split a number that the browser shows whole: <b>081</b>-234-5678.
+const markup = /\.(html?|jsx|tsx|svg|xml|md)$/i;
+// The text a browser would show: tags removed and runs of spaces collapsed, as HTML does.
+export const shownText = (html) => html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ');
 
 // The made-up numbers the tests use, as digits. They are the only numbers allowed in the repo.
 export const madeUp = new Set(['0812345678', '021234567']);
@@ -94,5 +99,8 @@ export function unreadable(bytes, name = '') {
 // scripts/phone-sources.mjs fails any such file that isn't tied by hash to a scanned source.
 export function phonesIn(bytes, name = '') {
   if (unreadable(bytes, name)) return [];
-  return findPhones(decodeText(bytes)).filter((run) => !madeUp.has(phoneDigits(run)));
+  const text = decodeText(bytes);
+  // Markup is read twice: as typed, and as a browser shows it.
+  const runs = markup.test(name) ? [...findPhones(text), ...findPhones(shownText(text))] : findPhones(text);
+  return [...new Set(runs)].filter((run) => !madeUp.has(phoneDigits(run)));
 }

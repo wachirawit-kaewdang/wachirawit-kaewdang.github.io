@@ -177,7 +177,9 @@ function Prose({ pieces }) {
       <ExtLink key={i} href={piece.href}>{piece.label}</ExtLink>
     ) : (
       <Ref key={i} route={APPENDIX} to={piece.to} name={piece.about && `${piece.label}, ${piece.about}`} print={`${profile.site}${APPENDIX}/${piece.to}`}>
-        {piece.label}
+        {/* An appendix section's topic is shown, since "A.4" alone says nothing; a table's
+            caption already says what it holds, so only screen readers hear its topic. */}
+        {piece.about && piece.label.startsWith('Appendix') ? `${piece.label}, ${piece.about}` : piece.label}
       </Ref>
     ));
 }
@@ -244,7 +246,7 @@ function Project({ project, index }) {
       <p>{project.summary}</p>
       {project.caseStudy && (
         <p className="seealso">
-          Full write-up in <a href={project.caseStudy}>Appendix A</a>: the method, the baseline
+          Full case study in <a href={project.caseStudy}>Appendix A</a>: the method, the baseline
           check and what I would change.
         </p>
       )}
@@ -303,7 +305,7 @@ function Skills() {
       <SectionHeading id="skills" />
       <p>
         Each group starts with what the projects in{' '}
-        <Ref to="projects">§{sectionNumber('projects')}</Ref> show, then what I have also used.
+        <Ref to="projects">§{sectionNumber('projects')} Projects</Ref> show, then what I have also used.
       </p>
       <dl className="skills">
         {skills.map((s) => {

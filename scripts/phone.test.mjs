@@ -61,3 +61,17 @@ test('files it cannot read are reported as unreadable, by type or by content', a
   assert.equal(unreadable(Buffer.from([0x50, 0x4b, 0x03, 0x04, 1, 2]), 'resume.docx'), true);
   assert.equal(unreadable(Buffer.from([0xc3, 0x28, 0xa0, 0xa1, 0xe2, 0x28, 0xa1, 0x80, 0xf0, 0x28]), 'blob.bin'), true);
 });
+
+test('a number split by tags or spaced out in markup is found as the browser shows it', async () => {
+  const { phonesIn } = await import('./checks/phone.mjs');
+  const parts = ['089', '765', '4321'];
+  const cases = [
+    `<span>${parts.join('</span>-<span>')}</span>`,
+    `<p>${parts.join('  ')}</p>`,
+    `<p>${parts.join(',')}</p>`,
+    `<p>tel_${parts.join('')}_home</p>`,
+  ];
+  for (const html of cases) assert.equal(phonesIn(Buffer.from(html), 'resume.html').length, 1, html);
+  // Plain text keeps its table-column rule: a run of spaces there is columns, not one number.
+  assert.equal(phonesIn(Buffer.from('0.6000       0.4327'), 'notes.txt').length, 0);
+});

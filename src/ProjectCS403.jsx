@@ -424,7 +424,8 @@ export default function ProjectCS403() {
           {stockCount} stocks, only a little better than random (0.5). Predicting 3-day direction from these
           features is close to a coin flip, and on the {collapsed.length} stocks that collapsed neither score
           shows any skill (<ARef to="figure-a3">Figure A.3</ARef>). SHAP still gives a rough view of what
-          the model relied on, within the limits in A.2.
+          the model relied on, within the limits set out in{' '}
+          <ARef to={sectionId(2)}>A.2, SHAP and correlation disagree</ARef>.
         </p>
         <NumberedTable
           number="A.3"

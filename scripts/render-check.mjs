@@ -2,8 +2,10 @@
 // shows NaN, or puts correct numbers in the wrong place. This opens the built site in headless
 // Chrome and compares what each page rendered with what metrics.js computed.
 // Run: npm run build, then npm run render-check (CI runs it before deploying).
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, resolve, sep } from 'node:path';
 import { dumpDom, withSite } from './chrome.mjs';
-import { findPhones } from './checks/phone.mjs';
+import { findPhones, phonesIn } from './checks/phone.mjs';
 import {
   alwaysUpF1, bondRankRows, collapsed, ensembleAuc, rankGapRange, retrainAuc, retrainCorrWins, modelRows, table1Rows,
 } from '../src/metrics.js';
@@ -82,6 +84,17 @@ async function read({ chrome, profile, url }, { path, expected, tables = {}, hea
   }
 }
 
+// Every file in the built site, as it will be served: HTML, CSS (a number in a content: rule),
+// scripts and anything copied from public/. The sources are scanned too, but this is what ships.
+const dist = resolve(import.meta.dirname, '..', 'dist');
+let shipped = 0;
+for (const name of readdirSync(dist, { recursive: true })) {
+  let bytes;
+  try { bytes = readFileSync(join(dist, name)); } catch { continue; } // a folder
+  shipped++;
+  if (phonesIn(bytes, name).length) failures.push(`dist/${name.split(sep).join('/')} contains a phone number`);
+}
+
 await withSite('render-check', port, async (site) => {
   for (const page of pages) {
     await read(site, page).catch((error) => failures.push(`${page.path} could not be opened in Chrome: ${error.message.split('\n')[0]}`));
@@ -92,4 +105,4 @@ if (failures.length) {
   console.error(failures.map((f) => `✗ ${f}`).join('\n'));
   process.exit(1);
 }
-console.log(`✓ ${pages.length} pages rendered their tables, ticks and key sentences as computed`);
+console.log(`✓ ${pages.length} pages rendered their tables, ticks and key sentences as computed; no phone numbers in ${shipped} built files`);

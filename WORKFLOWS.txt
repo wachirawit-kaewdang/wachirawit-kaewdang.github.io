@@ -18,7 +18,11 @@ npm run check:phone  Scans every tracked file for a phone number. npm install sw
                   git hooks (.githooks) that scan each commit's files and message, each
                   merge, and every commit (merges included) and tag in a push, so a commit
                   made with --no-verify is still caught before it leaves this copy. Numbers
-                  typed with en dashes, &nbsp;, slashes or Thai digits are found too.
+                  typed with en dashes, &nbsp;, slashes, commas or Thai digits are found too,
+                  and HTML is also read as a browser shows it, so <b>081</b>-… is found.
+                  What ships is scanned as well: npm run resume scans the rendered résumé
+                  before printing it, and render-check scans every file in dist/.
+                  It is a pattern match, so a number spelled out in words would pass.
                   Binary files (the résumé PDF, images) can't be scanned, so each one must be
                   tied by hash to a scanned source (scripts/checks/pins.mjs and
                   resume/resume.sha256). Any other file the scan can't read (a new image, a

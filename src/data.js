@@ -1,16 +1,15 @@
 // All site content lives here, so updating the portfolio never means touching layout code.
 // The CS403 numbers come from metrics.js, which computes them from the notebook's outputs.
 import {
-  aucRange, collapsed, lstmF1About, notebookUrl, rankGapRange, sectorCount, source,
-  stockCount, table1Rows,
+  collapsed, notebookUrl, rankGapRange, sectorCount, source, stockCount, table1Rows,
 } from './metrics.js';
 
 const collapsedShare = `${collapsed.length} of ${stockCount}`;
 
 // Prose that points into Appendix A is written as a list of pieces: strings, and refs that the
 // page renders as cross-references, e.g. ['see ', appendix('A.2', 'appendix-a2')].
-// A cross-reference into Appendix A. `about` names what is there, for a screen reader's list of
-// links and for anyone who doesn't read "A.4" as a place.
+// A cross-reference into Appendix A. `about` names what is there, shown after the number, since
+// "A.4" alone tells a reader nothing. A table ref's caption already says what the table holds.
 const appendix = (label, to, about) => ({ label: `Appendix ${label}`, to, about });
 const tableA2 = { label: 'Table A.2', to: 'table-a2', about: 'the always-up check, stock by stock' };
 const tableA3 = { label: 'Table A.3', to: 'table-a3', about: 'every model’s averages' };
@@ -23,7 +22,8 @@ const github = `https://github.com/${username}`;
 export const profile = {
   name: 'Wachirawit Kaewdang',
   nickname: 'Ohm',
-  role: 'Machine Learning & Software Engineer',
+  // A new graduate's honest title; the roles wanted are in `status`.
+  role: 'Computer Science graduate · ML and software',
   location: 'Bangkok, Thailand',
   email: 'wachirawit.kaewdang@gmail.com',
   github,
@@ -50,7 +50,7 @@ export const projects = [
     // Opens the abstract: the skill first, then the catch as proof of it. No metric here.
     finding: [
       'I test my own results against a simple baseline. In my senior project, that check showed my LSTM ' +
-        `did no better than always predicting “up” on ${collapsedShare} stocks, so I reported the honest result (the baseline check, `,
+        `did no better than always predicting “up” on ${collapsedShare} stocks, so I reported the honest result (`,
       appendix('A.4', 'appendix-a4', 'the baseline check'),
       ')',
     ],
@@ -63,23 +63,19 @@ export const projects = [
         '.',
       ],
       note: [
-        'Average F1 over those stocks, on the test set: the last 20% of Jan 2020 – Apr 2025. The LSTM’s threshold ' +
-          `was tuned on it, so its row is if anything optimistic. Across all ${stockCount} stocks it averages ` +
-          `${lstmF1About}, and every model with a recorded ROC-AUC is close to chance, at ${aucRange} where 0.50 is chance (`,
+        'Test set: the last 20% of Jan 2020 – Apr 2025, which the LSTM’s threshold was tuned on. Every model’s averages: ',
         tableA3,
-        '). Source: ',
+        '. Source: ',
         { label: `Project-CS403 @ ${source.commit}`, href: notebookUrl },
         '.',
       ],
       columns: ['Model', 'F1'],
+      // Two rows with one value: the tie shows without bold, which would mark every row.
       rows: table1Rows,
-      // The baseline and the LSTM on the same stocks: the tie the table exists to show.
-      emphasis: 2,
     },
-    // The details (SHAP findings, the baseline check, what I'd change) live in Appendix A; here
-    // only what a reader needs before choosing to go there.
+    // The details (the architecture, SHAP findings, the baseline check, what I'd change) live in
+    // Appendix A; here only what a reader needs before choosing to go there.
     points: [
-      'LSTM + self-attention (3 layers, hidden 128) with Focal Loss, compared with Random Forest, Logistic Regression and a soft-voting ensemble.',
       [
         `SHAP and Pearson correlation ranked features ${rankGapRange} positions apart on average, about what ` +
           'unrelated rankings give, and retraining on each method’s top features did not favour SHAP; see ',

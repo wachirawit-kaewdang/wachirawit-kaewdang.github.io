@@ -1,8 +1,9 @@
 // Scans for phone numbers before anything is public. The git hooks in .githooks run it:
 //   --staged             the files a commit or merge would record (pre-commit, pre-merge-commit)
 //   --message <file>     the commit message (commit-msg)
-//   --push               every commit and tag about to be pushed (pre-push, which also covers
-//                        commits made with --no-verify or by a cherry-pick)
+//   --push [remote]      every commit and tag about to be pushed (pre-push, which also covers
+//                        commits made with --no-verify or by a cherry-pick). A new branch is
+//                        compared only with what that remote already has, not with any remote.
 // Every mode but --message also fails a file it can't read (an image, PDF, .docx) unless that file
 // is tied by hash to a scanned source, and --staged and --push check that each tied file still
 // matches its hash.
@@ -42,7 +43,8 @@ if (mode === '--message') {
     if (git(['cat-file', '-t', local]).toString().trim() === 'tag') {
       sources.push([`the tag ${line.split(' ')[0]}`, git(['cat-file', '-p', local])]);
     }
-    const range = none.test(remote) ? [local, '--not', '--remotes'] : [`${remote}..${local}`];
+    const known = file ? `--remotes=${file}` : '--remotes';
+    const range = none.test(remote) ? [local, '--not', known] : [`${remote}..${local}`];
     for (const commit of git(['rev-list', ...range]).toString().split('\n').filter(Boolean)) commits.add(commit);
   }
   for (const commit of commits) {

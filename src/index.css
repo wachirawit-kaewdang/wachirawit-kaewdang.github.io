@@ -86,7 +86,6 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
   .wide { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 .ext { width: 0.6em; height: 0.6em; margin-left: 0.2em; vertical-align: 0.12em; }
-.results tr.emphasis th, .results tr.emphasis td { font-weight: 600; }
 /* The recruiter's summary: two label-and-answer lines under the title, no symbols. */
 .glance { margin: 0 0 1.5rem; display: grid; gap: 0.2rem; }
 .glance div { display: grid; grid-template-columns: 7.5rem 1fr; gap: 0 0.75rem; }
@@ -161,8 +160,8 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .section { padding-top: 2.25rem; }
 .section h2 { font-size: 1.4rem; margin: 0 0 1rem; }
 .subsection { padding: 0.75rem 0 1.25rem; border-radius: 2px; }
-.subsection + .subsection { border-top: 1px solid var(--hair); padding-top: 1.75rem; }
-.subsection h3 { font-size: 1.15rem; margin: 0 0 0.25rem; }
+.subsection + .subsection { border-top: 1px solid var(--hair); padding-top: 2.25rem; margin-top: 0.75rem; }
+.subsection h3 { font-size: 1.3rem; margin: 0 0 0.25rem; }
 .context { font-style: italic; color: var(--ink-soft); margin-bottom: 0.75rem; }
 .meta { margin: 0.25rem 0 0; font-size: 1rem; color: var(--ink-soft); }
 .meta em { color: var(--ink); }

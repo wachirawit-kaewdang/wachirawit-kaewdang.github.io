@@ -61,7 +61,7 @@ export function LinkLine({ className, children }) {
 // A booktabs table with its numbered caption above, as in a paper. The first column is the
 // row label; the rest are figures, right-aligned in tabular numerals. An optional note sits
 // under the bottom rule for sources and the test setup.
-export function NumberedTable({ number, caption, note, columns, rows, emphasis = 0 }) {
+export function NumberedTable({ number, caption, note, columns, rows }) {
   const frame = useRef(null);
   const [scrolls, setScrolls] = useState(false);
   useEffect(() => {
@@ -93,8 +93,8 @@ export function NumberedTable({ number, caption, note, columns, rows, emphasis =
           </tr>
         </thead>
         <tbody>
-          {rows.map(([label, ...values], i) => (
-            <tr key={label} className={i < emphasis ? 'emphasis' : undefined}>
+          {rows.map(([label, ...values]) => (
+            <tr key={label}>
               <th scope="row">{label}</th>
               {values.map((v, j) => (
                 <td key={j}>{v}</td>

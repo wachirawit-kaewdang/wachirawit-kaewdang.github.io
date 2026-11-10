@@ -93,6 +93,20 @@ test('the staged scan stops a file it cannot read unless it is tied by hash', ()
   rmSync(join(repo, 'shot.jpg'));
 });
 
+test('a new branch is compared only with the remote it goes to, not with any remote', () => {
+  const base = git('rev-parse', 'HEAD');
+  writeFileSync(join(repo, 'backup.txt'), `call ${number}\n`);
+  git('add', 'backup.txt');
+  git('commit', '-q', '--no-verify', '-m', 'only on the backup remote');
+  const head = git('rev-parse', 'HEAD');
+  git('update-ref', 'refs/remotes/backup/main', head);
+  const result = scan(['--push', 'origin'], `refs/heads/feature ${head} refs/heads/feature ${'0'.repeat(40)}\n`);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /backup\.txt/);
+  git('update-ref', '-d', 'refs/remotes/backup/main');
+  git('reset', '-q', '--hard', base);
+});
+
 test('the push scan asks for a pull when the remote has unknown commits', () => {
   const head = git('rev-parse', 'HEAD');
   const result = scan(['--push'], `refs/heads/main ${head} refs/heads/main ${'1'.repeat(40)}\n`);
