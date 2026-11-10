@@ -148,7 +148,7 @@ function GapFigure() {
         <span className="caplabel">Figure A.1.</span> Average gap between each feature’s correlation
         and SHAP ranks over the {stockCount} stocks. The averages run from {rankGapRange}, around the 9 that
         unrelated rankings give. Bond yield is in <strong>bold</strong>.{' '}
-        <a href={img('rank_disagreement_summary')} target="_blank" rel="noreferrer">Original chart, with the per-stock heatmap<span className="newtab"> (opens in a new tab)</span></a>
+        <ExtLink href={img('rank_disagreement_summary')}>Original chart, with the per-stock heatmap</ExtLink>
       </figcaption>
     </figure>
   );
@@ -199,7 +199,7 @@ function SectorFigure() {
         <span className="caplabel">Figure A.2.</span> Mean |SHAP| of the top {shownFeatures} features in
         each sector. Bond yield makes the notebook’s top 10 in {bondSectors} sectors, and the top{' '}
         {shownFeatures} in each of them.{' '}
-        <a href={img('sector_shap')} target="_blank" rel="noreferrer">Original chart, with the top 10<span className="newtab"> (opens in a new tab)</span></a>
+        <ExtLink href={img('sector_shap')}>Original chart, with the top 10</ExtLink>
       </figcaption>
     </figure>
   );
@@ -271,7 +271,7 @@ function StockFigure() {
         “up”, per stock, on a scale of ±{gapRange.toFixed(2)}. Right of the centre line is better, left is
         worse, and no bar is an exact tie, as on the {collapsed.length} stocks that collapsed. JNJ beat
         always “up” on both, COST tied on accuracy and fell short on F1, and NVDA’s reference isn’t known.{' '}
-        <a href={img('final_summary')} target="_blank" rel="noreferrer">Original chart, with the ensemble and VIX runs<span className="newtab"> (opens in a new tab)</span></a>
+        <ExtLink href={img('final_summary')}>Original chart, with the ensemble and VIX runs</ExtLink>
       </figcaption>
     </figure>
   );

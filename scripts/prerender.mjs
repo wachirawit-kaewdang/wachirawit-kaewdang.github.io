@@ -32,7 +32,9 @@ const rendered = dom.slice(start, end);
 
 // Every project title must be in the raw HTML, or the point of this step is lost.
 const missing = projects.map((p) => p.title).filter((title) => !rendered.includes(title));
-if (!rendered.includes('I check whether results hold up') || missing.length) {
+// The abstract's opening sentence, read from data.js so a rewording can't break this check.
+const opening = projects.find((p) => p.finding).finding[0].split('. ')[0];
+if (!rendered.includes(opening) || missing.length) {
   console.error(`✗ the pre-rendered home page is incomplete${missing.length ? `: missing ${missing.join(', ')}` : ''}`);
   process.exit(1);
 }

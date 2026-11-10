@@ -47,27 +47,27 @@ export const projects = [
       `An LSTM with self-attention that predicts 3-day price direction for ${stockCount} US stocks across ` +
       `${sectorCount} sectors, used to compare SHAP explanations with plain correlation, ` +
       'with results set against a naive baseline.',
-    // Opens the abstract, ahead of any metric.
+    // Opens the abstract: the skill first, then the catch as proof of it. No metric here.
     finding: [
-      'I check whether results hold up. In my senior project I caught my own LSTM doing no better than ' +
-        `always predicting “up” on ${collapsedShare} stocks, and reported that instead of its ${lstmF1About} F1 (`,
+      'I test my own results against a simple baseline. In my senior project, that check showed my LSTM ' +
+        `did no better than always predicting “up” on ${collapsedShare} stocks, so I reported the honest result (the baseline check, `,
       appendix('A.4', 'appendix-a4', 'the baseline check'),
       ')',
     ],
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption: [
-        `On the ${collapsedShare} stocks where the tuned LSTM predicted “up” on every test day, its F1 (a 0–1 ` +
-          'score for spotting “up” days) is exactly what always predicting “up” scores (',
+        `On ${collapsedShare} stocks the tuned LSTM said “up” every test day, so it scored exactly what always ` +
+          'saying “up” scores. F1 is a 0–1 score for spotting “up” days. Stock by stock: ',
         tableA2,
-        `). Across all ${stockCount} stocks it averages ${lstmF1About}, and every model with a recorded ROC-AUC is ` +
-          `close to chance, at ${aucRange} where 0.50 is chance (`,
-        tableA3,
-        ').',
+        '.',
       ],
       note: [
         'Average F1 over those stocks, on the test set: the last 20% of Jan 2020 – Apr 2025. The LSTM’s threshold ' +
-          'was tuned on it, so its row is if anything optimistic. Source: ',
+          `was tuned on it, so its row is if anything optimistic. Across all ${stockCount} stocks it averages ` +
+          `${lstmF1About}, and every model with a recorded ROC-AUC is close to chance, at ${aucRange} where 0.50 is chance (`,
+        tableA3,
+        '). Source: ',
         { label: `Project-CS403 @ ${source.commit}`, href: notebookUrl },
         '.',
       ],

@@ -182,12 +182,11 @@ function Prose({ pieces }) {
     ));
 }
 
-// The 10-second version for a recruiter: the roles wanted and the two projects to start with,
-// the featured one and the HTTP server, which is code I wrote alone. Contact links sit once, in
-// the title block above.
+// The 10-second version for a recruiter: the roles wanted, the featured project and its code, so
+// both links open something real. If the HTTP server's code is published, it is the stronger
+// second link: code I wrote alone. Contact links sit once, in the title block above.
 function AtAGlance() {
   const featured = projects.findIndex((p) => p.results);
-  const ownCode = projects.findIndex((p) => p.title.startsWith('HTTP'));
   return (
     <dl className="glance" aria-label="At a glance">
       <div>
@@ -198,7 +197,7 @@ function AtAGlance() {
         <dt>Start with</dt>
         <dd>
           <Ref to={projectId(featured)}>{projects[featured].title}</Ref>, and{' '}
-          <Ref to={projectId(ownCode)}>{projects[ownCode].title}</Ref>
+          <ExtLink href={projects[featured].link}>its code on GitHub</ExtLink>
         </dd>
       </div>
     </dl>

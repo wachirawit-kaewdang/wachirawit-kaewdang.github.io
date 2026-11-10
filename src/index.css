@@ -298,7 +298,7 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
   .bars .fill, .bars .tick, .bars .zero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .bars .track { box-shadow: none; border-left: 1px solid var(--ink-soft); }
   .bars .track.centred { border-left: none; }
-  .newtab, .ext { display: none; }
+  .ext { display: none; }
   .contactline a[href^='http']::after { content: ' (' attr(href) ')'; font-size: 0.85em; }
   .contactline a[data-print]::after, a.ref[data-print]::after { content: ' (' attr(data-print) ')'; font-size: 0.85em; }
   .results, .figure { break-inside: avoid; }

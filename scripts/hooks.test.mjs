@@ -61,6 +61,38 @@ test('the push scan stops a commit made with --no-verify, and names it', () => {
   git('reset', '-q', '--hard', base);
 });
 
+test('the push scan reads a merge commit, where a conflict fix can add a number', () => {
+  const base = git('rev-parse', 'HEAD');
+  git('checkout', '-q', '-b', 'side');
+  writeFileSync(join(repo, 'side.txt'), 'side work\n');
+  git('add', 'side.txt');
+  git('commit', '-q', '-m', 'side');
+  git('checkout', '-q', 'main');
+  writeFileSync(join(repo, 'main.txt'), 'main work\n');
+  git('add', 'main.txt');
+  git('commit', '-q', '-m', 'main');
+  git('merge', '-q', '--no-commit', '--no-ff', 'side');
+  writeFileSync(join(repo, 'main.txt'), `main work, call ${number}\n`);
+  git('add', 'main.txt');
+  git('commit', '-q', '--no-verify', '-m', 'merge side');
+  const head = git('rev-parse', 'HEAD');
+  const result = scan(['--push'], `refs/heads/main ${head} refs/heads/main ${base}\n`);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, new RegExp(`main\\.txt in ${head.slice(0, 7)}`));
+  git('reset', '-q', '--hard', base);
+  git('branch', '-q', '-D', 'side');
+});
+
+test('the staged scan stops a file it cannot read unless it is tied by hash', () => {
+  writeFileSync(join(repo, 'shot.jpg'), Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0, 16]));
+  git('add', 'shot.jpg');
+  const result = scan(['--staged']);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /shot\.jpg can't be scanned/);
+  git('rm', '-q', '--cached', 'shot.jpg');
+  rmSync(join(repo, 'shot.jpg'));
+});
+
 test('the push scan asks for a pull when the remote has unknown commits', () => {
   const head = git('rev-parse', 'HEAD');
   const result = scan(['--push'], `refs/heads/main ${head} refs/heads/main ${'1'.repeat(40)}\n`);

@@ -20,6 +20,14 @@ const phones = [
   'โทร.081-234-5678',
   'Tel:081 234 5678',
   '081-234-\n      5678',
+  '081\u2013234\u20135678',
+  '081\u2011234\u20115678',
+  '081&nbsp;234&nbsp;5678',
+  '081&#8211;234&#8211;5678',
+  '081/234/5678',
+  'Tel081-234-5678',
+  '\u0e50\u0e58\u0e51\u0e52\u0e53\u0e54\u0e55\u0e56\u0e57\u0e58',
+  '\uff10\uff18\uff11-\uff12\uff13\uff14-\uff15\uff16\uff17\uff18',
 ];
 
 test('finds a phone number in every common format', () => {
@@ -40,6 +48,16 @@ test('leaves the site\'s own numbers alone', () => {
     '3 layers, hidden size 128, over a 60-day window',
     '0.6000       0.4327',
     '0.50    0.5469   0',
+    'built 2025/11/09',
+    'sha f0812345678',
   ];
   for (const text of ordinary) assert.deepEqual(findPhones(text), [], text);
+});
+
+test('files it cannot read are reported as unreadable, by type or by content', async () => {
+  const { unreadable } = await import('./checks/phone.mjs');
+  assert.equal(unreadable(Buffer.from('plain text'), 'notes.txt'), false);
+  assert.equal(unreadable(Buffer.from('x'), 'shot.jpg'), true);
+  assert.equal(unreadable(Buffer.from([0x50, 0x4b, 0x03, 0x04, 1, 2]), 'resume.docx'), true);
+  assert.equal(unreadable(Buffer.from([0xc3, 0x28, 0xa0, 0xa1, 0xe2, 0x28, 0xa1, 0x80, 0xf0, 0x28]), 'blob.bin'), true);
 });

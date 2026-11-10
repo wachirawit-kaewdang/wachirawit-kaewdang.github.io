@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { phonesIn } from './checks/phone.mjs';
+import { phonesIn, unreadable } from './checks/phone.mjs';
 import { pinnedFiles, shareSourceHash } from './checks/pins.mjs';
 import { profile } from '../src/data.js';
 
@@ -27,6 +27,14 @@ const lf = (bytes) => bytes.toString('utf8').replaceAll('\r\n', '\n');
 export const withPhones = (sources) =>
   sources.filter(([name, bytes]) => phonesIn(bytes, name.split(' ')[0]).length).map(([name]) => name);
 
+// The files the scan can't read (images, PDFs, fonts, .docx, anything not text) that aren't tied by
+// hash to a scanned source. A new one has to be tied in scripts/checks/pins.mjs on purpose, so a
+// screenshot or a Word copy of the private résumé can't slip through unread.
+const tied = new Set([`public/${profile.resume}`, ...Object.keys(pinnedFiles).map((file) => `public/${file}`)]);
+export const untiedBinaries = (sources) => sources
+  .filter(([name, bytes]) => !tied.has(name.split(' ')[0]) && unreadable(bytes, name.split(' ')[0]))
+  .map(([name]) => `${name} can't be scanned for a phone number. Tie it by hash in scripts/checks/pins.mjs, or keep it out of the repo`);
+
 // Tracked files as they are on disk; one deleted but not yet committed has nothing to scan.
 export const trackedFiles = () => names(git(['ls-files', '-z']))
   .filter((name) => existsSync(resolve(name)))
@@ -34,9 +42,10 @@ export const trackedFiles = () => names(git(['ls-files', '-z']))
 // What a commit would record: the staged copy, which can differ from the file on disk.
 export const stagedFiles = () =>
   names(git(['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z'])).map((name) => [name, git(['show', `:${name}`])]);
-// Every file a commit added or changed, and its message.
+// Every file a commit added or changed, and its message. For a merge, -m compares it with each
+// parent, so a file changed while resolving a conflict is read too.
 export const commitContents = (commit) => [
-  ...names(git(['diff-tree', '--no-commit-id', '-r', '--root', '--name-only', '--diff-filter=ACMR', '-z', commit]))
+  ...[...new Set(names(git(['diff-tree', '-m', '--no-commit-id', '-r', '--root', '--name-only', '--diff-filter=ACMR', '-z', commit])))]
     .map((name) => [`${name} in ${commit.slice(0, 7)}`, git(['show', `${commit}:${name}`])]),
   [`the message of ${commit.slice(0, 7)}`, git(['log', '-1', '--format=%B', commit])],
 ];

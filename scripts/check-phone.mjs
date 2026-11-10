@@ -3,12 +3,13 @@
 //   --message <file>     the commit message (commit-msg)
 //   --push               every commit and tag about to be pushed (pre-push, which also covers
 //                        commits made with --no-verify or by a cherry-pick)
-// --staged and --push also check that each binary file (résumé PDF, images) still matches the hash
-// that ties it to a scanned source, since a binary can't be scanned itself.
+// Every mode but --message also fails a file it can't read (an image, PDF, .docx) unless that file
+// is tied by hash to a scanned source, and --staged and --push check that each tied file still
+// matches its hash.
 // With no arguments it scans every tracked file, as npm run check also does in CI.
 // Run: npm run check:phone. npm install switches the hooks on (the prepare script).
 import { readFileSync } from 'node:fs';
-import { brokenTies, commitContents, git, reader, stagedFiles, trackedFiles, withPhones } from './phone-sources.mjs';
+import { brokenTies, commitContents, git, reader, stagedFiles, trackedFiles, untiedBinaries, withPhones } from './phone-sources.mjs';
 
 const [mode, file] = process.argv.slice(2);
 const none = /^0+$/;
@@ -55,6 +56,7 @@ if (mode === '--message') {
 const found = withPhones(sources);
 const problems = [
   ...(found.length ? [`phone number found in ${found.join(', ')}. Remove it first; use only the made-up numbers in scripts/checks/phone.mjs as examples.`] : []),
+  ...(mode === '--message' ? [] : untiedBinaries(sources)),
   ...ties,
 ];
 if (problems.length) fail(problems);

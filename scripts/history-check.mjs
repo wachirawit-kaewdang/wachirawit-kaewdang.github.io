@@ -35,7 +35,7 @@ async function check({ chrome: path, profile, url }) {
       throw new Error(`Chrome did not start: ${chromeSaid.trim().split('\n').at(-1) || `exit code ${chrome.exitCode}`}`);
     }
     const debugPort = readFileSync(portFile, 'utf8').split('\n')[0];
-    const targets = await (await fetch(`http://127.0.0.1:${debugPort}/json/list`)).json();
+    const targets = await (await fetch(`http://127.0.0.1:${debugPort}/json/list`, { signal: AbortSignal.timeout(10_000) })).json();
     socket = new WebSocket(targets.find((t) => t.type === 'page').webSocketDebuggerUrl);
     await new Promise((done, fail) => { socket.onopen = done; socket.onerror = fail; });
     let id = 0;

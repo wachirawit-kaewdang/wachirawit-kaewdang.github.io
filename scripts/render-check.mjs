@@ -7,13 +7,17 @@ import { findPhones } from './checks/phone.mjs';
 import {
   alwaysUpF1, bondRankRows, collapsed, ensembleAuc, rankGapRange, retrainAuc, retrainCorrWins, modelRows, table1Rows,
 } from '../src/metrics.js';
+import { projects } from '../src/data.js';
+
+// The abstract's opening sentence, read from data.js so a rewording can't break this check.
+const opening = projects.find((p) => p.finding).finding[0].split('. ')[0];
 
 const port = 4179;
 const pct = (v) => v.toFixed(3);
 const pages = [
   {
     path: '/',
-    expected: ['Wachirawit Kaewdang', 'Abstract. I check whether results hold up.', 'Looking for', `${rankGapRange} positions apart`, 'did not favour SHAP', 'Contact'],
+    expected: ['Wachirawit Kaewdang', `Abstract. ${opening}.`, 'Looking for', `${rankGapRange} positions apart`, 'did not favour SHAP', 'Contact'],
     tables: { 'table-1': table1Rows },
     headers: { 'table-1': ['Model', 'F1'] },
   },
