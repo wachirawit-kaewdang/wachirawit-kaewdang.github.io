@@ -52,6 +52,23 @@ test('finds a number that follows other digits, a list marker or a web-address c
   for (const text of stuck) assert.equal(findPhones(text).length, 1, text);
 });
 
+// Digits glued to letters are skipped as hashes and IDs, unless the letters are a label or a suffix.
+// Test numbers are built here from made-up parts.
+test('finds a number glued to a label or a suffix, but not to a hash', () => {
+  const digits = ['089', '765', '4321'].join('');
+  for (const label of ['Tel', 'tel', 'TEL', 'Phone', 'Mobile', 'Call', 'Fax', 'Tel:', 'โทร']) {
+    assert.equal(findPhones(`contact ${label}${digits} here`).length, 1, label);
+  }
+  assert.equal(findPhones(`my ${digits}th line`).length, 1, 'th suffix');
+  assert.equal(findPhones(`my ${digits}th`).length, 1, 'th suffix at the end');
+  // Hex strings, IDs and unknown words next to the same digits stay skipped.
+  const hash = 'a3f9c2d1e8b7064f5a3c9d2e1b8f7a06';
+  for (const text of [`f${digits}`, `${hash}${digits}`, `ab12cd${digits}`, `id${digits}`, `x${digits}y`,
+    `${digits}abc`, `Tel${digits}abc`, `Tel${digits}${'ab12cd'.repeat(3)}`]) {
+    assert.deepEqual(findPhones(text), [], text);
+  }
+});
+
 test('leaves the site\'s own numbers alone', () => {
   const ordinary = [
     '2022 – May 2026',

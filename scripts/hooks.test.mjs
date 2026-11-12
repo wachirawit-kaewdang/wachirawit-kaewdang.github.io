@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { after, before, test } from 'node:test';
 import { decodeText, phonesIn } from './checks/phone.mjs';
 
@@ -134,11 +135,49 @@ test('each commit in a push is checked against its own pinned hashes', () => {
   git('reset', '-q', '--hard', base);
 });
 
+test('the pinned-hash reader accepts single quotes, and fails loudly when it finds no entries', () => {
+  const base = git('rev-parse', 'HEAD');
+  const image = Buffer.from([0x89, 0x50, 0x4e, 0x47, 7]);
+  const hash = createHash('sha256').update(image).digest('hex');
+  const commitPins = (text, message) => {
+    mkdirSync(join(repo, 'scripts/checks'), { recursive: true });
+    mkdirSync(join(repo, 'public'), { recursive: true });
+    writeFileSync(join(repo, 'public/og-image.png'), image);
+    writeFileSync(join(repo, 'scripts/checks/pins.mjs'), text);
+    git('add', 'public/og-image.png', 'scripts/checks/pins.mjs');
+    git('commit', '-q', '--no-verify', '-m', message);
+    return scan(['--push'], `refs/heads/main ${git('rev-parse', 'HEAD')} refs/heads/main ${base}\n`);
+  };
+  // Single quotes are read as well as double: a changed image against its pin is still caught.
+  const wrong = '0'.repeat(64);
+  const single = commitPins(`export const pinnedFiles = {\n  'og-image.png': '${wrong}',\n};\n`, 'single quotes');
+  assert.equal(single.status, 1);
+  assert.match(single.stderr, /og-image\.png in [0-9a-f]{7} doesn't match its pinned hash/);
+  git('reset', '-q', '--hard', base);
+  assert.equal(commitPins(`export const pinnedFiles = {\n  'og-image.png': '${hash}',\n};\n`, 'single quotes, right hash').status, 0);
+  git('reset', '-q', '--hard', base);
+  // A pins file the reader can't make sense of stops the scan, rather than skipping the checks.
+  const none = commitPins('export const pinnedFiles = {\n  og: [1, 2, 3],\n};\n', 'unreadable pins');
+  assert.notEqual(none.status, 0);
+  assert.match(none.stderr, /no pinned hashes/);
+  git('reset', '-q', '--hard', base);
+});
+
 test('the push scan asks for a pull when the remote has unknown commits', () => {
   const head = git('rev-parse', 'HEAD');
   const result = scan(['--push'], `refs/heads/main ${head} refs/heads/main ${'1'.repeat(40)}\n`);
   assert.equal(result.status, 1);
   assert.match(result.stderr, /git pull/);
+});
+
+test('reader returns null for a missing path but rethrows any other git failure', () => {
+  const run = (snapshot) => spawnSync(process.execPath, ['--input-type=module', '-e',
+    `import { reader } from ${JSON.stringify(pathToFileURL(resolve(import.meta.dirname, 'phone-sources.mjs')).href)};
+     try { console.log(JSON.stringify(reader(${JSON.stringify(snapshot)})('no/such/file.txt'))); } catch (e) { console.log('THROWN'); }`],
+  { cwd: repo, encoding: 'utf8' }).stdout.trim();
+  assert.equal(run('HEAD'), 'null');
+  assert.equal(run(':'), 'null');
+  assert.equal(run('not-a-real-commit'), 'THROWN');
 });
 
 test('UTF-16 text is decoded, and only listed binary types are skipped', () => {

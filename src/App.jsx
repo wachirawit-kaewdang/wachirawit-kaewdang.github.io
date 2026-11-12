@@ -132,7 +132,9 @@ function RunningHead({ appendix }) {
                 aria-current={s.id === current ? 'location' : undefined}
               >
                 <span className="num">{i + 1}</span>{' '}
-                {s.id === 'education' ? 'Education' : s.title}
+                {/* The menu shows the heading's first word, so five items still fit a phone screen;
+                    the full title is in the link's accessible name above. */}
+                {s.title.split(' ')[0]}
               </a>
             ))
           )}

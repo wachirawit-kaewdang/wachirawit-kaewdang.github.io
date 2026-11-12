@@ -395,10 +395,10 @@ export default function ProjectCS403() {
         </p>
         <SectorFigure />
         <p className="aside">
-          If you open the notebook, note that its closing summary cell says top 5 for 8 of 10 stocks, #1
-          for both banks, and that SHAP gives richer insight than correlation. Those lines are typed text,
-          and the notebook’s own printed tables don’t support them. The numbers here come from those
-          tables, and Figures A.1 and A.2 from the values printed on its charts.
+          If you open the notebook, its closing summary cell says top 5 for 8 of 10 stocks, #1 for both
+          banks, and that SHAP gives richer insight than correlation. That cell overstates what the
+          printed tables show. The numbers here come from those tables, and Figures A.1 and A.2 from the
+          values printed on its charts.
         </p>
       </section>
 

@@ -49,13 +49,30 @@ export function plainText(text) {
     .replace(/[\u00ad\u200b-\u200d\u2060\ufeff]/g, '');
 }
 
+const labelWord = /^(tel|telephone|phone|mobile|mob|cell|call|fax)$/i;
+const suffixWord = /^(th|st|nd|rd)$/i;
+// Whether digits glued to letters are a number with a label or a suffix, not a hash or an ID.
+// A hex string (letters a-f only) is never a label or a suffix, so hashes stay skipped. So does
+// any longer word, or a word with digits stuck to its far side (ab12cd0897654321), or a token
+// longer than 20 characters (an ID).
+function labelled(joined, index, run, lettersBefore, lettersAfter) {
+  // Only a window of 30 characters each side is read: the token is rejected above 20 anyway, and a
+  // match against the whole text from every number would be slow on a large file.
+  const token = joined.slice(Math.max(0, index - 30), index).match(/[A-Za-z0-9]*$/)[0] + run
+    + joined.slice(index + run.length, index + run.length + 30).match(/^[A-Za-z0-9]*/)[0];
+  if (token.length > 20 || token !== lettersBefore + run + lettersAfter) return false;
+  const labelBefore = labelWord.test(lettersBefore);
+  const suffixAfter = suffixWord.test(lettersAfter);
+  if (lettersBefore && lettersAfter) return labelBefore && suffixAfter;
+  return lettersBefore ? labelBefore : suffixAfter;
+}
+
 export function findPhones(text) {
   // A number wrapped across indented lines (081-234- then 5678 on the next line) reads as one.
   const joined = plainText(text).replace(/[ \t]*\r?\n[ \t]*/g, ' ');
   const found = [];
   for (const { 0: run, index } of joined.matchAll(candidate)) {
     const before = joined[index - 1] ?? '';
-    const after = joined[index + run.length] ?? '';
     // Odd places hold the digit groups, even places the separators around them.
     const parts = run.split(/(\d+)/);
     for (let i = 1; i < parts.length; i += 2) {
@@ -67,9 +84,11 @@ export function findPhones(text) {
         digits += parts[j];
         if (digits.length > 12) break;
         const stretch = parts.slice(i, j + 1).join('');
-        // One unbroken string of digits against a letter is part of a hash or an ID.
-        const touching = /[A-Za-z]/.test(i === 1 ? before : '') || /[A-Za-z]/.test(j === parts.length - 2 ? after : '');
-        if (i === j && touching) continue;
+        // One unbroken string of digits against a letter is part of a hash or an ID, unless the
+        // letters are a label (Tel0812345678) or a common suffix (0812345678th).
+        const lettersBefore = i === 1 ? joined.slice(Math.max(0, index - 30), index).match(/[A-Za-z]*$/)[0] : '';
+        const lettersAfter = j === parts.length - 2 ? joined.slice(index + run.length, index + run.length + 30).match(/^[A-Za-z]*/)[0] : '';
+        if (i === j && (lettersBefore || lettersAfter) && !labelled(joined, index, run, lettersBefore, lettersAfter)) continue;
         // A number written with dots uses only dots (081.234.5678). A dot beside other separators
         // is a decimal in a list or table (0.608 0.756 0.756, 0.6000     0.4327).
         if (stretch.includes('.') && /[^\d.]/.test(stretch)) continue;

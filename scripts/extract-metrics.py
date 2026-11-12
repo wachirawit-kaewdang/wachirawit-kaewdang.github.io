@@ -27,6 +27,7 @@ import re
 import subprocess
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 SRC = Path(__file__).resolve().parent.parent / 'src' / 'metrics.json'
@@ -181,7 +182,17 @@ def main():
         'sectorShap': current['sectorShap'],
         'rankGap': current['rankGap'],
     }
-    OUT.write_text(json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + '\n', encoding='utf-8', newline='\n')
+    # Write beside the target, then swap it in, so an interrupted run can't leave a half-written file.
+    text = json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + '\n'
+    fd, tmp = tempfile.mkstemp(dir=OUT.parent, prefix=OUT.name + '.', suffix='.tmp')
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(text)
+        os.replace(tmp, OUT)
+    except BaseException:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+        raise
     print(f'Wrote {OUT} from {NOTEBOOK} @ {commit}: {len(stocks)} stocks')
 
 

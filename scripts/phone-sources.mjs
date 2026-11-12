@@ -56,7 +56,13 @@ export const commitContents = (commit) => [
 
 // A file's bytes in a snapshot (":" for the staged index, or a commit), or null if it isn't there.
 export const reader = (snapshot) => (path) => {
-  try { return git(['show', `${snapshot}${snapshot === ':' ? '' : ':'}${path}`]); } catch { return null; }
+  // Ask git whether the path is listed, instead of reading its English error text. A snapshot git
+  // can't read (a bad commit, a broken repository) makes the listing itself fail, and that throws.
+  const listed = snapshot === ':'
+    ? git(['ls-files', '-z', '--', `:(literal)${path}`])
+    : git(['ls-tree', '-z', '--name-only', snapshot, '--', path]);
+  if (!names(listed).includes(path)) return null;
+  return git(['show', `${snapshot}${snapshot === ':' ? '' : ':'}${path}`]);
 };
 
 // The binary files can't be scanned, so each must match the hash that ties it to a scanned source:
@@ -67,8 +73,12 @@ export const reader = (snapshot) => (path) => {
 function pinsIn(read) {
   const text = read('scripts/checks/pins.mjs')?.toString();
   if (!text) return { files: pinnedFiles, share: shareSourceHash };
-  const files = Object.fromEntries([...text.matchAll(/"([^"]+)":\s*"([0-9a-f]{64})"/g)].map(([, file, hash]) => [file, hash]));
-  return { files, share: text.match(/shareSourceHash = '([0-9a-f]{64})'/)?.[1] };
+  // Single or double quotes, as a formatter may write either.
+  const files = Object.fromEntries([...text.matchAll(/(["'])([^"'\n]+)\1\s*:\s*(["'])([0-9a-f]{64})\3/g)].map(([, , file, , hash]) => [file, hash]));
+  // A pins file with no entries read means the reader no longer matches its format. Skipping the
+  // checks quietly would let a changed image through, so stop instead.
+  if (!Object.keys(files).length) throw new Error('scripts/checks/pins.mjs has no pinned hashes the reader can find; update pinsIn in scripts/phone-sources.mjs');
+  return { files, share: text.match(/shareSourceHash\s*=\s*["']([0-9a-f]{64})["']/)?.[1] };
 }
 
 export function brokenTies(read, where = '') {

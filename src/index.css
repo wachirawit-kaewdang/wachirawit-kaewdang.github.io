@@ -141,6 +141,9 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 }
 /* Inline links are text-height; vertical padding widens their hit area without moving text. */
 .contactline a, .meta a, .seealso a, .back a, .footer a, .glance a { padding-block: 0.6rem; }
+/* Cross-references and links in captions and table notes: 0.45rem above and below makes a hit
+   area of about 30px. Padding on an inline link doesn't change the line spacing. */
+a.ref, :where(.section p, .section li, figcaption, .results caption) a { padding-block: 0.45rem; }
 /* The way into Appendix A, the site's main onward path, so it reads as text rather than a note. */
 .seealso { margin-top: -0.25rem; }
 .seealso a { font-weight: 600; }
@@ -168,8 +171,9 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .subsection + .subsection { border-top: 1px solid var(--hair); padding-top: 2.25rem; margin-top: 0.75rem; }
 .subsection h3 { font-size: 1.3rem; margin: 0 0 0.25rem; }
 .context { font-style: italic; color: var(--ink-soft); margin-bottom: 0.75rem; }
-.meta { margin: 0.25rem 0 0; font-size: 1rem; color: var(--ink-soft); }
+.meta { margin: 0.25rem 0 0; font-size: 1rem; color: var(--ink-soft); text-wrap: pretty; }
 .meta em { color: var(--ink); }
+.section p.meta { max-width: none; }
 .meta + .meta { margin-top: 0.1rem; }
 .subsection > :not(.meta) + .meta { margin-top: 1rem; }
 
@@ -186,7 +190,9 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .shot { margin: 1rem 0; }
 .shot img { display: block; max-width: 100%; height: auto; border: 1px solid var(--hair); border-radius: 2px; background: #fff; }
 .shot figcaption, .sample figcaption { max-width: 34rem; margin-top: 0.5rem; font-size: 0.9rem; line-height: 1.45; color: var(--ink-soft); }
-.tablenote { width: 0; min-width: 100%; margin: 0.5rem 0 0; font-size: 0.9rem; line-height: 1.45; color: var(--ink-soft); }
+/* width: 0 keeps the note from widening the table; min-width is the table's width, but never
+   more than about 75 characters (40em at this font size, as .section p allows 36em). */
+.tablenote { width: 0; min-width: min(100%, 40em); margin: 0.5rem 0 0; font-size: 0.9rem; line-height: 1.45; color: var(--ink-soft); }
 .results table { border-top: 1.5px solid var(--rule); border-bottom: 1.5px solid var(--rule); }
 .results thead th { border-bottom: 0.75px solid var(--rule); font-weight: 600; }
 .results th, .results td { padding: 0.4rem 2rem 0.4rem 0; text-align: left; vertical-align: baseline; }
@@ -271,8 +277,9 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .skills, .facts { margin: 0; display: grid; gap: 1rem; }
 .skills dt, .facts dt { font-weight: 600; }
 .skills dd, .facts dd { margin: 0; }
-.also { color: var(--ink-soft); font-size: 1rem; }
-.also em { color: var(--ink); }
+/* "Also used" skills are in normal ink; only the italic label sets the group apart. */
+.also { font-size: 1rem; }
+.also em { color: var(--ink-soft); }
 
 .footer { padding: 3rem 16px 3rem; color: var(--ink-soft); font-size: 0.9rem; text-align: center; }
 
@@ -289,7 +296,9 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
   .runhead nav { width: 100%; justify-content: space-between; gap: 0 0.5rem; font-size: 0.88rem; }
   .titleblock { padding: 2.5rem 0 1.5rem; }
   .results th, .results td { padding-right: 1rem; }
-  .abstract { margin: 0 1rem 1rem; }
+  .abstract { margin: 0 0 1rem; }
+  /* A slightly smaller font so the longest curl line fits at 375px; it still scrolls if narrower. */
+  .sample pre { font-size: 0.76rem; }
   .sep { margin: 0 0.4em; }
 }
 

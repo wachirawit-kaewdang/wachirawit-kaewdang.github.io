@@ -33,8 +33,8 @@ export const profile = {
   resume: 'Wachirawit_Kaewdang_Resume.pdf',
   source: `${github}/${username}.github.io`,
   summary:
-    'Computer Science graduate (Software Engineering track, May 2026) from Thammasat University, ' +
-    'working across machine learning and full-stack web development (React, Node.js).',
+    'Graduated in May 2026 from Thammasat University (Software Engineering track). ' +
+    'I work across machine learning and full-stack web development (React, Node.js).',
   status: 'Open to Machine Learning Engineer, Software Engineer and QA roles in Bangkok or remote.',
 };
 
