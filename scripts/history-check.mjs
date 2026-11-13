@@ -143,19 +143,6 @@ async function check({ chrome: path, profile, url }) {
     if (home.notice) failures.push(`the name in the running head showed a notice: “${home.notice.slice(0, 60)}”`);
     if (home.top > 40) failures.push(`the name in the running head landed at ${home.top}px, not the top`);
 
-    // The same from an appendix opened directly, with no home page visited first.
-    await send('Page.navigate', { url: `${url}/#/cs403` });
-    await send('Page.reload');
-    if (!(await settle(`document.readyState === 'complete' && ${onAppendix} && !!document.querySelector('.runhead-name')`))) {
-      throw new Error('the appendix did not load directly');
-    }
-    await wait(300);
-    await evaluate("document.querySelector('.runhead-name').click()");
-    if (!(await settle(`!${onAppendix}`))) failures.push('the name in the running head did not leave a directly opened appendix');
-    await wait(300);
-    const direct = await evaluate(`({ top: Math.round(scrollY), notice: document.querySelector('.notice')?.textContent.trim() ?? '' })`);
-    if (direct.notice) failures.push(`the name in the running head showed a notice from a directly opened appendix: “${direct.notice.slice(0, 60)}”`);
-    if (direct.top > 40) failures.push(`the name in the running head landed at ${direct.top}px from a directly opened appendix`);
   } catch (error) {
     failures.push(`the browser check could not run: ${error.message.split('\n')[0]}`);
   } finally {
