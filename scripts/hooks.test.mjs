@@ -212,3 +212,20 @@ test('UTF-16 text is decoded, and only listed binary types are skipped', () => {
   assert.equal(phonesIn(Buffer.from(`${text}\0`), 'notes.txt').length, 1);
   assert.equal(phonesIn(Buffer.from(text), 'image.png').length, 0);
 });
+
+test('blobs reads many objects in order with one git process, and names a missing one', async () => {
+  const { blobs } = await import('./phone-sources.mjs');
+  writeFileSync(join(repo, 'one.txt'), 'first\n');
+  writeFileSync(join(repo, 'two.bin'), Buffer.from([0, 10, 255, 10, 13]));
+  git('add', '.');
+  git('commit', '-q', '-m', 'two files');
+  const read = (code) => spawnSync(process.execPath, ['--input-type=module', '-e', code], { cwd: repo, encoding: 'utf8' });
+  const url = JSON.stringify(pathToFileURL(resolve(import.meta.dirname, 'phone-sources.mjs')).href);
+  const ok = read(`import { blobs } from ${url};
+    console.log(JSON.stringify(blobs(['HEAD:two.bin', 'HEAD:one.txt', ':notes.txt']).map((b) => [...b])));`);
+  assert.deepEqual(JSON.parse(ok.stdout), [[0, 10, 255, 10, 13], [...Buffer.from('first\n')], [...Buffer.from('nothing here\n')]]);
+  assert.deepEqual(blobs([]), []);
+  const missing = read(`import { blobs } from ${url};
+    try { blobs(['HEAD:one.txt', 'HEAD:nope.txt']); } catch (e) { console.log(e.message); }`);
+  assert.match(missing.stdout, /HEAD:nope\.txt is not in the repository/);
+});

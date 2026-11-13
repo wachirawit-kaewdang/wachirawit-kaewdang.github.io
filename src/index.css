@@ -103,11 +103,12 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 }
 .runhead-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: 3rem; }
 .runhead a { color: var(--ink); text-decoration: none; }
-.runhead-name { font-weight: 600; white-space: nowrap; }
+.runhead-name { display: inline-flex; align-items: center; min-height: 2.75rem; font-weight: 600; white-space: nowrap; }
 .runhead nav { display: flex; gap: 0.25rem 1.1rem; font-size: 0.95rem; }
-.runhead nav a { color: var(--ink-soft); padding: 0.7rem 0; white-space: nowrap; }
+/* A 44px-tall target that still fits the 3rem bar: the link is a flex box, not padded text. */
+.runhead nav a { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--ink-soft); white-space: nowrap; }
 .runhead nav a:hover { color: var(--ink); }
-.runhead nav .num { margin-right: 0; }
+.runhead nav .num { margin-right: 0.3em; }
 .runhead a:focus-visible { outline-offset: -2px; }
 .runhead nav a[aria-current] { color: var(--ink); text-decoration: underline; text-underline-offset: 0.3em; }
 .runhead nav .runhead-resume { color: var(--link); font-weight: 600; }
@@ -151,7 +152,7 @@ a.ref, :where(.section p, .section li, figcaption, .results caption) a { padding
 .contents p { margin: 0 0 0.2rem; }
 .contents strong { color: var(--ink); }
 .contents ol { list-style: none; margin: 0; padding: 0; }
-/* Each entry is a full-height target (about 32px), not just its line of text. */
+/* Each entry is a full-height target, not just its line of text. */
 .contents a { display: inline-block; padding-block: 0.3rem; }
 @media (max-width: 600px) { .contents { margin: 0 1rem 1rem; } }
 .titleblock h1 .num { display: block; margin: 0 0 0.35rem; font-size: 0.5em; font-weight: 600; color: var(--ink-soft); letter-spacing: 0; }
@@ -186,7 +187,7 @@ a.ref, :where(.section p, .section li, figcaption, .results caption) a { padding
 .caplabel { font-weight: 600; }
 /* Output from running a project whose code can't be shown: a quiet monospace block. */
 .sample { margin: 1rem 0; }
-.sample pre { margin: 0; padding: 0.6rem 0.8rem; overflow-x: auto; font: 0.85rem/1.45 ui-monospace, 'Cascadia Mono', Consolas, Menlo, monospace; border: 1px solid var(--hair); border-radius: 2px; }
+.sample pre { margin: 0; padding: 0.6rem 0.8rem; overflow-x: auto; font: 0.9rem/1.45 ui-monospace, 'Cascadia Mono', Consolas, Menlo, monospace; border: 1px solid var(--hair); border-radius: 2px; }
 .shot { margin: 1rem 0; }
 .shot img { display: block; max-width: 100%; height: auto; border: 1px solid var(--hair); border-radius: 2px; background: #fff; }
 .shot figcaption, .sample figcaption { max-width: 34rem; margin-top: 0.5rem; font-size: 0.9rem; line-height: 1.45; color: var(--ink-soft); }
@@ -279,7 +280,7 @@ a.ref, :where(.section p, .section li, figcaption, .results caption) a { padding
 .skills dd, .facts dd { margin: 0; }
 /* "Also used" skills are in normal ink; only the italic label sets the group apart. */
 .also { font-size: 1rem; }
-.also em { color: var(--ink-soft); }
+.tag { color: var(--ink-soft); }
 
 .footer { padding: 3rem 16px 3rem; color: var(--ink-soft); font-size: 0.9rem; text-align: center; }
 
@@ -299,6 +300,8 @@ a.ref, :where(.section p, .section li, figcaption, .results caption) a { padding
   .abstract { margin: 0 0 1rem; }
   /* A slightly smaller font so the longest curl line fits at 375px; it still scrolls if narrower. */
   .sample pre { font-size: 0.76rem; }
+  /* Links that stand alone (not inside a sentence) are 44px tall on a touch screen. */
+  .contactline a, .meta a, .back a, .footer a, .contents a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0; }
   .sep { margin: 0 0.4em; }
 }
 

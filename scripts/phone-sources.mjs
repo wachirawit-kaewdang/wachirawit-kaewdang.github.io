@@ -11,12 +11,33 @@ import { pinnedFiles, shareSourceHash } from './checks/pins.mjs';
 import { profile } from '../src/data.js';
 
 // A failed git command throws with git's own message, not only "Command failed".
-export function git(args) {
+export function git(args, input) {
   try {
-    return execFileSync('git', args, { maxBuffer: 256 * 1024 * 1024, stdio: ['pipe', 'pipe', 'pipe'] });
+    return execFileSync('git', args, { input, maxBuffer: 256 * 1024 * 1024, stdio: ['pipe', 'pipe', 'pipe'] });
   } catch (error) {
     throw new Error(`git ${args[0]} failed: ${error.stderr?.toString().trim() || error.message}`, { cause: error });
   }
+}
+// The contents of several objects, named like `git show` names them (":path" for the staged copy,
+// "<commit>:<path>"), read by one `git cat-file --batch` process instead of one `git show` each: a
+// push of many files would otherwise start hundreds of processes. Throws if any is missing. Git
+// reads names line by line, so a name holding a line break is read on its own with `git show`.
+export function blobs(specs) {
+  if (!specs.length) return [];
+  if (specs.some((spec) => /[\r\n]/.test(spec))) return specs.map((spec) => git(['show', spec]));
+  const out = git(['cat-file', '--batch'], `${specs.join('\n')}\n`);
+  const found = [];
+  let at = 0;
+  for (const spec of specs) {
+    // A header line is "<id> <type> <size>", or "<name> missing"; the bytes follow, then a newline.
+    const end = out.indexOf(10, at);
+    const header = end < 0 ? '' : out.toString('latin1', at, end);
+    if (!header || header.endsWith(' missing')) throw new Error(`git cat-file: ${spec} is not in the repository`);
+    const size = Number(header.slice(header.lastIndexOf(' ') + 1));
+    found.push(out.subarray(end + 1, end + 1 + size));
+    at = end + size + 2;
+  }
+  return found;
 }
 const names = (output) => output.toString().split('\0').filter(Boolean);
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -44,15 +65,21 @@ export const trackedFiles = () => names(git(['ls-files', '-z']))
   .filter((name) => existsSync(resolve(name)))
   .map((name) => [name, readFileSync(resolve(name))]);
 // What a commit would record: the staged copy, which can differ from the file on disk.
-export const stagedFiles = () =>
-  names(git(['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z'])).map((name) => [name, git(['show', `:${name}`])]);
+export const stagedFiles = () => {
+  const staged = names(git(['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z']));
+  const contents = blobs(staged.map((name) => `:${name}`));
+  return staged.map((name, i) => [name, contents[i]]);
+};
 // Every file a commit added or changed, and its message. For a merge, -m compares it with each
 // parent, so a file changed while resolving a conflict is read too.
-export const commitContents = (commit) => [
-  ...[...new Set(names(git(['diff-tree', '-m', '--no-commit-id', '-r', '--root', '--name-only', '--diff-filter=ACMR', '-z', commit])))]
-    .map((name) => [`${name} in ${commit.slice(0, 7)}`, git(['show', `${commit}:${name}`])]),
-  [`the message of ${commit.slice(0, 7)}`, git(['log', '-1', '--format=%B', commit])],
-];
+export const commitContents = (commit) => {
+  const changed = [...new Set(names(git(['diff-tree', '-m', '--no-commit-id', '-r', '--root', '--name-only', '--diff-filter=ACMR', '-z', commit])))];
+  const contents = blobs(changed.map((name) => `${commit}:${name}`));
+  return [
+    ...changed.map((name, i) => [`${name} in ${commit.slice(0, 7)}`, contents[i]]),
+    [`the message of ${commit.slice(0, 7)}`, git(['log', '-1', '--format=%B', commit])],
+  ];
+};
 
 // A file's bytes in a snapshot (":" for the staged index, or a commit), or null if it isn't there.
 export const reader = (snapshot) => (path) => {

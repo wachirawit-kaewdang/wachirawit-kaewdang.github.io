@@ -11,7 +11,7 @@ if (!globalThis.WebSocket) {
   const child = spawn(process.execPath, ['--experimental-websocket', ...process.argv.slice(1)], { stdio: 'inherit' });
   child.on('exit', (code) => process.exit(code ?? 1));
 } else {
-  const failures = await withSite('history-check', 4181, check);
+  const failures = await withSite('history-check', check);
   if (failures.length) {
     console.error(failures.map((f) => `✗ ${f}`).join('\n'));
     process.exit(1);

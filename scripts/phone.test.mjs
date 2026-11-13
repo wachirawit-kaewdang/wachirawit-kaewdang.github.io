@@ -116,3 +116,17 @@ test('a path with a space keeps its file type, with or without a commit suffix',
   const split = Buffer.from(`<b>${['089', '765', '4321'].join('</b>-<b>')}</b>`);
   assert.deepEqual(withPhones([['my cv.html', split], ['my cv.html in abc1234', split]]), ['my cv.html', 'my cv.html in abc1234']);
 });
+
+// Made-up parts joined with each separator a contact line might use, built here at run time.
+test('finds a number split by an underscore, a middle dot or a bullet', () => {
+  for (const sep of ['_', ' \u00b7 ', '\u00b7', ' \u2022 ', '\u2022']) {
+    assert.equal(findPhones(`call ${['089', '765', '4321'].join(sep)} now`).length, 1, JSON.stringify(sep));
+  }
+});
+
+test('does not join times or a number cut into code strings', () => {
+  // Two times side by side hold ten digits that start with 08, but a colon is no separator.
+  assert.deepEqual(findPhones('opens 08:30:45 closes 09:15:30'), []);
+  // Documented limit: pieces in quotes are how code lists ordinary values, so they stay unread.
+  assert.deepEqual(findPhones(`const a = ['089', '765', '4321'];`), []);
+});

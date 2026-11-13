@@ -7,7 +7,13 @@
 // a longer run (Bangkok 10200, 081-234-5678 or 1. 081-…), so every stretch of up to five
 // neighbouring groups is tested on its own, not only the whole run.
 // A number may follow a label and a dot (Tel.081…, โทร.081…); a decimal's fraction (0.0812…) may not.
-const candidate = /\d[\d\s(),./+-]*\d|\d/g;
+// Separators: space, comma, brackets, dot, slash, plus, hyphen, underscore (081_234_5678), and the
+// middle dot or bullet (081 · 234 · 5678). A colon is not one: 08:30:45 09:15:30 is two times, and
+// joining them would read as a number. A number cut into JavaScript string pieces ('081' + '234')
+// is also not caught: quotes between groups are how code lists ordinary values, so the scan would
+// fail on every array of numbers. The built page is scanned too (npm run render-check), which
+// catches pieces once they are joined into text.
+const candidate = /\d[\d\s(),./+_\u00b7\u2022-]*\d|\d/g;
 
 // Markup, where tags can split a number that the browser shows whole: <b>081</b>-234-5678.
 const markup = /\.(html?|jsx|tsx|svg|xml|md)$/i;

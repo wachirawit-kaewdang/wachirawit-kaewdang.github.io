@@ -14,7 +14,6 @@ import { projects } from '../src/data.js';
 // The abstract's opening sentence, read from data.js so a rewording can't break this check.
 const opening = projects.find((p) => p.finding).finding[0].split('. ')[0];
 
-const port = 4179;
 const pct = (v) => v.toFixed(3);
 const pages = [
   {
@@ -95,7 +94,7 @@ for (const name of readdirSync(dist, { recursive: true })) {
   if (phonesIn(bytes, name).length) failures.push(`dist/${name.split(sep).join('/')} contains a phone number`);
 }
 
-await withSite('render-check', port, async (site) => {
+await withSite('render-check', async (site) => {
   for (const page of pages) {
     await read(site, page).catch((error) => failures.push(`${page.path} could not be opened in Chrome: ${error.message.split('\n')[0]}`));
   }

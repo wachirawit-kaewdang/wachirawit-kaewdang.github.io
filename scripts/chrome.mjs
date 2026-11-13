@@ -2,6 +2,7 @@
 // dist/, and a throwaway Chrome profile. Set CHROME=/path/to/chrome to choose another browser.
 import { execFile } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
@@ -43,11 +44,25 @@ export async function dumpDom(chrome, profile, url) {
   return stdout;
 }
 
-// Serves dist/ on `port` with a fresh Chrome profile, runs `task`, then stops the server and
+// A port nothing is listening on, so two runs at once (npm run verify in two terminals, or beside
+// a dev server) never fight over one. Another program could take it before Vite does; strictPort
+// then makes that a clear error, and a rerun picks another.
+export function freePort() {
+  return new Promise((done, fail) => {
+    const probe = createServer();
+    probe.once('error', fail);
+    probe.listen(0, () => {
+      const { port } = probe.address();
+      probe.close(() => done(port));
+    });
+  });
+}
+
+// Serves dist/ on a free port with a fresh Chrome profile, runs `task`, then stops the server and
 // removes the profile. Profiles left by a run that was killed outright are removed first, once
 // they are an hour old so a run still going keeps its own. A cleanup error, such as a folder
 // Windows still has locked, never hides the result of `task`.
-export async function withSite(prefix, port, task) {
+export async function withSite(prefix, task) {
   for (const old of readdirSync(tmpdir()).filter((name) => name.startsWith(`${prefix}-`))) {
     const path = join(tmpdir(), old);
     try {
@@ -55,6 +70,7 @@ export async function withSite(prefix, port, task) {
     } catch { /* still in use; a later run tries again */ }
   }
   const profile = mkdtempSync(join(tmpdir(), `${prefix}-`));
+  const port = await freePort();
   const { preview } = await import('vite');
   const server = await preview({ logLevel: 'silent', preview: { port, strictPort: true } });
   try {

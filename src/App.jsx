@@ -70,8 +70,11 @@ function useHash() {
   return hash;
 }
 
-// The section the reader is in: the last one to start above the middle of the window. At the very
-// end short sections can't get that high, so there it's the one just linked to, or else the last.
+// The section the reader is in: the last one whose top has risen above 30% of the window, so the
+// menu changes soon after a new heading arrives rather than while the old section still fills the
+// screen. At the very end short sections can't get that high, so there it's the one just linked to,
+// or else the last.
+const SPY_LINE = 0.3;
 const homeSections = sections.map((s) => s.id);
 const appendixSections = [1, 2, 3, 4, 5, 6].map((n) => `appendix-a${n}`);
 
@@ -81,11 +84,11 @@ function useCurrentSection(ids) {
     const update = () => {
       const atEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
       const started = ids.filter((id) =>
-        document.getElementById(id)?.getBoundingClientRect().top < window.innerHeight * 0.5);
+        document.getElementById(id)?.getBoundingClientRect().top < window.innerHeight * SPY_LINE);
       // A section just linked to wins while it's near the top, even if a short one follows it.
       const named = window.location.hash.replace(/^.*[#/]/, '');
       const namedTop = ids.includes(named) ? document.getElementById(named)?.getBoundingClientRect().top : null;
-      const landed = namedTop != null && namedTop >= 0 && namedTop < window.innerHeight * 0.5;
+      const landed = namedTop != null && namedTop >= 0 && namedTop < window.innerHeight * SPY_LINE;
       setCurrent(landed ? named : atEnd ? ids.at(-1) : started.at(-1) ?? null);
     };
     update();
@@ -186,9 +189,9 @@ function Prose({ pieces }) {
     ));
 }
 
-// The 10-second version for a recruiter: the roles wanted, the featured project and its code, so
-// both links open something real. If the HTTP server's code is published, it is the stronger
-// second link: code I wrote alone. Contact links sit once, in the title block above.
+// The 10-second version for a recruiter: the roles wanted, and where to start reading. It states
+// no result, because the abstract right below leads with it. Contact links sit once, in the title
+// block above.
 function AtAGlance() {
   const featured = projects.findIndex((p) => p.results);
   return (
@@ -200,8 +203,8 @@ function AtAGlance() {
       <div>
         <dt>Start with</dt>
         <dd>
-          <Ref to={projectId(featured)}>{projects[featured].title}</Ref>, and{' '}
-          <ExtLink href={projects[featured].link}>its code on GitHub</ExtLink>
+          <Ref to={projectId(featured)}>{projects[featured].title}</Ref> (§{sectionNumber('projects')}.{featured + 1}),
+          with <ExtLink href={projects[featured].link}>its code on GitHub</ExtLink>
         </dd>
       </div>
     </dl>
@@ -321,8 +324,9 @@ function Skills() {
     <section id="skills" className="section" tabIndex={-1} aria-labelledby="skills-title">
       <SectionHeading id="skills" />
       <p>
-        Each group starts with what the projects in{' '}
-        <Ref to="projects">§{sectionNumber('projects')} Projects</Ref> show, then what I have also used.
+        Each group lists first the skills that the projects in{' '}
+        <Ref to="projects">§{sectionNumber('projects')} Projects</Ref> use, then the ones I have used
+        elsewhere, with no project here to show for them.
       </p>
       <dl className="skills">
         {skills.map((s) => {
@@ -331,10 +335,14 @@ function Skills() {
           return (
             <div key={s.group}>
               <dt>{s.group}</dt>
-              {shown.length > 0 && <dd>{shown.join(', ')}</dd>}
+              {shown.length > 0 && (
+                <dd>
+                  <em className="tag">In the projects:</em> {shown.join(', ')}
+                </dd>
+              )}
               {also.length > 0 && (
                 <dd className="also">
-                  <em>Also used:</em> {also.join(', ')}
+                  <em className="tag">Used, not shown here:</em> {also.join(', ')}
                 </dd>
               )}
             </div>
@@ -355,12 +363,12 @@ function Background() {
           <dd>{education.degree}</dd>
           <dd className="also">{education.period}</dd>
         </div>
-        {languages.map((l) => (
-          <div key={l.name}>
-            <dt>{l.name}</dt>
-            <dd>{l.level}</dd>
-          </div>
-        ))}
+        <div>
+          <dt>Languages</dt>
+          {languages.map((l) => (
+            <dd key={l.name}>{l.name}: {l.level.toLowerCase()}</dd>
+          ))}
+        </div>
       </dl>
     </section>
   );
@@ -370,11 +378,11 @@ function Contact() {
   return (
     <section id="contact" className="section" tabIndex={-1} aria-labelledby="contact-title">
       <SectionHeading id="contact" />
+      {/* The title block holds the full set of links; here the two ways to start a conversation. */}
       <p>Happy to talk through any of this. Email is quickest, or LinkedIn.</p>
       <LinkLine className="contactline left">
         <a className="primary" href={`mailto:${profile.email}`}>{profile.email}</a>
         <ExtLink href={profile.linkedin}>LinkedIn</ExtLink>
-        <ExtLink href={asset(profile.resume)} data-print={`${profile.site}${profile.resume}`}>Résumé (PDF)</ExtLink>
       </LinkLine>
     </section>
   );

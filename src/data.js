@@ -57,8 +57,8 @@ export const projects = [
     results: {
       // The caption leads with what the numbers mean, so the F1 column is never read alone.
       caption: [
-        `On ${collapsedShare} stocks the tuned LSTM said “up” every test day, so it scored exactly what always ` +
-          'saying “up” scores. F1 is a 0–1 score for spotting “up” days. Stock by stock: ',
+        `Average F1 on the ${collapsedShare} stocks where the tuned LSTM predicted “up” on every test day. F1 is a 0–1 score ` +
+          'for spotting “up” days; higher is better. Stock by stock: ',
         tableA2,
         '.',
       ],

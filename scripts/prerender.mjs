@@ -6,7 +6,6 @@ import { resolve } from 'node:path';
 import { dumpDom, withSite } from './chrome.mjs';
 import { projects } from '../src/data.js';
 
-const port = 4180;
 const page = resolve(import.meta.dirname, '..', 'dist', 'index.html');
 const empty = '<div id="root"></div>';
 // index.html marks where the root ends, so the cut never depends on what follows it.
@@ -18,7 +17,7 @@ if (!html.includes(empty) || !html.includes(endMark)) {
   process.exit(1);
 }
 
-const dom = await withSite('prerender', port, ({ chrome, profile, url }) => dumpDom(chrome, profile, `${url}/`));
+const dom = await withSite('prerender', ({ chrome, profile, url }) => dumpDom(chrome, profile, `${url}/`));
 
 // The root's contents run from its opening tag to the marked closing one.
 const open = dom.indexOf('<div id="root">');

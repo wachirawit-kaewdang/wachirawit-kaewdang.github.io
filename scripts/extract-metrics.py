@@ -101,11 +101,9 @@ def bond_correlation_ranks(top5_text, diff_text):
     return ranks
 
 
-def main():
-    if len(sys.argv) < 2:
-        sys.exit(__doc__)
-    target = Path(sys.argv[1])
-    current = json.loads(SRC.read_text(encoding='utf-8'))
+def read_notebook(target, current):
+    """(commit, raw bytes, git blob hash) of the notebook named on the command line: the frozen
+    copy kept in this repo, or a checkout's file at a commit."""
     if target.is_file():
         # The frozen copy kept in this repo, so deploys don't depend on the notebook's branch.
         commit = current['source']['commit']
@@ -120,54 +118,61 @@ def main():
     pinned = current['source'].get('notebookBlob')
     if pinned and blob != pinned and commit == current['source']['commit']:
         sys.exit(f'The notebook read has git hash {blob}, but the frozen one is {pinned}')
-    texts = list(outputs(json.loads(raw.decode('utf-8'))))
+    return commit, raw, blob
 
-    lstm_text = find(texts, 'LSTM Acc  LSTM F1')
-    lstm = table(lstm_text, 'LSTM Acc  LSTM F1')
-    ensemble = table(find(texts, '=== Ensemble Model Results ==='), 'Soft_Acc')
-    bond = table(find(texts, 'Bond_yield SHAP Rank across all stocks'), 'Bond_yield Rank')
-    baselines = find(texts, 'Random Forest: Acc=')
+
+def read_tables(texts):
+    """Every table and printed block the metrics come from, each located by its header."""
+    per_ticker_pattern = r'=== ([A-Z]+) ===\n(.*?)(?==== |\Z)'
+    tables = {
+        'lstm': table(find(texts, 'LSTM Acc  LSTM F1'), 'LSTM Acc  LSTM F1'),
+        'ensemble': table(find(texts, '=== Ensemble Model Results ==='), 'Soft_Acc'),
+        'bond': table(find(texts, 'Bond_yield SHAP Rank across all stocks'), 'Bond_yield Rank'),
+        'baselines': dict(re.findall(per_ticker_pattern, find(texts, 'Random Forest: Acc='), re.S)),
+        'corr_ranks': bond_correlation_ranks(find(texts, 'Top 5 Corr:'), find(texts, 'Corr_Rank')),
+        'retrain': dict(re.findall(per_ticker_pattern, find(texts, 'Corr top-10:'), re.S)),
+    }
+    tickers = set(tables['lstm'])
+    for name, key in (('ensemble', 'ensemble'), ('bond-yield', 'bond'), ('RF/LR', 'baselines'), ('retrain', 'retrain')):
+        if set(tables[key]) != tickers:
+            sys.exit(f'The {name} table has different stocks: {sorted(set(tables[key]) ^ tickers)}')
+    return tables
+
+
+def build_stock(ticker, row, tables):
+    """One stock's entry in metrics.json, checked against the other tables as it is built."""
+    ens = tables['ensemble'][ticker]
+    # The LSTM table reprints the ensemble's numbers, a free check that the columns line up.
+    for here, there in (('Ens Acc', 'Soft_Acc'), ('Ens F1', 'Soft_F1'), ('Thresh', 'Thresh')):
+        if column(row, here) != column(ens, there):
+            sys.exit(f'{ticker}: {here} {row[here]} disagrees with the ensemble table\'s {there} {ens[there]}')
     metric = r'Acc=([\d.]+) F1=([\d.]+) AUC=([\d.]+)'
-    per_ticker = dict(re.findall(r'=== ([A-Z]+) ===\n(.*?)(?==== |\Z)', baselines, re.S))
-    corr_ranks = bond_correlation_ranks(find(texts, 'Top 5 Corr:'), find(texts, 'Corr_Rank'))
-    retrain = dict(re.findall(r'=== ([A-Z]+) ===\n(.*?)(?==== |\Z)', find(texts, 'Corr top-10:'), re.S))
+    rf = re.search(r'Random Forest: ' + metric, tables['baselines'][ticker])
+    lr = re.search(r'Logistic Reg:\s+' + metric, tables['baselines'][ticker])
+    by_corr = re.search(r'Corr top-10:\s+' + metric, tables['retrain'][ticker])
+    by_shap = re.search(r'SHAP top-10:\s+' + metric, tables['retrain'][ticker])
+    if not (rf and lr and by_corr and by_shap):
+        sys.exit(f'{ticker}: a Random Forest, Logistic Reg or top-10 retrain line was not found')
+    return {
+        'sector': row['Sector'],
+        'threshold': column(row, 'Thresh'),
+        'lstm': {'acc': column(row, 'LSTM Acc'), 'f1': column(row, 'LSTM F1')},
+        'vix': {'acc': column(row, 'VIX Acc'), 'f1': column(row, 'VIX F1')},
+        'ensemble': {key: column(ens, name) for key, name in
+                     (('acc', 'Soft_Acc'), ('f1', 'Soft_F1'), ('auc', 'AUC'))},
+        'rf': dict(zip(('acc', 'f1', 'auc'), map(float, rf.groups()))),
+        'lr': dict(zip(('acc', 'f1', 'auc'), map(float, lr.groups()))),
+        'retrain': {
+            'corr': dict(zip(('acc', 'f1', 'auc'), map(float, by_corr.groups()))),
+            'shap': dict(zip(('acc', 'f1', 'auc'), map(float, by_shap.groups()))),
+        },
+        'bondYieldRank': int(column(tables['bond'][ticker], 'Bond_yield Rank')),
+        'bondCorrelationRank': tables['corr_ranks'].get(ticker),
+    }
 
-    tickers = set(lstm)
-    for name, seen in (('ensemble', ensemble), ('bond-yield', bond), ('RF/LR', per_ticker), ('retrain', retrain)):
-        if set(seen) != tickers:
-            sys.exit(f'The {name} table has different stocks: {sorted(set(seen) ^ tickers)}')
 
-    stocks = {}
-    for ticker, row in lstm.items():
-        ens = ensemble[ticker]
-        # The LSTM table reprints the ensemble's numbers, a free check that the columns line up.
-        for here, there in (('Ens Acc', 'Soft_Acc'), ('Ens F1', 'Soft_F1'), ('Thresh', 'Thresh')):
-            if column(row, here) != column(ens, there):
-                sys.exit(f'{ticker}: {here} {row[here]} disagrees with the ensemble table\'s {there} {ens[there]}')
-        rf = re.search(r'Random Forest: ' + metric, per_ticker[ticker])
-        lr = re.search(r'Logistic Reg:\s+' + metric, per_ticker[ticker])
-        by_corr = re.search(r'Corr top-10:\s+' + metric, retrain[ticker])
-        by_shap = re.search(r'SHAP top-10:\s+' + metric, retrain[ticker])
-        if not (rf and lr and by_corr and by_shap):
-            sys.exit(f'{ticker}: a Random Forest, Logistic Reg or top-10 retrain line was not found')
-        stocks[ticker] = {
-            'sector': row['Sector'],
-            'threshold': column(row, 'Thresh'),
-            'lstm': {'acc': column(row, 'LSTM Acc'), 'f1': column(row, 'LSTM F1')},
-            'vix': {'acc': column(row, 'VIX Acc'), 'f1': column(row, 'VIX F1')},
-            'ensemble': {key: column(ens, name) for key, name in
-                         (('acc', 'Soft_Acc'), ('f1', 'Soft_F1'), ('auc', 'AUC'))},
-            'rf': dict(zip(('acc', 'f1', 'auc'), map(float, rf.groups()))),
-            'lr': dict(zip(('acc', 'f1', 'auc'), map(float, lr.groups()))),
-            'retrain': {
-                'corr': dict(zip(('acc', 'f1', 'auc'), map(float, by_corr.groups()))),
-                'shap': dict(zip(('acc', 'f1', 'auc'), map(float, by_shap.groups()))),
-            },
-            'bondYieldRank': int(column(bond[ticker], 'Bond_yield Rank')),
-            'bondCorrelationRank': corr_ranks.get(ticker),
-        }
-
-    # sector_shap.png's bond-yield bar is the mean of the sector's two stocks in the table.
+def check_sector_shap(current, stocks, bond):
+    """sector_shap.png's bond-yield bar is the mean of the sector's two stocks in the table."""
     for sector in current['sectorShap']:
         drawn = dict(sector['rows']).get('Bond_yield')
         values = [column(bond[t], 'SHAP Value') for t, s in stocks.items() if s['sector'] == sector['sector']]
@@ -176,13 +181,9 @@ def main():
         if drawn is not None and abs(drawn - sum(values) / len(values)) > 0.00011:
             sys.exit(f'sectorShap {sector["sector"]}: bond yield {drawn} does not match the notebook\'s {values}')
 
-    data = {
-        'source': {**current['source'], 'commit': commit, 'notebookBlob': blob},
-        'stocks': stocks,
-        'sectorShap': current['sectorShap'],
-        'rankGap': current['rankGap'],
-    }
-    # Write beside the target, then swap it in, so an interrupted run can't leave a half-written file.
+
+def write_json(data):
+    """Writes beside the target, then swaps it in, so an interrupted run can't leave a half-written file."""
     text = json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + '\n'
     fd, tmp = tempfile.mkstemp(dir=OUT.parent, prefix=OUT.name + '.', suffix='.tmp')
     try:
@@ -193,6 +194,22 @@ def main():
         if os.path.exists(tmp):
             os.unlink(tmp)
         raise
+
+
+def main():
+    if len(sys.argv) < 2:
+        sys.exit(__doc__)
+    current = json.loads(SRC.read_text(encoding='utf-8'))
+    commit, raw, blob = read_notebook(Path(sys.argv[1]), current)
+    tables = read_tables(list(outputs(json.loads(raw.decode('utf-8')))))
+    stocks = {ticker: build_stock(ticker, row, tables) for ticker, row in tables['lstm'].items()}
+    check_sector_shap(current, stocks, tables['bond'])
+    write_json({
+        'source': {**current['source'], 'commit': commit, 'notebookBlob': blob},
+        'stocks': stocks,
+        'sectorShap': current['sectorShap'],
+        'rankGap': current['rankGap'],
+    })
     print(f'Wrote {OUT} from {NOTEBOOK} @ {commit}: {len(stocks)} stocks')
 
 
