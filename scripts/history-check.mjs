@@ -37,7 +37,11 @@ async function check({ chrome: path, profile, url }) {
     const debugPort = readFileSync(portFile, 'utf8').split('\n')[0];
     const targets = await (await fetch(`http://127.0.0.1:${debugPort}/json/list`, { signal: AbortSignal.timeout(10_000) })).json();
     socket = new WebSocket(targets.find((t) => t.type === 'page').webSocketDebuggerUrl);
-    await new Promise((done, fail) => { socket.onopen = done; socket.onerror = fail; });
+    await new Promise((done, fail) => {
+      const timer = setTimeout(() => fail(new Error('Chrome did not open the debugging connection within 10 s')), 10_000);
+      socket.onopen = () => { clearTimeout(timer); done(); };
+      socket.onerror = () => { clearTimeout(timer); fail(new Error('the connection to Chrome failed')); };
+    });
     let id = 0;
     const pending = new Map();
     socket.onmessage = ({ data }) => {
@@ -130,6 +134,28 @@ async function check({ chrome: path, profile, url }) {
     if (!forward.appendix) failures.push('Forward did not return to the appendix');
     if (Math.abs(forward.top - deep) > 40) failures.push(`Forward returned to ${forward.top}px, not the appendix place at ${deep}px`);
     if (!forward.focusInView) failures.push('Forward left focus off screen');
+
+    // The name in the running head goes home, to the top, with no "section doesn't exist" notice.
+    await evaluate("document.querySelector('.runhead-name').click()");
+    if (!(await settle(`!${onAppendix}`))) failures.push('the name in the running head did not leave the appendix');
+    await wait(300);
+    const home = await evaluate(`({ top: Math.round(scrollY), notice: document.querySelector('.notice')?.textContent.trim() ?? '' })`);
+    if (home.notice) failures.push(`the name in the running head showed a notice: “${home.notice.slice(0, 60)}”`);
+    if (home.top > 40) failures.push(`the name in the running head landed at ${home.top}px, not the top`);
+
+    // The same from an appendix opened directly, with no home page visited first.
+    await send('Page.navigate', { url: `${url}/#/cs403` });
+    await send('Page.reload');
+    if (!(await settle(`document.readyState === 'complete' && ${onAppendix} && !!document.querySelector('.runhead-name')`))) {
+      throw new Error('the appendix did not load directly');
+    }
+    await wait(300);
+    await evaluate("document.querySelector('.runhead-name').click()");
+    if (!(await settle(`!${onAppendix}`))) failures.push('the name in the running head did not leave a directly opened appendix');
+    await wait(300);
+    const direct = await evaluate(`({ top: Math.round(scrollY), notice: document.querySelector('.notice')?.textContent.trim() ?? '' })`);
+    if (direct.notice) failures.push(`the name in the running head showed a notice from a directly opened appendix: “${direct.notice.slice(0, 60)}”`);
+    if (direct.top > 40) failures.push(`the name in the running head landed at ${direct.top}px from a directly opened appendix`);
   } catch (error) {
     failures.push(`the browser check could not run: ${error.message.split('\n')[0]}`);
   } finally {

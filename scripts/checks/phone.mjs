@@ -17,8 +17,10 @@ export const shownText = (html) => html.replace(/<[^>]*>/g, '').replace(/\s+/g, 
 // The made-up numbers the tests use, as digits. They are the only numbers allowed in the repo.
 export const madeUp = new Set(['0812345678', '021234567']);
 
-// Images, PDFs and fonts hold no readable text to scan. Each one in this repo is tied by hash to a
-// text source that is scanned (scripts/checks/pins.mjs, resume/resume.sha256).
+// Images, PDFs and fonts hold no readable text to scan. Only the résumé PDF and the share image are
+// tied by hash to a text source that is scanned (resume/resume.html, og/og-image.html). The charts
+// and the recipe screenshot are pinned by hash (scripts/checks/pins.mjs): the owner approved those
+// exact bytes, but nothing scans their pixels.
 export const binaryFile = /\.(pdf|png|webp|jpe?g|gif|ico|woff2?|ttf|otf)$/i;
 
 // A number's digits in the local 0… form, so every way of writing it compares equal.

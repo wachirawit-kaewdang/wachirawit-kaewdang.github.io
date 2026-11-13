@@ -23,14 +23,18 @@ npm run check:phone  Scans every tracked file for a phone number. npm install sw
                   What ships is scanned as well: npm run resume scans the rendered résumé
                   before printing it, and render-check scans every file in dist/.
                   It is a pattern match, so a number spelled out in words would pass.
-                  Binary files (the résumé PDF, images) can't be scanned, so each one must be
-                  tied by hash to a scanned source (scripts/checks/pins.mjs and
-                  resume/resume.sha256). Any other file the scan can't read (a new image, a
-                  .docx) fails until it is tied there on purpose.
+                  Binary files (the résumé PDF, images) can't be scanned. The résumé PDF and
+                  the share image are tied by hash to a scanned source (resume/resume.sha256,
+                  scripts/checks/pins.mjs). The charts and the recipe screenshot are only
+                  pinned by hash: the owner approved those exact bytes, but nothing scans
+                  their pixels. Any other file the scan can't read (a new image, a .docx)
+                  fails until it is added to the pins on purpose.
                   The push hook is the last gate: CI runs after the push, when the commit is
-                  already public. CI still scans every commit in the push, so a number pushed
-                  without the hooks (even one removed again in a later commit) fails the build
-                  instead of passing quietly. The hooks don't run for edits made on GitHub's website, and
+                  already public. CI still scans every commit in the whole history
+                  (node scripts/check-phone.mjs --history, files and messages, phone numbers
+                  only), so a number pushed without the hooks (even one removed again in a
+                  later commit, or in a run that was cancelled) fails the build instead of
+                  passing quietly. The hooks don't run for edits made on GitHub's website, and
                   npm run check warns when they are off in this copy.
 npm run render-check  Opens the built site in headless Chrome; run npm run build first.
                   npm run build also pre-renders the home page into dist/index.html, so its

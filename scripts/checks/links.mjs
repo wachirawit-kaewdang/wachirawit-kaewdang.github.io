@@ -22,16 +22,23 @@ for (const p of projects) if (p.shot) expect(p.shot.src, `src/data.js (${p.title
 expect('404.html', 'GitHub Pages');
 // Search engines and audit tools ask for this; without it they get the page HTML instead.
 expect('robots.txt', 'crawlers');
-for (const [, path] of read('public/404.html').matchAll(/href="\/([^"#]+)"/g)) expect(path, 'public/404.html');
+// A file that can't be read is a failure to report, not a crash that hides the other checks.
+const readOrFail = (path) => {
+  try { return read(path); } catch {
+    failures.push(`${path} could not be read, so the links in it were not checked`);
+    return '';
+  }
+};
+for (const [, path] of readOrFail('public/404.html').matchAll(/href="\/([^"#]+)"/g)) expect(path, 'public/404.html');
 
 // Appendix figures: <Figure name="..."> props and img('...') calls map to public/cs403/<name>.webp.
-const appendix = read('src/ProjectCS403.jsx');
+const appendix = readOrFail('src/ProjectCS403.jsx');
 for (const m of appendix.matchAll(/\bname="([\w-]+)"|\bimg\('([\w-]+)'\)/g)) {
   expect(`cs403/${m[1] ?? m[2]}.webp`, 'src/ProjectCS403.jsx');
 }
 
 // index.html: root-relative files (favicon) and the absolute og:image, which must also be ours.
-const html = read('index.html');
+const html = readOrFail('index.html');
 for (const [, path] of html.matchAll(/(?:href|src)="\/([^"/][^"]*)"/g)) {
   if (!path.startsWith('src/')) expect(path, 'index.html');
 }

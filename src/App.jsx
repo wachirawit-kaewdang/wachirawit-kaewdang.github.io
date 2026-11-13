@@ -500,7 +500,8 @@ export default function App() {
     } else {
       const named = hash.length > 1 ? hash.slice(1) : wasCaseStudy.current ? projectId(0) : null;
       const target = named && document.getElementById(named);
-      found = !named || Boolean(target);
+      // "top" always means the start of the page, which the running head's name links to.
+      found = !named || named === 'top' || Boolean(target);
       if (!found) window.scrollTo({ top: 0, behavior: 'instant' });
       if (target) {
         target.scrollIntoView();

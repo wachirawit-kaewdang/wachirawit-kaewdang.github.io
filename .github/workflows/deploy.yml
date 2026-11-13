@@ -40,19 +40,13 @@ jobs:
       # pre-render, the rendered tables, and Back and Forward in a browser.
       - run: npm run verify
       # npm run verify scans the files as they are now. A push made without the hooks could add a
-      # number in one commit and remove it in the next, so every commit in the push is scanned
-      # too, as the pre-push hook does. A number found here is already public: remove it and
-      # rewrite history. After a force-push the old tip is gone; the final tree was scanned above.
-      - name: Scan every commit in this push for phone numbers
-        if: github.event_name == 'push'
-        env:
-          BEFORE: ${{ github.event.before }}
-        run: |
-          if git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
-            echo "refs/heads/main $GITHUB_SHA refs/heads/main $BEFORE" | node scripts/check-phone.mjs --push origin
-          else
-            echo "No earlier commit to compare with; the final files were scanned by npm run verify."
-          fi
+      # number in one commit and remove it in the next, so every commit in the history is scanned
+      # too (files and messages, phone numbers only). The whole history is scanned, not just the
+      # last push, because a cancelled run or a force-push can leave commits no run has seen. A
+      # number found here is already public: remove it and rewrite history.
+      - name: Scan every commit in the history for phone numbers
+        if: github.event_name != 'pull_request'
+        run: node scripts/check-phone.mjs --history
       - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:

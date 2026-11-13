@@ -4,9 +4,11 @@
 //   --push [remote]      every commit and tag about to be pushed (pre-push, which also covers
 //                        commits made with --no-verify or by a cherry-pick). A new branch is
 //                        compared only with what that remote already has, not with any remote.
-// Every mode but --message also fails a file it can't read (an image, PDF, .docx) unless that file
-// is tied by hash to a scanned source, and --staged and --push check that each tied file still
-// matches its hash.
+//   --history            every commit reachable from HEAD, files and messages, for phone numbers only
+//                        (CI runs it). It skips the hash checks below: old commits predate the pins.
+// Every mode but --message and --history also fails a file it can't read (an image, PDF, .docx)
+// unless that file is listed in scripts/checks/pins.mjs or is the résumé PDF, and --staged and
+// --push check that each listed file still matches its hash.
 // With no arguments it scans every tracked file, as npm run check also does in CI.
 // Run: npm run check:phone. npm install switches the hooks on (the prepare script).
 import { readFileSync } from 'node:fs';
@@ -51,6 +53,13 @@ if (mode === '--message') {
     sources.push(...commitContents(commit));
     ties.push(...brokenTies(reader(commit), ` in ${commit.slice(0, 7)}`));
   }
+} else if (mode === '--history') {
+  // Every commit reachable from HEAD: its changed files and its message. Phone numbers only. An
+  // old commit predates the pins and ties of today, so the hash checks would fail there by design.
+  sources = [];
+  for (const commit of git(['rev-list', 'HEAD']).toString().split('\n').filter(Boolean)) {
+    sources.push(...commitContents(commit));
+  }
 } else {
   sources = trackedFiles();
 }
@@ -58,8 +67,9 @@ if (mode === '--message') {
 const found = withPhones(sources);
 const problems = [
   ...(found.length ? [`phone number found in ${found.join(', ')}. Remove it first; use only the made-up numbers in scripts/checks/phone.mjs as examples.`] : []),
-  ...(mode === '--message' ? [] : untiedBinaries(sources)),
+  ...(mode === '--message' || mode === '--history' ? [] : untiedBinaries(sources)),
   ...ties,
 ];
 if (problems.length) fail(problems);
 if (!mode) console.log(`✓ no phone numbers in ${sources.length} tracked files`);
+if (mode === '--history') console.log(`✓ no phone numbers in ${sources.length} files and messages across the history`);

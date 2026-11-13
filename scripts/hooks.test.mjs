@@ -63,6 +63,31 @@ test('the push scan stops a commit made with --no-verify, and names it', () => {
   git('reset', '-q', '--hard', base);
 });
 
+test('the history scan stops a number added in one commit and removed in the next', () => {
+  const base = git('rev-parse', 'HEAD');
+  assert.equal(scan(['--history']).status, 0);
+  writeFileSync(join(repo, 'brief.txt'), `Tel.${number}\n`);
+  git('add', 'brief.txt');
+  git('commit', '-q', '--no-verify', '-m', 'add');
+  const added = git('rev-parse', 'HEAD');
+  git('rm', '-q', 'brief.txt');
+  git('commit', '-q', '--no-verify', '-m', 'remove');
+  // The final files are clean, but the history still holds the number.
+  assert.equal(scan([]).status, 0);
+  const result = scan(['--history']);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, new RegExp(`brief\\.txt in ${added.slice(0, 7)}`));
+  git('reset', '-q', '--hard', base);
+});
+
+test('the history scan stops a number in an old commit message', () => {
+  const base = git('rev-parse', 'HEAD');
+  git('commit', '-q', '--allow-empty', '-m', `call ${number}`);
+  git('commit', '-q', '--allow-empty', '-m', 'later');
+  assert.equal(scan(['--history']).status, 1);
+  git('reset', '-q', '--hard', base);
+});
+
 test('the push scan reads a merge commit, where a conflict fix can add a number', () => {
   const base = git('rev-parse', 'HEAD');
   git('checkout', '-q', '-b', 'side');

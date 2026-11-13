@@ -14,7 +14,14 @@ export const failures = [];
 
 // The résumé is hand-set HTML, so its CS403 numbers are checked against the computed ones. Each
 // phrase is how resume.html says it; if a rerun changes a number, update the résumé and rebuild it.
-const resume = read('resume/resume.html');
+// A file that can't be read is a failure to report, not a crash that hides the other checks.
+const readOrFail = (path) => {
+  try { return read(path); } catch {
+    failures.push(`${path} could not be read`);
+    return '';
+  }
+};
+const resume = readOrFail('resume/resume.html');
 // A number in a comment isn't on the résumé, and the HTML's line breaks can fall inside a phrase.
 const resumeText = resume.replace(/<!--[\s\S]*?-->/g, '').replace(/\s+/g, ' ');
 const resumeClaims = [
@@ -87,7 +94,7 @@ const contacts = [
 for (const contact of contacts) {
   if (!resumeText.includes(contact)) failures.push(`resume/resume.html should include ${contact} (from src/data.js)`);
 }
-const shareSource = read('og/og-image.html');
+const shareSource = readOrFail('og/og-image.html');
 for (const detail of [bare(profile.site), profile.name, profile.role.replace('&', '&amp;')]) {
   if (!shareSource.includes(detail)) failures.push(`og/og-image.html should include ${detail} (from src/data.js)`);
 }
@@ -95,7 +102,7 @@ for (const detail of [bare(profile.site), profile.name, profile.role.replace('&'
 if (sha256(shareSource.replaceAll('\r\n', '\n')) !== shareSourceHash) {
   failures.push('og/og-image.html changed: rebuild public/og-image.png, then update both hashes (scripts/checks/)');
 }
-if (!read('index.html').includes(profile.email)) failures.push(`index.html's noscript text should include ${profile.email}`);
+if (!readOrFail('index.html').includes(profile.email)) failures.push(`index.html's noscript text should include ${profile.email}`);
 
 export const summary = [
   `résumé matches ${resumeClaims.length} CS403 and education facts, all skills and ${contacts.length} contact details`,

@@ -1,6 +1,8 @@
 // Hashes of the files copied in or built by hand. They live here so both npm run check and the git
 // hooks (scripts/check-phone.mjs) can compare against them. A binary file can't be scanned for a
-// phone number, so each one is tied by hash to something that can.
+// phone number. The share image is tied to its scanned source (og/og-image.html); the charts and
+// the recipe screenshot are only pinned: the owner approved those exact bytes, and a change to
+// them fails until the hash is updated on purpose. Nothing scans their pixels.
 
 // Charts and the share image, in public/. If a change was meant, update the hash here.
 export const pinnedFiles = {

@@ -24,9 +24,14 @@ export function findChrome() {
   return chrome;
 }
 
-// The flags every script starts Chrome with. GitHub's Linux runners don't allow Chrome's
-// sandbox; that is safe here because Chrome only ever loads the site just built.
-export const chromeFlags = (profile) => ['--headless=new', '--disable-gpu', '--no-sandbox', `--user-data-dir=${profile}`];
+// The flags every script starts Chrome with. GitHub's Linux runners (and Linux in general, often
+// run as root or in a container) don't allow Chrome's sandbox, so it is turned off only there.
+// That is safe here because Chrome only ever loads the site just built. On Windows and macOS
+// the sandbox stays on.
+const noSandbox = Boolean(process.env.CI) || process.platform === 'linux';
+export const chromeFlags = (profile) => [
+  '--headless=new', '--disable-gpu', ...(noSandbox ? ['--no-sandbox'] : []), `--user-data-dir=${profile}`,
+];
 
 // The page's HTML after its scripts ran, from a one-shot headless Chrome.
 export async function dumpDom(chrome, profile, url) {
