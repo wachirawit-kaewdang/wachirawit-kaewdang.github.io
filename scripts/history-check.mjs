@@ -119,9 +119,10 @@ async function check({ chrome: path, profile, url }) {
     if (!(await settle(onAppendix))) throw new Error('following the cross-reference did not open the appendix');
     await evaluate("scrollTo({ top: 3000, behavior: 'instant' })");
     await settle(onAppendix);
-    // The place is saved on a 250 ms throttle while scrolling, so give it time to be written.
-    await wait(400);
+    // The place is saved on a 250 ms throttle while scrolling. A slow CI machine can take longer
+    // than any fixed wait, so wait until the saved place matches the scroll position.
     const deep = await evaluate('Math.round(scrollY)');
+    await settle(`Math.abs((history.state?.top ?? -1) - ${deep}) < 40`);
 
     await step(-1, `!${onAppendix}`);
     const back = await state();
@@ -130,6 +131,8 @@ async function check({ chrome: path, profile, url }) {
     if (back.focus !== link.text) failures.push(`Back put focus on “${back.focus}”, not the link followed (“${link.text}”)`);
 
     await step(1, onAppendix);
+    // The place is restored after the page renders (and again once fonts load), so wait for it.
+    await settle(`Math.abs(scrollY - ${deep}) < 40`);
     const forward = await state();
     if (!forward.appendix) failures.push('Forward did not return to the appendix');
     if (Math.abs(forward.top - deep) > 40) failures.push(`Forward returned to ${forward.top}px, not the appendix place at ${deep}px`);
