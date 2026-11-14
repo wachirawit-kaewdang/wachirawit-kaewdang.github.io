@@ -51,7 +51,10 @@ Deploying
 ---------
 Push to main. GitHub Actions (.github/workflows/deploy.yml) runs npm ci and npm run verify,
 then publishes dist/ to GitHub Pages. Pull requests, and manual runs on other branches, run
-the same steps but never deploy.
+the same steps but never deploy. After a deploy, a smoke-test job fetches the live page and fails
+unless the pre-rendered abstract's opening sentence is in its HTML (retried for about 90 s; the
+sentence is typed in the job, so change it there if the abstract is reworded). Dependabot
+(.github/dependabot.yml) opens weekly pull requests for npm packages and for the pinned Actions.
 
 The CS403 results are frozen
 ----------------------------
@@ -61,7 +64,7 @@ so a rerun changes everything. An improved run belongs in a new section beside t
 not on top of them.
 
 To confirm the numbers still match the notebook (needs Python 3.10+):
-  python scripts/extract-metrics.py <path to Project-CS403>
+  python scripts/extract-metrics.py <path to Project-CS403> [commit]
   git diff src/metrics.json        (should show nothing)
 It reads the notebook's saved outputs by column name, cross-checks its tables and rewrites
 src/metrics.json. Nothing is re-executed. sectorShap is kept as is, because the notebook saved
@@ -115,6 +118,10 @@ What CI checks (npm run verify)
   the Project-CS403 branch. verify also compares it with a Project-CS403 checkout when present.
 - The resume and og/og-image.html contain the contact details in src/data.js. If you change
   the site address, rebuild og-image.png too; the check reads only its HTML source.
+- index.html carries a Content-Security-Policy meta tag that allows only the site's own script,
+  stylesheet, fonts and images (plus style attributes). If the site ever loads something from
+  elsewhere (a font service, analytics, an embed), add that origin to the tag, or the browser
+  blocks it. vite.config.js removes the tag for npm run dev. A meta tag can't set frame-ancestors.
 - After the build, both pages render in headless Chrome with no literal NaN or undefined.
 - The pre-render cuts the home page at <!--root-end--> in index.html; keep it right after the root.
 - Back and Forward between the home page and the appendix restore the place and the focus.

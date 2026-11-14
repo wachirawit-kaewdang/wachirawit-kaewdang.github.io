@@ -68,6 +68,37 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+
+  # A green deploy only means Pages accepted the files. This asks the public address for the page
+  # and fails unless the pre-rendered abstract is in the raw HTML, so a blank or stale site is
+  # caught here. The string is the abstract's opening sentence in src/data.js (render-check
+  # reads the same one); if that sentence is reworded, change it here too.
+  smoke-test:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Fetch the live page and look for the abstract
+        env:
+          PAGE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          # The CDN can serve the old page for a short while after a deploy, so try a few times.
+          for attempt in 1 2 3 4 5 6; do
+            page=$(curl --fail --silent --show-error --location --max-time 20 "$PAGE_URL" || true)
+            if grep --quiet --fixed-strings 'I test my own results against a simple baseline' <<< "$page"; then
+              echo "Live page at $PAGE_URL has the pre-rendered abstract (attempt $attempt)."
+              exit 0
+            fi
+            echo "Attempt $attempt: abstract not found yet."
+            sleep 15
+          done
+          echo "::error::The live page at $PAGE_URL does not contain the pre-rendered abstract."
+          exit 1

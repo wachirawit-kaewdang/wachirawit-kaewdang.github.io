@@ -8,8 +8,10 @@ import { profile } from './src/data.js'
 // A placeholder left unreplaced would ship as a broken share URL, so it fails the build instead.
 const siteUrl = {
   name: 'site-url',
-  transformIndexHtml(html) {
-    const out = html.replaceAll('%SITE_URL%', profile.site).replaceAll('%ROLE%', profile.role)
+  transformIndexHtml(html, { server }) {
+    let out = html.replaceAll('%SITE_URL%', profile.site).replaceAll('%ROLE%', profile.role)
+    // The dev server injects inline scripts and a socket, which the page's policy would block.
+    if (server) out = out.replace(/<!-- Only what the built site loads[\s\S]*?<meta http-equiv="Content-Security-Policy"[^>]*>\s*/, '')
     const left = out.match(/%[A-Z_]+%/)
     if (left) throw new Error(`index.html: no value for ${left[0]}`)
     return out

@@ -101,9 +101,9 @@ def bond_correlation_ranks(top5_text, diff_text):
     return ranks
 
 
-def read_notebook(target, current):
-    """(commit, raw bytes, git blob hash) of the notebook named on the command line: the frozen
-    copy kept in this repo, or a checkout's file at a commit."""
+def read_notebook(target, current, ref=None):
+    """(commit, raw bytes, git blob hash) of the notebook at the target path: the frozen copy kept in
+    this repo, or a checkout's file at ref (default: the frozen commit)."""
     if target.is_file():
         # The frozen copy kept in this repo, so deploys don't depend on the notebook's branch.
         commit = current['source']['commit']
@@ -111,7 +111,7 @@ def read_notebook(target, current):
     else:
         # Resolved, so a branch name can never be recorded as the commit.
         commit = git(target, 'rev-parse', '--short=7',
-                     f'{sys.argv[2] if len(sys.argv) > 2 else current["source"]["commit"]}^{{commit}}').decode().strip()
+                     f'{ref or current["source"]["commit"]}^{{commit}}').decode().strip()
         raw = git(target, 'show', f'{commit}:{NOTEBOOK}')
     # Git's own hash of the file, so the copy and the commit can be compared with no checkout.
     blob = hashlib.sha1(b'blob %d\0' % len(raw) + raw).hexdigest()
@@ -200,7 +200,7 @@ def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     current = json.loads(SRC.read_text(encoding='utf-8'))
-    commit, raw, blob = read_notebook(Path(sys.argv[1]), current)
+    commit, raw, blob = read_notebook(Path(sys.argv[1]), current, sys.argv[2] if len(sys.argv) > 2 else None)
     tables = read_tables(list(outputs(json.loads(raw.decode('utf-8')))))
     stocks = {ticker: build_stock(ticker, row, tables) for ticker, row in tables['lstm'].items()}
     check_sector_shap(current, stocks, tables['bond'])

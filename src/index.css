@@ -106,7 +106,7 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 .runhead-name { display: inline-flex; align-items: center; min-height: 2.75rem; font-weight: 600; white-space: nowrap; }
 .runhead nav { display: flex; gap: 0.25rem 1.1rem; font-size: 0.95rem; }
 /* A 44px-tall target that still fits the 3rem bar: the link is a flex box, not padded text. */
-.runhead nav a { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--ink-soft); white-space: nowrap; }
+.runhead nav a { display: inline-flex; align-items: center; justify-content: center; min-height: 2.75rem; min-width: 2.75rem; color: var(--ink-soft); white-space: nowrap; }
 .runhead nav a:hover { color: var(--ink); }
 .runhead nav .num { margin-right: 0.3em; }
 .runhead a:focus-visible { outline-offset: -2px; }
@@ -298,10 +298,10 @@ a.ref, :where(.section p, .section li, figcaption, .results caption) a { padding
   .titleblock { padding: 2.5rem 0 1.5rem; }
   .results th, .results td { padding-right: 1rem; }
   .abstract { margin: 0 0 1rem; }
-  /* A slightly smaller font so the longest curl line fits at 375px; it still scrolls if narrower. */
-  .sample pre { font-size: 0.76rem; }
   /* Links that stand alone (not inside a sentence) are 44px tall on a touch screen. */
-  .contactline a, .meta a, .back a, .footer a, .contents a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0; }
+  .contactline a, .back a, .footer a, .contents a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0; }
+  /* A link inside a Stack / Code line stays inline, so its label, URL and icon wrap as one run of text; extra padding gives it the tap height. */
+  .meta a { padding-block: 0.8rem; }
   .sep { margin: 0 0.4em; }
 }
 
