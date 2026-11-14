@@ -118,10 +118,11 @@ What CI checks (npm run verify)
   the Project-CS403 branch. verify also compares it with a Project-CS403 checkout when present.
 - The resume and og/og-image.html contain the contact details in src/data.js. If you change
   the site address, rebuild og-image.png too; the check reads only its HTML source.
-- index.html carries a Content-Security-Policy meta tag that allows only the site's own script,
-  stylesheet, fonts and images (plus style attributes). If the site ever loads something from
-  elsewhere (a font service, analytics, an embed), add that origin to the tag, or the browser
-  blocks it. vite.config.js removes the tag for npm run dev. A meta tag can't set frame-ancestors.
+- The build adds a Content-Security-Policy meta tag (the policy is in vite.config.js) that allows
+  only the site's own script, stylesheet, fonts and images (plus style attributes). If the site
+  ever loads something from elsewhere (a font service, analytics, an embed), add that origin to
+  the policy, or the browser blocks it. npm run dev leaves the tag out. A meta tag can't set
+  frame-ancestors.
 - After the build, both pages render in headless Chrome with no literal NaN or undefined.
 - The pre-render cuts the home page at <!--root-end--> in index.html; keep it right after the root.
 - Back and Forward between the home page and the appendix restore the place and the focus.
